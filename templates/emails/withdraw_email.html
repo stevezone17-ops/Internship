@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <body
+    style="
+      font-family: &quot;Segoe UI&quot;, Arial, sans-serif;
+      background: #f4f7fb;
+      padding: 24px;
+    "
+  >
+    <div
+      style="
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 28px;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+      "
+    >
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 12px;
+        "
+      >
+        <span style="font-size: 22px">{{ icon }}</span>
+        <h2 style="color:{{ accent_color }}; margin:0;">{{ title }}</h2>
+      </div>
+      <p style="margin: 0 0 12px; color: #111827">{{ greeting }}</p>
+      <p style="margin: 0 0 16px; color: #111827">{{ body }}</p>
+      <div
+        style="
+          background: #f8fafc;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 16px;
+          margin: 0 0 16px;
+        "
+      >
+        <p
+          style="
+            margin: 0 0 6px;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+          "
+        >
+          Amount
+        </p>
+        <p style="margin: 0 0 14px; color: #111827; font-weight: 600">
+          {{ amount }}
+        </p>
+        <p
+          style="
+            margin: 0 0 6px;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+          "
+        >
+          Remaining Balance
+        </p>
+        <p style="margin: 0 0 14px; color: #111827; font-weight: 600">
+          {{ balance }}
+        </p>
+        <p
+          style="
+            margin: 0 0 6px;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+          "
+        >
+          Date
+        </p>
+        <p style="margin: 0; color: #111827; font-weight: 600">{{ date }}</p>
+      </div>
+      <p style="margin: 0; color: #6b7280; font-size: 12px">{{ footer }}</p>
+    </div>
+  </body>
+</html>

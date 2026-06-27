@@ -1,0 +1,48 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Security Settings</h2>
+  <p>Change your account password and manage security settings.</p>
+</section>
+
+<section class="security-shell" data-page="security">
+  <div class="card form-card">
+    <h3>Change Password</h3>
+    <form id="change-password-form">
+      <label for="current-password">Current Password</label>
+      <input
+        id="current-password"
+        type="password"
+        placeholder="Current password"
+        required
+      />
+
+      <label for="new-password">New Password</label>
+      <input
+        id="new-password"
+        type="password"
+        placeholder="New password (min 8 chars)"
+        required
+      />
+
+      <label for="confirm-password">Confirm New Password</label>
+      <input
+        id="confirm-password"
+        type="password"
+        placeholder="Confirm new password"
+        required
+      />
+
+      <button class="btn primary" type="submit">Change Password</button>
+      <p id="change-password-message" class="message"></p>
+    </form>
+  <div class="card form-card">
+    <h3>Transaction PIN</h3>
+    <p class="muted" style="margin-bottom: 1rem;">Need to update your 4-digit Transaction PIN? You can do that here:</p>
+    <div class="security-links" style="display: flex; gap: 1rem;">
+      <a class="btn ghost" href="/change-pin">Change PIN</a>
+      <a class="btn ghost" href="/profile">Go to Profile</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Customer Support</h2>
+  <p>Tell us what you need help with and our team will respond.</p>
+</section>
+
+<section class="support-wrap" data-page="support">
+  <div class="grid support-grid">
+    <div class="card support-card">
+      <h3>Submit a support query</h3>
+      <p class="support-subtitle">
+        Share the details and choose a priority to help us route your request.
+      </p>
+      <form id="support-form" class="support-form">
+        <label for="support-subject">Subject</label>
+        <input
+          type="text"
+          id="support-subject"
+          name="subject"
+          placeholder="Card issue, login help, etc."
+          required
+        />
+
+        <label for="support-message">Query message</label>
+        <textarea
+          id="support-message"
+          name="message"
+          rows="5"
+          placeholder="Explain your issue in detail."
+          required
+        ></textarea>
+
+        <label for="support-priority">Priority</label>
+        <select id="support-priority" name="priority">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+
+        <button class="btn primary" type="submit" id="submitQuery">
+          Submit Query
+        </button>
+        <div class="message" id="support-status"></div>
+      </form>
+    </div>
+
+    <div class="card support-history">
+      <div class="support-history-head">
+        <h3>My Queries</h3>
+        <p>Track the status of your recent support requests.</p>
+      </div>
+      <ul class="list" id="support-history-list">
+        <li>Loading...</li>
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

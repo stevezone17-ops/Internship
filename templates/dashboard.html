@@ -1,0 +1,56 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Account Dashboard</h2>
+  <p>Daily overview of balances, activity, and quick actions.</p>
+</section>
+
+<section
+  class="card dashboard-hero"
+  data-page="dashboard"
+  data-account-id="{{ account_id }}"
+  id="profile"
+>
+  <div class="dashboard-top">
+    <div class="user-block">
+      <p class="eyebrow">Primary account</p>
+      <h3 id="account-name">Loading...</h3>
+      <div class="meta-line">
+        <span id="account-email"></span>
+        <span id="account-type"></span>
+      </div>
+    </div>
+    <div class="balance">
+      <span>Current balance</span>
+      <strong id="account-balance">₹0.00</strong>
+      <p class="balance-sub">Updated just now</p>
+    </div>
+  </div>
+  <div class="dashboard-actions">
+    <a class="btn deposit" href="/transact">Deposit</a>
+    <a class="btn withdraw" href="/transact">Withdraw</a>
+    <a class="btn transfer" href="/transfer">Transfer</a>
+    <button class="btn ghost subtle" id="delete-account">Delete Account</button>
+  </div>
+  <div class="message" id="dashboard-message"></div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <h3>Recent Transactions</h3>
+    <ul class="list" id="recent-transactions">
+      <li>Loading...</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Notifications</h3>
+    <ul class="list" id="notification-list">
+      <li>Loading...</li>
+    </ul>
+    <div class="pagination" id="notifications-pagination">
+      <button class="btn ghost" id="notifications-prev">Previous</button>
+      <span id="notifications-page">Page 1</span>
+      <button class="btn ghost" id="notifications-next">Next</button>
+    </div>
+  </div>
+</section>
+{% endblock %}

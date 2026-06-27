@@ -1,0 +1,100 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Deposit or Withdraw</h2>
+  <p>Manage funds with instant balance updates.</p>
+</section>
+
+<section class="grid">
+  <div class="card form-card" data-page="deposit">
+    <h3>Deposit Money</h3>
+    <form id="deposit-form" method="POST" action="/api/deposit">
+      <label for="deposit-amount">Amount</label>
+      <input
+        id="deposit-amount"
+        name="amount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        required
+      />
+      <label for="deposit-pin">Transaction PIN</label>
+      <input
+        id="deposit-pin"
+        name="pin"
+        type="password"
+        inputmode="numeric"
+        pattern="\d{4}"
+        placeholder="Enter PIN"
+        required
+      />
+      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
+      <button class="btn deposit" type="submit">Deposit</button>
+    </form>
+    <div class="message" id="deposit-message"></div>
+  </div>
+
+  <div class="card form-card" data-page="withdraw">
+    <h3>Withdraw Money</h3>
+    <form id="withdraw-form" method="POST" action="/api/withdraw">
+      <label for="withdraw-amount">Amount</label>
+      <input
+        id="withdraw-amount"
+        name="amount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        required
+      />
+      <label for="withdraw-pin">Transaction PIN</label>
+      <input
+        id="withdraw-pin"
+        name="pin"
+        type="password"
+        inputmode="numeric"
+        pattern="\d{4,6}"
+        placeholder="Enter PIN"
+        required
+      />
+      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
+      <button class="btn withdraw" type="submit">Withdraw</button>
+    </form>
+    <div class="message" id="withdraw-message"></div>
+  </div>
+
+  <div class="card form-card" data-page="transfer">
+    <h3>Transfer Money</h3>
+    <form id="transfer-form" method="POST" action="/api/transfer">
+      <label for="transfer-to">Receiver Email</label>
+      <input
+        id="transfer-to"
+        name="receiver_email"
+        type="text"
+        placeholder="recipient@bank.com"
+        required
+      />
+      <label for="transfer-amount">Amount</label>
+      <input
+        id="transfer-amount"
+        name="amount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        required
+      />
+      <label for="transfer-pin">Transaction PIN</label>
+      <input
+        id="transfer-pin"
+        name="pin"
+        type="password"
+        inputmode="numeric"
+        pattern="\d{4,6}"
+        placeholder="Enter PIN"
+        required
+      />
+      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
+      <button class="btn transfer" type="submit">Transfer</button>
+    </form>
+    <div class="message" id="transfer-message"></div>
+  </div>
+</section>
+{% endblock %}

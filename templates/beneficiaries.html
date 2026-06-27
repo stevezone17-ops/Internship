@@ -1,0 +1,48 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Beneficiaries</h2>
+  <p>Manage your saved recipients for faster transfers.</p>
+</section>
+
+<section class="beneficiaries-shell" data-page="beneficiaries">
+  <div class="card">
+    <h3>Add Beneficiary</h3>
+    <form id="beneficiary-form">
+      <label for="benef-name">Name</label>
+      <input
+        id="benef-name"
+        name="name"
+        type="text"
+        placeholder="Full name"
+        required
+      />
+
+      <label for="benef-email">Email</label>
+      <input
+        id="benef-email"
+        name="email"
+        type="email"
+        placeholder="recipient@example.com"
+        required
+      />
+
+      <label for="benef-nick">Nickname (optional)</label>
+      <input
+        id="benef-nick"
+        name="nickname"
+        type="text"
+        placeholder="Nickname"
+      />
+
+      <button class="btn primary" type="submit">Add Beneficiary</button>
+      <p id="benef-message" class="message"></p>
+    </form>
+  </div>
+
+  <div class="card beneficiaries-list-card">
+    <h3>Saved Beneficiaries</h3>
+    <div id="beneficiaries-list">Loading...</div>
+  </div>
+</section>
+
+{% endblock %}

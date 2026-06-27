@@ -1,0 +1,116 @@
+{% extends 'base.html' %} {% block content %}
+<section class="landing-hero">
+  <div class="hero-copy fade-in">
+    {% if session.get('user_name') %}
+    <p class="hero-badge">Welcome back, {{ session['user_name'] }}</p>
+    {% else %}
+    <p class="hero-badge">Fintech-ready banking demo</p>
+    {% endif %}
+    <h1>
+      Welcome to your
+      <span class="hero-accent">Simple Banking System</span>
+    </h1>
+    <p class="hero-lead">
+      Create accounts, move money instantly, and keep every transaction
+      transparent with a clean, real-time dashboard.
+    </p>
+
+    <div class="hero-features">
+      <span>✓ Secure Transactions</span>
+      <span>✓ Real-time Updates</span>
+      <span>✓ MongoDB Powered</span>
+    </div>
+
+    {% if session.get('user_id') %}
+    <div class="hero-actions">
+      <a class="btn primary" href="/dashboard">Dashboard</a>
+      <a class="btn ghost" href="/transfer">Transfer</a>
+      <a class="btn ghost" href="/transactions">Transactions</a>
+    </div>
+    {% else %}
+    <div class="hero-actions">
+      <a class="btn primary" href="/create">Get Started</a>
+      <a class="btn ghost" href="/login">Login</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="hero-panel fade-in">
+    <div class="hero-panel-header">
+      <h3>Quick Actions</h3>
+      <p>Jump into the core flows with one click.</p>
+    </div>
+    <div class="action-grid">
+      <a class="action-card" href="/transact">
+        <span class="action-icon">DP</span>
+        <div>
+          <strong>Deposit</strong>
+          <p>Add funds instantly</p>
+        </div>
+      </a>
+      <a class="action-card" href="/transact">
+        <span class="action-icon">WD</span>
+        <div>
+          <strong>Withdraw</strong>
+          <p>Move cash out</p>
+        </div>
+      </a>
+      <a class="action-card" href="/transfer">
+        <span class="action-icon">TX</span>
+        <div>
+          <strong>Transfer</strong>
+          <p>Send money securely</p>
+        </div>
+      </a>
+      <a class="action-card" href="/transactions">
+        <span class="action-icon">HX</span>
+        <div>
+          <strong>History</strong>
+          <p>View every movement</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="feature-grid fade-in">
+  <a class="feature-card" href="/create">
+    <div class="feature-icon">AC</div>
+    <h3>Create Account</h3>
+    <p>Open a new simulated account with a first deposit in seconds.</p>
+    <span class="feature-link">Get Started</span>
+  </a>
+  <a class="feature-card" href="/transact">
+    <div class="feature-icon">MB</div>
+    <h3>Manage Balance</h3>
+    <p>Deposit or withdraw funds with balance validation built in.</p>
+    <span class="feature-link">Make a Transfer</span>
+  </a>
+  <a class="feature-card" href="/transactions">
+    <div class="feature-icon">TH</div>
+    <h3>Transaction History</h3>
+    <p>Every action is recorded with type, amount, and timestamp.</p>
+    <span class="feature-link">View History</span>
+  </a>
+</section>
+
+<section class="trust-section fade-in">
+  <div>
+    <h3>Why Choose Us?</h3>
+    <p>
+      Purpose-built for learning secure banking workflows with real-time
+      feedback.
+    </p>
+  </div>
+  <div class="trust-list">
+    <span>✓ Secure authentication</span>
+    <span>✓ Instant transactions</span>
+    <span>✓ Clean dashboard UI</span>
+  </div>
+</section>
+
+<footer class="landing-footer">
+  <p>© 2026 Simple Banking System</p>
+  <p>Built with Flask + MongoDB</p>
+</footer>
+{% endblock %}

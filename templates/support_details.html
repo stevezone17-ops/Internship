@@ -1,0 +1,43 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Support Query</h2>
+  <p>Review the details of your support request.</p>
+</section>
+
+<section class="card support-details">
+  <a class="btn ghost support-back" href="/support">Back to Support</a>
+
+  {% if error %}
+  <div class="message error">{{ error }}</div>
+  {% elif query %}
+  <div class="support-details-header">
+    <div>
+      <h3>{{ query.subject }}</h3>
+      <div class="support-details-meta">
+        <span>Created: {{ query.created_at_display }}</span>
+        {% if query.resolved_at_display %}
+        <span>Resolved: {{ query.resolved_at_display }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="support-tags">
+      <span class="status-pill">{{ query.status }}</span>
+      <span class="priority-pill {{ query.priority|lower }}"
+        >{{ query.priority }}</span
+      >
+    </div>
+  </div>
+
+  <div class="support-detail-card">
+    <strong>Message</strong>
+    <p>{{ query.message }}</p>
+  </div>
+
+  {% if query.admin_reply %}
+  <div class="support-detail-card">
+    <strong>Admin reply</strong>
+    <p>{{ query.admin_reply }}</p>
+  </div>
+  {% endif %} {% endif %}
+</section>
+{% endblock %}

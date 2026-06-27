@@ -1,0 +1,89 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Send Money</h2>
+  <p>Move funds instantly with a clear, secure transfer flow.</p>
+</section>
+
+<section
+  class="transfer-shell"
+  data-page="transfer"
+  data-account-id="{{ account_id }}"
+>
+  <div class="card transfer-card">
+    <div class="transfer-header">
+      <div>
+        <p class="eyebrow">Transfer</p>
+        <h3>Send Money</h3>
+      </div>
+      <div class="balance-card" id="balance-card">
+        <span class="balance-card-icon">💳</span>
+        <span class="label">Available Balance</span>
+        <strong class="amount" id="transfer-balance">--</strong>
+        <span class="updated-time" id="balance-updated-time"></span>
+      </div>
+    </div>
+
+    <div class="transfer-form">
+      <label for="beneficiarySelect">Select Beneficiary</label>
+      <select id="beneficiarySelect">
+        <option value="">-- Choose saved beneficiary --</option>
+      </select>
+      <div class="muted"><a href="/beneficiaries">Manage beneficiaries</a></div>
+
+      <label for="receiverEmail">Receiver Email</label>
+      <input
+        id="receiverEmail"
+        type="email"
+        placeholder="recipient@bank.com"
+        autocomplete="email"
+        required
+      />
+
+      <label for="transferAmount">Amount (₹)</label>
+      <input
+        id="transferAmount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        placeholder="0.00"
+        required
+      />
+
+      <label for="transferPin">Transaction PIN</label>
+      <input
+        id="transferPin"
+        type="password"
+        inputmode="numeric"
+        pattern="\d{4,6}"
+        placeholder="Enter PIN"
+        required
+      />
+      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
+
+      <label for="scheduleCheck">Schedule transfer?</label>
+      <div class="schedule-row">
+        <input type="checkbox" id="scheduleCheck" />
+        <input
+          id="scheduleAt"
+          type="datetime-local"
+          name="schedule_at"
+          style="margin-left: 8px"
+        />
+      </div>
+
+      <div class="quick-amounts">
+        <button class="btn ghost" type="button" data-amount="100">₹100</button>
+        <button class="btn ghost" type="button" data-amount="500">₹500</button>
+        <button class="btn ghost" type="button" data-amount="1000">
+          ₹1000
+        </button>
+      </div>
+
+      <button class="btn primary" id="transferBtn" type="button">
+        Transfer
+      </button>
+      <p class="message" id="statusMsg"></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

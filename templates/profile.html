@@ -1,0 +1,151 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Profile</h2>
+  <p>Your account details and preferences.</p>
+</section>
+
+<section
+  class="profile-shell"
+  data-page="profile"
+  data-account-id="{{ account_id }}"
+>
+  <div class="profile-grid">
+    <div class="card profile-card profile-overview">
+      <div class="profile-header">
+        <div class="profile-avatar" id="profile-avatar" aria-hidden="true">
+          SB
+        </div>
+        <div>
+          <p class="profile-title">Account Profile</p>
+          <h3 id="userName">Loading...</h3>
+          <p id="userEmail" class="muted"></p>
+        </div>
+      </div>
+
+      <div class="profile-details-card">
+        <div class="profile-field">
+          <span class="profile-label">Full Name</span>
+          <span id="profile-name" class="profile-value"
+            >Loading...</span
+          >
+        </div>
+        <div class="profile-field">
+          <span class="profile-label">Email</span>
+          <span id="profile-email" class="profile-value"
+            >Loading...</span
+          >
+        </div>
+        <div class="profile-field">
+          <span class="profile-label">Account Type</span>
+          <span id="profile-account-type" class="profile-value">-</span>
+        </div>
+        <div class="profile-field">
+          <span class="profile-label">Status</span>
+          <span class="profile-value">
+            <span class="status-badge status-active">Active</span>
+          </span>
+        </div>
+        <div class="profile-field">
+          <span class="profile-label">PIN Status</span>
+          <span class="profile-value">
+            <span class="status-badge status-pin">PIN Configured</span>
+          </span>
+        </div>
+        <div class="profile-field">
+          <span class="profile-label">Member Since</span>
+          <span id="profile-member-since" class="profile-value">-</span>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn primary" id="edit-profile" type="button">
+          Edit Profile
+        </button>
+      </div>
+
+      <div class="message" id="profile-message"></div>
+    </div>
+
+    <div class="card profile-card security-card">
+      <div class="profile-header">
+        <div>
+          <p class="profile-title">Security Settings</p>
+          <h3>Change Transaction PIN</h3>
+          <p class="muted helper-text">
+            Reset your 4-digit PIN with your account password.
+          </p>
+        </div>
+      </div>
+
+      <div class="security-callout">
+        <p>
+          Use your account password to create a new transaction PIN without
+          contacting support.
+        </p>
+        <a class="btn primary" href="/change-pin">Change PIN</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+    <div class="card profile-card login-activity">
+      <div class="profile-header">
+        <div>
+          <p class="profile-title">Login Activity</p>
+          <h3>Recent Logins</h3>
+          <p class="muted">Last 10 login events for this account.</p>
+        </div>
+      </div>
+      <ul id="login-activity-list" class="login-activity-list">
+        <li>Loading...</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div
+  class="modal hidden"
+  id="edit-profile-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="edit-profile-title"
+>
+  <div class="modal-backdrop" data-close="modal"></div>
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 id="edit-profile-title">Edit Profile</h3>
+      <button
+        class="icon-button"
+        type="button"
+        data-close="modal"
+        aria-label="Close"
+      >
+        &times;
+      </button>
+    </div>
+    <div class="modal-body">
+      <label for="edit-name">Full Name</label>
+      <input id="edit-name" type="text" placeholder="Your name" />
+
+      <label for="edit-email">Email</label>
+      <input id="edit-email" type="email" placeholder="you@example.com" />
+
+      <label for="edit-pin">Transaction PIN</label>
+      <input
+        id="edit-pin"
+        type="password"
+        inputmode="numeric"
+        pattern="\d{4,6}"
+        placeholder="4 to 6 digits"
+      />
+      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" type="button" data-close="modal">Cancel</button>
+      <button class="btn primary" id="save-profile" type="button">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

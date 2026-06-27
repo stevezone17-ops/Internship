@@ -1,0 +1,44 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Secure Your Account</h2>
+  <p>Create your 4-digit transaction PIN.</p>
+</section>
+
+<section class="card form-card">
+  <h3>Set up your transaction PIN</h3>
+  <p class="muted helper-text">
+    This PIN will be required for deposits, withdrawals, and transfers.
+  </p>
+  {% if error %}
+  <div class="message error">{{ error }}</div>
+  {% endif %}
+  <form method="POST" action="/setup-pin">
+    <label for="pin">PIN</label>
+    <input
+      id="pin"
+      name="pin"
+      type="password"
+      inputmode="numeric"
+      pattern="\d{4}"
+      maxlength="4"
+      placeholder="Enter 4-digit PIN"
+      required
+    />
+    <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
+
+    <label for="confirm-pin">Confirm PIN</label>
+    <input
+      id="confirm-pin"
+      name="confirm_pin"
+      type="password"
+      inputmode="numeric"
+      pattern="\d{4}"
+      maxlength="4"
+      placeholder="Re-enter PIN"
+      required
+    />
+
+    <button class="btn primary" type="submit">Save PIN</button>
+  </form>
+</section>
+{% endblock %}

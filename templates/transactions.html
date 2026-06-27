@@ -1,0 +1,185 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header transaction-header-layout">
+  <div>
+    <h2>Transaction History</h2>
+    <p>All deposits, withdrawals, and transfers in one statement view.</p>
+  </div>
+  <div class="header-actions">
+    <a class="btn ghost btn-export" id="export-csv" href="#" aria-label="Export CSV">
+      <span class="icon">📊</span> Export CSV
+    </a>
+    <a class="btn ghost btn-export" id="export-pdf" href="#" aria-label="Export PDF">
+      <span class="icon">📄</span> Export PDF
+    </a>
+  </div>
+</section>
+
+<!-- Summary Cards -->
+<section class="summary-cards-container">
+  <div class="card summary-card">
+    <div class="summary-icon">🔢</div>
+    <div>
+      <span class="summary-label">Total Transactions</span>
+      <h3 id="summary-total-tx">0</h3>
+    </div>
+  </div>
+  <div class="card summary-card">
+    <div class="summary-icon deposit">📥</div>
+    <div>
+      <span class="summary-label">Total Deposits</span>
+      <h3 id="summary-total-deposits">₹0.00</h3>
+    </div>
+  </div>
+  <div class="card summary-card">
+    <div class="summary-icon withdrawal">📤</div>
+    <div>
+      <span class="summary-label">Total Withdrawals</span>
+      <h3 id="summary-total-withdrawals">₹0.00</h3>
+    </div>
+  </div>
+  <div class="card summary-card">
+    <div class="summary-icon balance">💰</div>
+    <div>
+      <span class="summary-label">Current Balance</span>
+      <h3 id="summary-balance">₹0.00</h3>
+    </div>
+  </div>
+</section>
+
+<section class="grid" style="grid-template-columns: 1fr; margin-bottom: 24px;">
+  <div class="card">
+    <h3>Transaction Insights</h3>
+    <div style="height: 300px; position: relative;">
+      <canvas id="transactions-chart"></canvas>
+    </div>
+  </div>
+</section>
+
+<section
+  class="transactions-shell"
+  data-page="transactions"
+  data-account-id="{{ account_id }}"
+>
+  <!-- Filters Card -->
+  <div class="card filter-card">
+    <form id="transaction-filters" class="modern-filter-form">
+      <div class="filter-row search-row">
+        <div class="form-group search-group">
+          <label for="filter-q">Search Transactions</label>
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input
+              id="filter-q"
+              type="search"
+              name="q"
+              placeholder="Search by transaction ID, notes, or counterparts..."
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-row split-row">
+        <!-- Date Filters & Presets -->
+        <div class="form-group date-range-group">
+          <div class="group-header">
+            <label>Date Range</label>
+            <div class="preset-pills">
+              <button type="button" class="preset-pill active" data-range="all">All</button>
+              <button type="button" class="preset-pill" data-range="1m">1M</button>
+              <button type="button" class="preset-pill" data-range="3m">3M</button>
+              <button type="button" class="preset-pill" data-range="6m">6M</button>
+              <button type="button" class="preset-pill" data-range="1y">1Y</button>
+            </div>
+          </div>
+          <div class="range-inputs">
+            <input id="filter-start" type="date" name="start_date" placeholder="From Date" aria-label="From Date" />
+            <span class="range-separator">to</span>
+            <input id="filter-end" type="date" name="end_date" placeholder="To Date" aria-label="To Date" />
+          </div>
+        </div>
+
+        <!-- Amount Range -->
+        <div class="form-group amount-range-group">
+          <label>Amount Range</label>
+          <div class="range-inputs">
+            <div class="amount-input-wrap">
+              <span class="currency-symbol">₹</span>
+              <input id="filter-min" type="number" step="0.01" name="min_amount" placeholder="Min Amount" aria-label="Min Amount" />
+            </div>
+            <span class="range-separator">to</span>
+            <div class="amount-input-wrap">
+              <span class="currency-symbol">₹</span>
+              <input id="filter-max" type="number" step="0.01" name="max_amount" placeholder="Max Amount" aria-label="Max Amount" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-row dropdown-row">
+        <div class="form-group">
+          <label for="filter-type">Transaction Type</label>
+          <select id="filter-type" name="type">
+            <option value="">All Types</option>
+            <option value="deposit">Deposits (Credits)</option>
+            <option value="withdraw">Withdrawals (Debits)</option>
+            <option value="transfer">Transfers</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="filter-sort">Sort By</label>
+          <select id="filter-sort" name="sort_by">
+            <option value="timestamp">Date & Time</option>
+            <option value="amount">Amount</option>
+            <option value="type">Transaction Type</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="filter-order">Direction</label>
+          <select id="filter-order" name="order">
+            <option value="desc">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
+        </div>
+        <div class="form-group filter-actions-group">
+          <button class="btn primary btn-apply" type="submit">Apply Filters</button>
+          <button class="btn ghost btn-reset" id="btn-reset-filters" type="button">Reset</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card table-card">
+    <div class="table-responsive">
+      <table class="transaction-table modern-table">
+        <thead>
+          <tr>
+            <th>Transaction Details</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th class="text-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="transaction-rows">
+          <tr>
+            <td colspan="4" class="text-center">Loading your transactions...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-container">
+      <div class="pagination-info" id="transactions-info">
+        Showing 0 transactions
+      </div>
+      <div class="pagination" id="transactions-pagination">
+        <button class="btn ghost" id="transactions-prev" aria-label="Previous page">← Previous</button>
+        <span id="transactions-page" class="page-indicator">Page 1</span>
+        <button class="btn ghost" id="transactions-next" aria-label="Next page">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="message" id="transactions-message"></div>
+</section>
+{% endblock %}

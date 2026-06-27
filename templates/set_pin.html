@@ -1,0 +1,37 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Set Transaction PIN</h2>
+  <p>Secure your transfers and withdrawals with a 4-digit PIN.</p>
+</section>
+
+<section class="card form-card" data-page="set-pin">
+  <h3>Set your PIN</h3>
+  <form id="set-pin-form">
+    <label for="pin">New PIN</label>
+    <input
+      id="pin"
+      type="password"
+      inputmode="numeric"
+      pattern="\d{4}"
+      maxlength="4"
+      placeholder="Enter 4-digit PIN"
+      required
+    />
+    <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
+
+    <label for="confirm-pin">Confirm PIN</label>
+    <input
+      id="confirm-pin"
+      type="password"
+      inputmode="numeric"
+      pattern="\d{4}"
+      maxlength="4"
+      placeholder="Re-enter PIN"
+      required
+    />
+
+    <button class="btn primary" type="submit">Set PIN</button>
+  </form>
+  <div class="message" id="set-pin-message"></div>
+</section>
+{% endblock %}

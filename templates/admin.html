@@ -1,0 +1,47 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Admin Dashboard</h2>
+  <p>Review users, transactions, and resolve support requests.</p>
+</section>
+
+<section class="admin-shell" data-page="admin">
+  <div class="analytics-grid" id="admin-overview">
+    <div class="card">
+      <h3>Users</h3>
+      <p id="admin-users-count">0</p>
+    </div>
+    <div class="card">
+      <h3>Accounts</h3>
+      <p id="admin-accounts-count">0</p>
+    </div>
+    <div class="card">
+      <h3>Transactions</h3>
+      <p id="admin-transactions-count">0</p>
+    </div>
+    <div class="card">
+      <h3>Open Support</h3>
+      <p id="admin-support-open">0</p>
+    </div>
+  </div>
+
+  <div class="admin-grid">
+    <div class="card">
+      <h3>Recent Users</h3>
+      <ul id="admin-users-list" class="admin-list">
+        <li>Loading...</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Recent Transactions</h3>
+      <ul id="admin-transactions-list" class="admin-list">
+        <li>Loading...</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Support Queue</h3>
+    <div id="admin-support-list" class="admin-support-list">Loading...</div>
+  </div>
+</section>
+{% endblock %}

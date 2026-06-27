@@ -1,0 +1,75 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Change Transaction PIN</h2>
+  <p>Reset your PIN securely with your account password.</p>
+</section>
+
+<section
+  class="card change-pin-shell"
+  data-page="change-pin"
+  data-email="{{ account_email }}"
+>
+  <div class="change-pin-header">
+    <div>
+      <p class="eyebrow">Security</p>
+      <h3>Forgot or want to change your PIN?</h3>
+      <p class="muted helper-text">
+        Enter your account password to set a new 4-digit transaction PIN.
+      </p>
+    </div>
+    <div class="change-pin-badge">
+      <span class="change-pin-badge-label">Signed in as</span>
+      <strong>{{ account_email }}</strong>
+    </div>
+  </div>
+
+  <form class="change-pin-form" id="change-pin-form">
+    <label for="change-pin-email">Current Account Email</label>
+    <input
+      id="change-pin-email"
+      type="email"
+      value="{{ account_email }}"
+      autocomplete="email"
+      readonly
+      required
+    />
+
+    <label for="change-pin-password">Account Password</label>
+    <input
+      id="change-pin-password"
+      type="password"
+      autocomplete="current-password"
+      placeholder="Enter your account password"
+      required
+    />
+
+    <label for="change-pin-new">New Transaction PIN</label>
+    <input
+      id="change-pin-new"
+      type="password"
+      inputmode="numeric"
+      pattern="\d{4}"
+      maxlength="4"
+      placeholder="Enter 4-digit PIN"
+      required
+    />
+
+    <label for="change-pin-confirm">Confirm New PIN</label>
+    <input
+      id="change-pin-confirm"
+      type="password"
+      inputmode="numeric"
+      pattern="\d{4}"
+      maxlength="4"
+      placeholder="Re-enter new PIN"
+      required
+    />
+
+    <button class="btn primary change-pin-submit" type="submit">
+      Update PIN
+    </button>
+  </form>
+
+  <div class="message alert" id="change-pin-message"></div>
+</section>
+{% endblock %}

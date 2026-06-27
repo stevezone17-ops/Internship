@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Banking System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+    <script>
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (
+          theme === "dark" ||
+          (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add("dark-mode");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="layout">
+      {% if session.get('user_id') %}
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">SB</span>
+          <div>
+            <h1>Simple Banking</h1>
+            <p>Simulation Dashboard</p>
+          </div>
+        </div>
+        <nav>
+          <a
+            class="{% if request.path == '/dashboard' %}active{% endif %}"
+            href="/dashboard"
+            >Dashboard</a
+          >
+          <a
+            class="{% if request.path == '/transactions' %}active{% endif %}"
+            href="/transactions"
+            >Transactions</a
+          >
+          <a
+            class="{% if request.path == '/transfer' %}active{% endif %}"
+            href="/transfer"
+            >Transfer</a
+          >
+          <a
+            class="{% if request.path == '/beneficiaries' %}active{% endif %}"
+            href="/beneficiaries"
+            >Beneficiaries</a
+          >
+
+          <a
+            class="{% if request.path == '/profile' %}active{% endif %}"
+            href="/profile"
+            >Profile</a
+          >
+          <a
+            class="{% if request.path == '/security' %}active{% endif %}"
+            href="/security"
+            >Security</a
+          >
+          <a
+            class="{% if request.path == '/support' %}active{% endif %}"
+            href="/support"
+            >Customer Support</a
+          >
+          {% if session.get('is_admin') %}
+          <a
+            class="{% if request.path == '/admin' %}active{% endif %}"
+            href="/admin"
+            >Admin Dashboard</a
+          >
+          {% endif %}
+        </nav>
+      </aside>
+      {% endif %}
+
+      <div
+        class="content{% if not session.get('user_id') %} no-sidebar{% endif %}"
+      >
+        <header class="site-header">
+          <div class="header-left">
+            <button
+              class="sidebar-toggle"
+              type="button"
+              aria-label="Toggle sidebar"
+            >
+              <span></span>
+              <span></span>
+            </button>
+            <div>
+              <h2>Simple Banking System</h2>
+              <p>Secure, responsive, and built for learning.</p>
+            </div>
+          </div>
+          <div class="header-right">
+            {% if session.get('user_name') %}
+            <div class="user-meta">
+              <span class="user-label">Signed in</span>
+              <strong id="nav-user-name">{{ session['user_name'] }}</strong>
+            </div>
+            <button
+              class="btn ghost theme-toggle"
+              id="theme-toggle"
+              type="button"
+            >
+              Toggle Theme
+            </button>
+            <a class="btn btn-logout" href="/logout">Logout</a>
+            {% else %}
+            <a class="btn primary" href="/create">Get Started</a>
+            <a class="btn ghost" href="/login">Login</a>
+            {% endif %}
+          </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        <div
+          class="page-alert-stack"
+          id="page-alert-stack"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {% for category, message in messages %}
+          <div class="bank-alert {{ category }}" data-alert>
+            <span class="bank-alert-icon" aria-hidden="true">
+              {% if category in ['success', 'message'] %}✅{% elif category in
+              ['warning'] %}⚠{% else %}❌{% endif %}
+            </span>
+            <span class="bank-alert-text">
+              <strong class="bank-alert-title">
+                {% if category in ['success', 'message'] %}Operation
+                Successful{% elif category in ['warning'] %}Please Check Your
+                Input{% else %}Transaction Failed{% endif %}
+              </strong>
+              <span class="bank-alert-body">{{ message }}</span>
+            </span>
+            <button
+              class="bank-alert-close"
+              type="button"
+              aria-label="Dismiss alert"
+            >
+              &times;
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endwith %}
+
+        <main class="page">{% block content %}{% endblock %}</main>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>

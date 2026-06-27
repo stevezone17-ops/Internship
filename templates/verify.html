@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block content %}
+<section class="page-header">
+  <h2>Email Verification</h2>
+  <p id="verify-message">{{ message }}</p>
+</section>
+
+<section class="card form-card">
+  {% if success %}
+  <p>Your email is verified. You can now login and continue.</p>
+  <a class="btn primary" href="/login">Go to Login</a>
+  {% else %}
+  <p>Verification failed. Please request a new link from support.</p>
+  {% endif %}
+</section>
+{% endblock %}
