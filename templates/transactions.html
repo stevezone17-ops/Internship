@@ -6,10 +6,10 @@
   </div>
   <div class="header-actions">
     <a class="btn ghost btn-export" id="export-csv" href="#" aria-label="Export CSV">
-      <span class="icon">📊</span> Export CSV
+      Export CSV
     </a>
     <a class="btn ghost btn-export" id="export-pdf" href="#" aria-label="Export PDF">
-      <span class="icon">📄</span> Export PDF
+      Export PDF
     </a>
   </div>
 </section>
@@ -17,28 +17,28 @@
 <!-- Summary Cards -->
 <section class="summary-cards-container">
   <div class="card summary-card">
-    <div class="summary-icon">🔢</div>
+    <div class="summary-icon">#</div>
     <div>
       <span class="summary-label">Total Transactions</span>
       <h3 id="summary-total-tx">0</h3>
     </div>
   </div>
   <div class="card summary-card">
-    <div class="summary-icon deposit">📥</div>
+    <div class="summary-icon deposit">+</div>
     <div>
       <span class="summary-label">Total Deposits</span>
       <h3 id="summary-total-deposits">₹0.00</h3>
     </div>
   </div>
   <div class="card summary-card">
-    <div class="summary-icon withdrawal">📤</div>
+    <div class="summary-icon withdrawal">-</div>
     <div>
       <span class="summary-label">Total Withdrawals</span>
       <h3 id="summary-total-withdrawals">₹0.00</h3>
     </div>
   </div>
   <div class="card summary-card">
-    <div class="summary-icon balance">💰</div>
+    <div class="summary-icon balance">₹</div>
     <div>
       <span class="summary-label">Current Balance</span>
       <h3 id="summary-balance">₹0.00</h3>
@@ -46,10 +46,10 @@
   </div>
 </section>
 
-<section class="grid" style="grid-template-columns: 1fr; margin-bottom: 24px;">
+<section class="grid">
   <div class="card">
     <h3>Transaction Insights</h3>
-    <div style="height: 300px; position: relative;">
+    <div class="chart-wrap" style="height: 300px; position: relative;">
       <canvas id="transactions-chart"></canvas>
     </div>
   </div>
@@ -67,7 +67,6 @@
         <div class="form-group search-group">
           <label for="filter-q">Search Transactions</label>
           <div class="search-input-wrap">
-            <span class="search-icon">🔍</span>
             <input
               id="filter-q"
               type="search"

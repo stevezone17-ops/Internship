@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:wght@600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link
@@ -34,7 +34,6 @@
           <span class="brand-mark">SB</span>
           <div>
             <h1>Simple Banking</h1>
-            <p>Simulation Dashboard</p>
           </div>
         </div>
         <nav>
@@ -99,8 +98,7 @@
               <span></span>
             </button>
             <div>
-              <h2>Simple Banking System</h2>
-              <p>Secure, responsive, and built for learning.</p>
+              <h2>Simple Banking</h2>
             </div>
           </div>
           <div class="header-right">
@@ -134,14 +132,13 @@
           {% for category, message in messages %}
           <div class="bank-alert {{ category }}" data-alert>
             <span class="bank-alert-icon" aria-hidden="true">
-              {% if category in ['success', 'message'] %}✅{% elif category in
-              ['warning'] %}⚠{% else %}❌{% endif %}
+              {% if category in ['success', 'message'] %}&#10003;{% elif category in
+              ['warning'] %}!{% else %}&#10007;{% endif %}
             </span>
             <span class="bank-alert-text">
               <strong class="bank-alert-title">
-                {% if category in ['success', 'message'] %}Operation
-                Successful{% elif category in ['warning'] %}Please Check Your
-                Input{% else %}Transaction Failed{% endif %}
+                {% if category in ['success', 'message'] %}Success{% elif category in
+                ['warning'] %}Warning{% else %}Error{% endif %}
               </strong>
               <span class="bank-alert-body">{{ message }}</span>
             </span>

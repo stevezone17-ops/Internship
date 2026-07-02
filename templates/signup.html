@@ -1,103 +1,56 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Banking Management System | Signup</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:wght@600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/styles.css') }}"
-    />
-  </head>
-  <body class="auth-body">
-    <main class="auth-shell" data-page="signup">
-      <section class="auth-card">
-        <div class="auth-header">
-          <div class="auth-icon" aria-hidden="true">🏦</div>
-          <h1>Create your account</h1>
-          <p>Set up your banking profile in a few steps.</p>
-        </div>
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %}
-        <div class="auth-alert-stack" aria-live="polite" aria-atomic="true">
-          {% for category, message in messages %}
-          <div class="bank-alert {{ category }}" data-alert>
-            <span class="bank-alert-icon" aria-hidden="true">
-              {% if category in ['success', 'message'] %}✅{% elif category in
-              ['warning'] %}⚠{% else %}❌{% endif %}
-            </span>
-            <span class="bank-alert-text">
-              <strong class="bank-alert-title">
-                {% if category in ['success', 'message'] %}Operation
-                Successful{% elif category in ['warning'] %}Please Check Your
-                Input{% else %}Transaction Failed{% endif %}
-              </strong>
-              <span class="bank-alert-body">{{ message }}</span>
-            </span>
-            <button
-              class="bank-alert-close"
-              type="button"
-              aria-label="Dismiss alert"
-            >
-              &times;
-            </button>
-          </div>
-          {% endfor %}
-        </div>
-        {% endif %} {% endwith %}
-        <form method="POST" action="/api/signup" class="auth-form">
-          <label for="signup-name">Full Name</label>
-          <input
-            id="signup-name"
-            name="name"
-            type="text"
-            placeholder="Ava Banks"
-            required
-          />
+{% extends 'base.html' %}
+{% block content %}
+<main class="auth-shell" data-page="signup">
+  <section class="auth-card">
+    <div class="auth-header">
+      <h1>Create Account</h1>
+      <p>Set up your banking profile in a few steps.</p>
+    </div>
+    <form method="POST" action="/api/signup" class="auth-form">
+      <label for="signup-name">Full Name</label>
+      <input
+        id="signup-name"
+        name="name"
+        type="text"
+        placeholder="Ava Banks"
+        required
+      />
 
-          <label for="signup-email">Email</label>
-          <input
-            id="signup-email"
-            name="email"
-            type="email"
-            placeholder="you@bank.com"
-            required
-          />
+      <label for="signup-email">Email</label>
+      <input
+        id="signup-email"
+        name="email"
+        type="email"
+        placeholder="you@bank.com"
+        required
+      />
 
-          <label for="signup-password">Password</label>
-          <input
-            id="signup-password"
-            name="password"
-            type="password"
-            placeholder="Create a password"
-            required
-          />
+      <label for="signup-password">Password</label>
+      <input
+        id="signup-password"
+        name="password"
+        type="password"
+        placeholder="Create a password"
+        required
+      />
 
-          <label for="signup-pin">Transaction PIN</label>
-          <input
-            id="signup-pin"
-            name="pin"
-            type="password"
-            inputmode="numeric"
-            pattern="\d{4,6}"
-            placeholder="4 to 6 digits"
-            required
-          />
-          <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
+      <label for="signup-pin">Transaction PIN</label>
+      <input
+        id="signup-pin"
+        name="pin"
+        type="password"
+        inputmode="numeric"
+        pattern="\d{4,6}"
+        placeholder="4 to 6 digits"
+        required
+      />
+      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
 
-          <button class="auth-btn" type="submit">Create Account</button>
-        </form>
-        <p class="auth-footnote">
-          Already have an account? <a href="/login">Sign in</a>
-        </p>
-      </section>
-    </main>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-  </body>
-</html>
+      <button class="auth-btn" type="submit">Create Account</button>
+    </form>
+    <p class="auth-footnote">
+      Already have an account? <a href="/login">Sign in</a>
+    </p>
+  </section>
+</main>
+{% endblock %}
