@@ -1,0 +1,15 @@
+[2026-07-02 22:06:39,166] WARNING in app: FLASK_SECRET_KEY not set. Using random key — sessions will not persist across restarts.
+[2026-07-02 22:06:40,280] WARNING in app: FLASK_SECRET_KEY not set. Using random key — sessions will not persist across restarts.
+2026-07-02 22:06:40,280 WARNING app - FLASK_SECRET_KEY not set. Using random key — sessions will not persist across restarts.
+2026-07-02 22:06:40,426 INFO werkzeug - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-07-02 22:06:40,427 INFO werkzeug - [33mPress CTRL+C to quit[0m
+2026-07-02 22:06:41,022 INFO werkzeug - 127.0.0.1 - - [02/Jul/2026 22:06:41] "GET / HTTP/1.1" 200 -
+2026-07-02 22:09:35,505 INFO werkzeug - 127.0.0.1 - - [02/Jul/2026 22:09:35] "GET / HTTP/1.1" 200 -
+2026-07-02 22:09:36,028 INFO werkzeug - 127.0.0.1 - - [02/Jul/2026 22:09:36] "GET /static/js/main.js HTTP/1.1" 200 -
+2026-07-02 22:09:36,093 INFO werkzeug - 127.0.0.1 - - [02/Jul/2026 22:09:36] "GET /static/css/styles.css HTTP/1.1" 200 -
+2026-07-02 22:09:36,652 INFO werkzeug - 127.0.0.1 - - [02/Jul/2026 22:09:36] "[32mGET /favicon.ico HTTP/1.1[0m" 302 -
+2026-07-02 22:09:36,683 INFO werkzeug - 127.0.0.1 - - [02/Jul/2026 22:09:36] "GET / HTTP/1.1" 200 -
+2026-07-02 22:09:42,350 INFO werkzeug - 127.0.0.1 - - [02/Jul/2026 22:09:42] "GET /login HTTP/1.1" 200 -
+2026-07-02 22:09:42,413 INFO werkzeug - 127.0.0.1 - - [02/Jul/2026 22:09:42] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2026-07-02 22:09:42,415 INFO werkzeug - 127.0.0.1 - - [02/Jul/2026 22:09:42] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -

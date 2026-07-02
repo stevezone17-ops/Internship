@@ -1,116 +1,231 @@
-{% extends 'base.html' %} {% block content %}
-<section class="landing-hero">
-  <div class="hero-copy fade-in">
-    {% if session.get('user_name') %}
-    <p class="hero-badge">Welcome back, {{ session['user_name'] }}</p>
-    {% else %}
-    <p class="hero-badge">Fintech-ready banking demo</p>
-    {% endif %}
-    <h1>
-      Welcome to your
-      <span class="hero-accent">Simple Banking System</span>
-    </h1>
-    <p class="hero-lead">
-      Create accounts, move money instantly, and keep every transaction
-      transparent with a clean, real-time dashboard.
-    </p>
+{% extends 'base.html' %}
+{% block content %}
 
-    <div class="hero-features">
-      <span>Secure Transactions</span>
-      <span>Real-time Updates</span>
-      <span>MongoDB Powered</span>
-    </div>
+{# ── Hero ── #}
+<section class="lp-hero">
+  <div class="lp-hero-content">
+    {% if session.get('user_name') %}
+    <span class="lp-badge">Welcome back, {{ session['user_name'] }}</span>
+    {% else %}
+    <span class="lp-badge">Open-source banking simulator</span>
+    {% endif %}
+
+    <h1 class="lp-headline">
+      Banking that<br>
+      <span class="lp-accent">just works.</span>
+    </h1>
+
+    <p class="lp-sub">
+      A full-featured banking simulation with real-time balances,
+      instant transfers, and a clean dashboard — built for learning
+      and demoing.
+    </p>
 
     {% if session.get('user_id') %}
-    <div class="hero-actions">
-      <a class="btn primary" href="/dashboard">Dashboard</a>
-      <a class="btn ghost" href="/transfer">Transfer</a>
-      <a class="btn ghost" href="/transactions">Transactions</a>
+    <div class="lp-cta-row">
+      <a class="btn primary lp-cta" href="/dashboard">Go to Dashboard</a>
+      <a class="btn ghost" href="/transfer">Send Money</a>
     </div>
     {% else %}
-    <div class="hero-actions">
-      <a class="btn primary" href="/create">Get Started</a>
-      <a class="btn ghost" href="/login">Login</a>
+    <div class="lp-cta-row">
+      <a class="btn primary lp-cta" href="/create">Create Free Account</a>
+      <a class="btn ghost" href="/login">Sign In</a>
     </div>
     {% endif %}
-  </div>
 
-  <div class="hero-panel fade-in">
-    <div class="hero-panel-header">
-      <h3>Quick Actions</h3>
-      <p>Jump into the core flows with one click.</p>
-    </div>
-    <div class="action-grid">
-      <a class="action-card" href="/transact">
-        <span class="action-icon">DP</span>
-        <div>
-          <strong>Deposit</strong>
-          <p>Add funds instantly</p>
-        </div>
-      </a>
-      <a class="action-card" href="/transact">
-        <span class="action-icon">WD</span>
-        <div>
-          <strong>Withdraw</strong>
-          <p>Move cash out</p>
-        </div>
-      </a>
-      <a class="action-card" href="/transfer">
-        <span class="action-icon">TX</span>
-        <div>
-          <strong>Transfer</strong>
-          <p>Send money securely</p>
-        </div>
-      </a>
-      <a class="action-card" href="/transactions">
-        <span class="action-icon">HX</span>
-        <div>
-          <strong>History</strong>
-          <p>View every movement</p>
-        </div>
-      </a>
+    <div class="lp-stats">
+      <div class="lp-stat">
+        <strong>256-bit</strong>
+        <span>Encryption</span>
+      </div>
+      <div class="lp-stat-divider"></div>
+      <div class="lp-stat">
+        <strong>Real-time</strong>
+        <span>Updates</span>
+      </div>
+      <div class="lp-stat-divider"></div>
+      <div class="lp-stat">
+        <strong>Instant</strong>
+        <span>Transfers</span>
+      </div>
     </div>
   </div>
-</section>
 
-<section class="feature-grid fade-in">
-  <a class="feature-card" href="/create">
-    <div class="feature-icon">AC</div>
-    <h3>Create Account</h3>
-    <p>Open a new simulated account with a first deposit in seconds.</p>
-    <span class="feature-link">Get Started</span>
-  </a>
-  <a class="feature-card" href="/transact">
-    <div class="feature-icon">MB</div>
-    <h3>Manage Balance</h3>
-    <p>Deposit or withdraw funds with balance validation built in.</p>
-    <span class="feature-link">Make a Transfer</span>
-  </a>
-  <a class="feature-card" href="/transactions">
-    <div class="feature-icon">TH</div>
-    <h3>Transaction History</h3>
-    <p>Every action is recorded with type, amount, and timestamp.</p>
-    <span class="feature-link">View History</span>
-  </a>
-</section>
-
-<section class="trust-section fade-in">
-  <div>
-    <h3>Why Choose Us?</h3>
-    <p>
-      Purpose-built for learning secure banking workflows with real-time
-      feedback.
-    </p>
+  <div class="lp-hero-visual">
+    <div class="lp-mock-card">
+      <div class="lp-mock-header">
+        <div class="lp-mock-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="lp-mock-title">Account Overview</span>
+      </div>
+      <div class="lp-mock-body">
+        <div class="lp-mock-label">Total Balance</div>
+        <div class="lp-mock-amount">₹2,45,800.00</div>
+        <div class="lp-mock-row">
+          <div class="lp-mock-mini">
+            <span class="lp-mock-dot green"></span>
+            <div>
+              <small>Deposits</small>
+              <strong>₹3,20,000</strong>
+            </div>
+          </div>
+          <div class="lp-mock-mini">
+            <span class="lp-mock-dot red"></span>
+            <div>
+              <small>Withdrawals</small>
+              <strong>₹74,200</strong>
+            </div>
+          </div>
+        </div>
+        <div class="lp-mock-bar">
+          <div class="lp-mock-bar-fill" style="width:72%"></div>
+        </div>
+        <div class="lp-mock-bar-label">
+          <span>Savings</span>
+          <span>72%</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="trust-list">
-    <span>Secure authentication</span>
-    <span>Instant transactions</span>
-    <span>Clean dashboard UI</span>
+</section>
+
+{# ── Features ── #}
+<section class="lp-features">
+  <div class="lp-section-header">
+    <h2>Everything you need</h2>
+    <p>Core banking features wrapped in a clean interface.</p>
+  </div>
+
+  <div class="lp-feature-grid">
+    <div class="lp-feature">
+      <div class="lp-feature-icon">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      </div>
+      <h3>Instant Transfers</h3>
+      <p>Send money to any account in seconds with PIN-verified security.</p>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature-icon">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      </div>
+      <h3>Account Management</h3>
+      <p>Create savings or current accounts with configurable minimum balances.</p>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature-icon">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+      </div>
+      <h3>Transaction History</h3>
+      <p>Full audit trail with filters, search, and CSV/PDF export.</p>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature-icon">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3>Fraud Detection</h3>
+      <p>Automatic high-value and high-frequency transaction monitoring.</p>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature-icon">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      <h3>Scheduled Transfers</h3>
+      <p>Queue future-dated transfers that execute automatically.</p>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature-icon">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <h3>Admin Panel</h3>
+      <p>User management, support queue, and system analytics dashboard.</p>
+    </div>
   </div>
 </section>
 
-<footer class="landing-footer">
-  <p>© 2026 Simple Banking System</p>
-  <p>Built with Flask + MongoDB</p>
+{# ── How it works ── #}
+<section class="lp-how">
+  <div class="lp-section-header">
+    <h2>How it works</h2>
+    <p>Three steps to start banking.</p>
+  </div>
+
+  <div class="lp-steps">
+    <div class="lp-step">
+      <div class="lp-step-num">1</div>
+      <h3>Create Account</h3>
+      <p>Sign up with your name, email, and a 4-digit transaction PIN.</p>
+    </div>
+    <div class="lp-step-arrow">&rarr;</div>
+    <div class="lp-step">
+      <div class="lp-step-num">2</div>
+      <h3>Deposit Funds</h3>
+      <p>Add money to your account and watch the balance update instantly.</p>
+    </div>
+    <div class="lp-step-arrow">&rarr;</div>
+    <div class="lp-step">
+      <div class="lp-step-num">3</div>
+      <h3>Start Transferring</h3>
+      <p>Send money to other users with real-time notifications.</p>
+    </div>
+  </div>
+</section>
+
+{# ── Tech Stack ── #}
+<section class="lp-tech">
+  <div class="lp-section-header">
+    <h2>Built with modern tools</h2>
+    <p>A clean stack designed for reliability and speed.</p>
+  </div>
+
+  <div class="lp-tech-grid">
+    <div class="lp-tech-item">
+      <strong>Flask</strong>
+      <span>Python web framework</span>
+    </div>
+    <div class="lp-tech-item">
+      <strong>MongoDB</strong>
+      <span>Document database</span>
+    </div>
+    <div class="lp-tech-item">
+      <strong>Vanilla JS</strong>
+      <span>No framework overhead</span>
+    </div>
+    <div class="lp-tech-item">
+      <strong>Inter</strong>
+      <span>Clean typography</span>
+    </div>
+  </div>
+</section>
+
+{# ── CTA Banner ── #}
+{% if not session.get('user_id') %}
+<section class="lp-cta-banner">
+  <h2>Ready to try it?</h2>
+  <p>Create a free account and explore the full banking experience.</p>
+  <a class="btn primary lp-cta" href="/create">Get Started Now</a>
+</section>
+{% endif %}
+
+{# ── Footer ── #}
+<footer class="lp-footer">
+  <div class="lp-footer-inner">
+    <div class="lp-footer-brand">
+      <span class="brand-mark" style="width:28px;height:28px;font-size:0.7rem;border-radius:6px;">SB</span>
+      <strong>Simple Banking</strong>
+    </div>
+    <div class="lp-footer-links">
+      <a href="/login">Login</a>
+      <a href="/signup">Signup</a>
+      <a href="/support">Support</a>
+    </div>
+    <p class="lp-footer-copy">&copy; 2026 Simple Banking System &middot; Built with Flask + MongoDB</p>
+  </div>
 </footer>
+
 {% endblock %}
