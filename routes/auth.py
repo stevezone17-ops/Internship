@@ -63,8 +63,10 @@ def forgot_page():
 def reset_page(token):
     return render_template("reset_password.html", token=token)
 
-@auth_bp.route("/verify/<token>")
+@auth_bp.route("/verify/<token>", methods=["GET", "POST"])
 def verify_page(token):
+    if request.method == "GET":
+        return render_template("verify.html", success=None, message="Click the button below to verify your email.", token=token)
     user, error = mark_user_verified(users_col, token)
     if error:
         return render_template("verify.html", success=False, message=error)

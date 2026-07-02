@@ -1,11 +1,17 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% block content %}
 <section class="page-header">
   <h2>Email Verification</h2>
   <p id="verify-message">{{ message }}</p>
 </section>
 
 <section class="card form-card">
-  {% if success %}
+  {% if success is none %}
+  <form method="POST" action="/verify/{{ token }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <button class="btn primary" type="submit">Verify My Email</button>
+  </form>
+  {% elif success %}
   <p>Your email is verified. You can now login and continue.</p>
   <a class="btn primary" href="/login">Go to Login</a>
   {% else %}

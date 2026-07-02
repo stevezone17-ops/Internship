@@ -47,6 +47,7 @@ scheduled_transfers_col = cols["scheduled_transfers"]
 
 # Temporary in-memory cache for recent transactions by account id.
 recent_transactions = {}
+CACHE_MAX_SIZE = 1000
 
 
 def insert_transaction(account_id, tx_type, amount, metadata=None):
@@ -55,6 +56,9 @@ def insert_transaction(account_id, tx_type, amount, metadata=None):
     )
     cache_key = str(account_id)
     recent_transactions.setdefault(cache_key, []).append(tx_tuple)
+    if len(recent_transactions) > CACHE_MAX_SIZE:
+        oldest_key = next(iter(recent_transactions))
+        recent_transactions.pop(oldest_key, None)
     return tx_doc, warnings
 
 @transactions_bp.route("/api/deposit", methods=["POST"])

@@ -1098,6 +1098,7 @@ const setupTransferPage = () => {
                     const payload = {
                         receiver_email: receiverEmail,
                         amount: amount,
+                        pin: pin,
                         scheduled_at: scheduleAt && scheduleAt.value ? new Date(scheduleAt.value).toISOString() : null,
                     };
                     const csrfEl = document.querySelector('input[name="_csrf_token"]');

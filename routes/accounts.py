@@ -35,6 +35,7 @@ transactions_col = cols["transactions"]
 
 # Temporary in-memory cache for quick lookups in this process only.
 account_cache = {}
+ACCOUNT_CACHE_MAX = 500
 # Temporary list cache of recent transactions by account id.
 recent_transactions = {}
 
@@ -160,6 +161,9 @@ def create_account():
 
     account_id = account_doc["_id"]
     account_cache[str(account_id)] = account_doc
+    if len(account_cache) > ACCOUNT_CACHE_MAX:
+        oldest_key = next(iter(account_cache))
+        account_cache.pop(oldest_key, None)
 
     if initial_deposit > 0:
         tx_doc, tx_tuple, warnings = record_transaction(
@@ -404,8 +408,8 @@ def change_password_api():
         account = get_account_for_user(accounts_col, user_id)
         if account:
             add_notification(notifications_col, account['_id'], 'Account password changed successfully.', metadata={'type': 'security'})
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Failed to send password change notification: %s", exc)
 
     session.clear()
     if request.is_json:

@@ -32,8 +32,8 @@ def admin_required(view_func):
         user = None
         try:
             user = users_col.find_one({"_id": ObjectId(user_id)})
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to fetch user for admin check: %s", exc)
         if not is_admin_user(user):
             flash("You do not have access to the admin dashboard.", "danger")
             return redirect(url_for("main.dashboard_page"))
@@ -49,6 +49,8 @@ def admin_page():
 @admin_bp.route("/test-db")
 @admin_required
 def test_db():
+    if os.environ.get("FLASK_ENV") != "testing":
+        return jsonify({"status": "error", "message": "Only available in testing environment."}), 403
     sample = {"message": "db_check", "created_at": ist_now()}
     result = notifications_col.insert_one(sample)
     inserted = notifications_col.find_one({"_id": result.inserted_id})

@@ -95,6 +95,21 @@ def create_app():
             return redirect(url_for("auth.login_page"))
 
         session["last_activity"] = now_ts
+
+        # Refresh admin status from DB every 5 minutes
+        last_admin_check = session.get("last_admin_check", 0)
+        if now_ts - last_admin_check > 300:
+            try:
+                from bson import ObjectId
+                from models.db import get_collections
+                from utils.helpers import is_admin_user
+                cols = get_collections()
+                user = cols["users"].find_one({"_id": ObjectId(session["user_id"])})
+                session["is_admin"] = is_admin_user(user)
+                session["last_admin_check"] = now_ts
+            except Exception:
+                pass
+
         session.modified = True
         return None
 
