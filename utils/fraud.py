@@ -12,7 +12,7 @@ def check_fraud(transactions_col, account_id, amount, timestamp):
         "timestamp": {"$gte": window_start}
     })
 
-    if recent_count > 3:
+    if recent_count > 4:
         warnings.append("High-frequency activity detected (more than 3 in 1 minute).")
 
     return warnings

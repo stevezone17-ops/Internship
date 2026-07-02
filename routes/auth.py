@@ -2,7 +2,6 @@ import time
 from datetime import timedelta
 from flask import Blueprint, request, jsonify, session, redirect, url_for, flash, render_template
 from werkzeug.security import generate_password_hash
-from bson import ObjectId
 
 from models.db import get_collections
 from services.accounts import (
@@ -71,7 +70,7 @@ def verify_page(token):
         return render_template("verify.html", success=False, message=error)
     return render_template("verify.html", success=True, message="Email verified. You can login now.")
 
-@auth_bp.route("/logout")
+@auth_bp.route("/logout", methods=["GET", "POST"])
 def logout():
     session.clear()
     return redirect(url_for("main.home_page"))
@@ -86,6 +85,10 @@ def signup():
 
     if not name or not email or not password:
         return api_error("Please check your input.", 400, endpoint="auth.signup_page", category="warning")
+    if len(name) > 100:
+        return api_error("Name must be 100 characters or fewer.", 400, endpoint="auth.signup_page", category="warning")
+    if len(password) < 8:
+        return api_error("Password must be at least 8 characters.", 400, endpoint="auth.signup_page", category="warning")
     if not pin or not pin.isdigit() or len(pin) < 4 or len(pin) > 6:
         return api_error("Please check your input.", 400, endpoint="auth.signup_page", category="warning")
 
@@ -177,8 +180,8 @@ def forgot_password():
     user, token = create_reset_token(users_col, email)
     if user and token:
         reset_link = url_for("auth.reset_page", token=token, _external=True)
-        logger.info("Password reset link for %s: %s", email, reset_link)
-        return jsonify({"message": "Reset link generated.", "reset_link": reset_link})
+        logger.info("Password reset link generated for %s", email)
+        return api_success("If the email exists, a reset link was generated.", endpoint="auth.forgot_page")
 
     return api_success("If the email exists, a reset link was generated.", endpoint="auth.forgot_page")
 

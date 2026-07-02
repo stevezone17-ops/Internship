@@ -8,7 +8,7 @@ from services.notifications import (
     mark_notification_read,
     mark_all_read,
 )
-from utils.helpers import login_required, get_display_name
+from utils.helpers import login_required, get_display_name, get_session_account_id
 from utils.logging_config import setup_logging
 
 logger = setup_logging()
@@ -17,22 +17,6 @@ cols = get_collections()
 notifications_col = cols["notifications"]
 accounts_col = cols["accounts"]
 users_col = cols["users"]
-
-def get_session_account_id():
-    from services.accounts import get_account_for_user
-    account_id = session.get("account_id")
-    if account_id:
-        return account_id
-
-    user_id = session.get("user_id")
-    if not user_id:
-        return None
-
-    account = get_account_for_user(accounts_col, user_id)
-    if account:
-        session["account_id"] = str(account["_id"])
-        return session["account_id"]
-    return None
 
 @notifications_bp.route("/api/notifications", methods=["GET"])
 @login_required

@@ -27,6 +27,7 @@ from utils.helpers import (
     api_success,
     get_display_name,
     get_session_user_id,
+    get_session_account_id,
     make_aware,
     format_currency,
     verify_transaction_pin,
@@ -55,21 +56,6 @@ def insert_transaction(account_id, tx_type, amount, metadata=None):
     cache_key = str(account_id)
     recent_transactions.setdefault(cache_key, []).append(tx_tuple)
     return tx_doc, warnings
-
-def get_session_account_id():
-    account_id = session.get("account_id")
-    if account_id:
-        return account_id
-
-    user_id = session.get("user_id")
-    if not user_id:
-        return None
-
-    account = get_account_for_user(accounts_col, user_id)
-    if account:
-        session["account_id"] = str(account["_id"])
-        return session["account_id"]
-    return None
 
 @transactions_bp.route("/api/deposit", methods=["POST"])
 def deposit():
@@ -362,8 +348,52 @@ def transfer():
     for warning in warnings:
         add_notification(notifications_col, sender_account["_id"], warning, level="warning")
 
-    # Email notifications (simplified)
-    # ... (similar logic as in app.py)
+    # Email notifications
+    if sender_user:
+        sender_email = sender_user.get("email")
+        if sender_email:
+            try:
+                subject, email_message, template_name, context = build_transfer_email(
+                    sender_name, receiver_name, float(amount)
+                )
+                email_html = render_template(template_name, **context)
+                send_fake_email(sender_email, subject, email_message)
+                add_notification(
+                    notifications_col,
+                    sender_account["_id"],
+                    f"Email notification sent: {subject}.",
+                    metadata={
+                        "type": "transfer",
+                        "email_subject": subject,
+                        "email_to": sender_email,
+                        "email_preview_html": email_html,
+                    },
+                )
+            except Exception as exc:
+                logger.warning("Sender email failed: %s", exc)
+
+    if receiver_user:
+        receiver_email_addr = receiver_user.get("email")
+        if receiver_email_addr:
+            try:
+                subject, email_message, template_name, context = build_transfer_received_email(
+                    receiver_name, sender_name, float(amount)
+                )
+                email_html = render_template(template_name, **context)
+                send_fake_email(receiver_email_addr, subject, email_message)
+                add_notification(
+                    notifications_col,
+                    receiver_account["_id"],
+                    f"Email notification sent: {subject}.",
+                    metadata={
+                        "type": "transfer",
+                        "email_subject": subject,
+                        "email_to": receiver_email_addr,
+                        "email_preview_html": email_html,
+                    },
+                )
+            except Exception as exc:
+                logger.warning("Receiver email failed: %s", exc)
 
     logger.info("Transfer %s from %s to %s", amount, sender_account_id, receiver_account_id)
     if request.is_json:

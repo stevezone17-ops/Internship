@@ -1,7 +1,3 @@
-import uuid
-from datetime import timedelta
-
-from bson import ObjectId
 from werkzeug.security import check_password_hash, generate_password_hash
 from utils.time_utils import ist_now
 
@@ -9,28 +5,6 @@ ACCOUNT_RULES = {
     "savings": {"min_balance": 1000.0, "label": "Savings"},
     "current": {"min_balance": 5000.0, "label": "Current"},
 }
-
-
-def create_user(users_col, name, email, password):
-    existing = users_col.find_one({"email": email})
-    if existing:
-        return None, "Email already registered."
-
-    verification_token = str(uuid.uuid4())
-    verification_expires = ist_now() + timedelta(minutes=30)
-    user_doc = {
-        "name": name,
-        "email": email,
-        "password_hash": generate_password_hash(password),
-        "verified": False,
-        "verification_token": verification_token,
-        "verification_expires": verification_expires,
-        "reset_token": None,
-        "reset_expires": None,
-        "created_at": ist_now(),
-    }
-    result = users_col.insert_one(user_doc)
-    return str(result.inserted_id), None, verification_token
 
 
 def authenticate_user(users_col, email, password):

@@ -24,6 +24,13 @@ const apiRequest = async (url, options = {}) => {
     return data;
 };
 
+const escapeHtml = (str) => {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(String(str)));
+    return div.innerHTML;
+};
+
 const setMessage = (element, message, type) => {
     if (!element) return;
     element.textContent = message;
@@ -238,7 +245,6 @@ const setupSignup = () => {
                 "success"
             );
             if (data.verification_link) {
-                console.log("Verification link:", data.verification_link);
             }
             window.location.href = "/login";
         } catch (error) {
@@ -351,7 +357,6 @@ const setupForgotPassword = () => {
             ]).then(([result]) => result);
             setMessage(message, "If the email exists, a reset link was created.", "success");
             if (data.reset_link) {
-                console.log("Reset link:", data.reset_link);
             }
         } catch (error) {
             setMessage(message, error.message, "error");
@@ -460,8 +465,8 @@ const renderTransactions = (rows, transactions) => {
                         <div class="tx-details-cell">
                             <div class="tx-icon-wrap ${iconClass}" aria-hidden="true">${icon}</div>
                             <div>
-                                <strong class="tx-title">${titleLabel}</strong>
-                                <span class="tx-subtitle">${dateLabel} <span class="divider">•</span> ID: ${tx.transaction_id || "-"}</span>
+                                <strong class="tx-title">${escapeHtml(titleLabel)}</strong>
+                                <span class="tx-subtitle">${escapeHtml(dateLabel)} <span class="divider">•</span> ID: ${escapeHtml(tx.transaction_id || "-")}</span>
                             </div>
                         </div>
                     </td>
@@ -679,8 +684,6 @@ const setupDashboard = () => {
     if (!container) return;
 
     const accountId = container.dataset.accountId || getAccountId();
-    console.log("ACCOUNT ID:", accountId);
-    console.log("CONTAINER DATA:", container.dataset);
     
     const nameEl = document.getElementById("account-name");
     const emailEl = document.getElementById("account-email");
@@ -708,7 +711,6 @@ const setupDashboard = () => {
 
     apiRequest(`/api/account/${accountId}`)
         .then((data) => {
-            console.log("Account data loaded:", data);
             if (nameEl) nameEl.textContent = data.name;
             if (emailEl) emailEl.textContent = data.email;
             if (typeEl) typeEl.textContent = `Account Type: ${data.account_type || "-"}`;
@@ -734,8 +736,8 @@ const setupDashboard = () => {
             recentList.innerHTML = slice
                 .map(
                     (tx) =>
-                        `<li>${tx.type} ${formatCurrency(tx.amount)} <span class="meta">${
-                            tx.formatted_time || formatTimestamp(tx.timestamp)
+                        `<li>${escapeHtml(tx.type)} ${formatCurrency(tx.amount)} <span class="meta">${
+                            escapeHtml(tx.formatted_time || formatTimestamp(tx.timestamp))
                         }</span></li>`
                 )
                 .join("");
@@ -779,10 +781,10 @@ const setupDashboard = () => {
                             return `<li class="notification-item${typeClass} ${isWarning ? 'warning' : ''}">
                                 <span class="notif-icon">${icon}</span>
                                 <div class="notif-body">
-                                    <span class="notif-message">${msg}</span>
+                                    <span class="notif-message">${escapeHtml(msg)}</span>
                                     ${emailBadge}
                                     ${emailPreview}
-                                    <span class="notif-time">${timeLabel}</span>
+                                    <span class="notif-time">${escapeHtml(timeLabel)}</span>
                                 </div>
                             </li>`;
                         })
@@ -802,10 +804,11 @@ const setupDashboard = () => {
     // Migrate old notifications with ObjectIds once per session, then fetch
     const migrationKey = "notifications_migrated";
     if (!sessionStorage.getItem(migrationKey)) {
+        const csrfMig = document.querySelector('input[name="_csrf_token"]');
         fetch("/api/notifications/migrate", {
             method: "POST",
             credentials: "same-origin",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...(csrfMig ? { "X-CSRFToken": csrfMig.value } : {}) },
         })
             .then(() => {
                 sessionStorage.setItem(migrationKey, "1");
@@ -909,11 +912,12 @@ const setupTransact = () => {
         try {
             const button = withdrawForm.querySelector("button[type='submit']");
             setButtonLoading(button, true);
+            const csrfW = document.querySelector('input[name="_csrf_token"]');
             const data = await Promise.all([
                 fetch("/api/withdraw", {
                     method: "POST",
                     credentials: "same-origin",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", ...(csrfW ? { "X-CSRFToken": csrfW.value } : {}) },
                     body: JSON.stringify({
                         amount: withdrawForm.amount.value,
                         pin: pin,
@@ -965,11 +969,12 @@ const setupTransact = () => {
         try {
             const button = transferForm.querySelector("button[type='submit']");
             setButtonLoading(button, true);
+            const csrfT = document.querySelector('input[name="_csrf_token"]');
             const data = await Promise.all([
                 fetch("/api/transfer", {
                     method: "POST",
                     credentials: "same-origin",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", ...(csrfT ? { "X-CSRFToken": csrfT.value } : {}) },
                     body: JSON.stringify({
                         receiver_email: transferForm.receiver_email.value.trim(),
                         amount: transferForm.amount.value,
@@ -1053,7 +1058,10 @@ const setupTransferPage = () => {
     // populate beneficiary select
     if (beneficiarySelect) {
         fetchBeneficiaries().then(list => {
-            beneficiarySelect.innerHTML = '<option value="">-- Choose saved beneficiary --</option>' + list.map(b => `<option value="${b.email}">${b.nickname ? b.nickname + ' ('+b.name+')' : b.name} — ${b.email}</option>`).join('');
+            beneficiarySelect.innerHTML = '<option value="">-- Choose saved beneficiary --</option>' + list.map(b => {
+                const label = b.nickname ? escapeHtml(b.nickname) + ' ('+escapeHtml(b.name)+')' : escapeHtml(b.name);
+                return `<option value="${escapeHtml(b.email)}">${label} — ${escapeHtml(b.email)}</option>`;
+            }).join('');
             // if quick_transfer_email exists, prefill
             const quick = sessionStorage.getItem('quick_transfer_email');
             if (quick) {
@@ -1253,20 +1261,22 @@ const renderBeneficiariesList = (container, list) => {
         target.innerHTML = '<p>No beneficiaries saved.</p>';
         return;
     }
-    target.innerHTML = list.map(b => `
-        <div class="beneficiary-card" data-id="${b.id}">
+    target.innerHTML = list.map(b => {
+        const nameDisplay = b.nickname ? escapeHtml(b.nickname) + ' (' + escapeHtml(b.name) + ')' : escapeHtml(b.name);
+        return `
+        <div class="beneficiary-card" data-id="${escapeHtml(b.id)}">
             <div class="benef-row">
                 <div>
-                    <strong>${b.nickname ? b.nickname + ' (' + b.name + ')' : b.name}</strong>
-                    <div class="muted">${b.email}</div>
+                    <strong>${nameDisplay}</strong>
+                    <div class="muted">${escapeHtml(b.email)}</div>
                 </div>
                 <div class="benef-actions">
-                    <button class="btn ghost quick-transfer" data-email="${b.email}">Transfer</button>
-                    <button class="btn danger delete-benef" data-id="${b.id}">Delete</button>
+                    <button class="btn ghost quick-transfer" data-email="${escapeHtml(b.email)}">Transfer</button>
+                    <button class="btn danger delete-benef" data-id="${escapeHtml(b.id)}">Delete</button>
                 </div>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 };
 
 const setupBeneficiaries = () => {
@@ -1282,7 +1292,10 @@ const setupBeneficiaries = () => {
         const select = document.getElementById('beneficiarySelect');
         if (select) {
             select.innerHTML = '<option value="">-- Choose saved beneficiary --</option>' +
-                list.map(b => `<option value="${b.email}">${b.nickname ? b.nickname + ' ('+b.name+')' : b.name} — ${b.email}</option>`).join('');
+                list.map(b => {
+                    const label = b.nickname ? escapeHtml(b.nickname) + ' ('+escapeHtml(b.name)+')' : escapeHtml(b.name);
+                    return `<option value="${escapeHtml(b.email)}">${label} — ${escapeHtml(b.email)}</option>`;
+                }).join('');
         }
         // attach handlers for quick transfer and delete
         container.querySelectorAll('.quick-transfer').forEach(btn => {
@@ -1460,7 +1473,6 @@ const setupProfile = () => {
             if (accountId) {
                 apiRequest(`/api/account/${accountId}`)
                     .then((acct) => {
-                        console.log("PROFILE: account data:", acct);
                         const acctTypeEl = document.getElementById("profile-account-type");
                         const memberSinceEl = document.getElementById("profile-member-since");
                         const acctLabel = acct.account_type_label || (acct.account_type ? acct.account_type.charAt(0).toUpperCase() + acct.account_type.slice(1) : "-");
@@ -1493,7 +1505,7 @@ const setupProfile = () => {
                     return;
                 }
                 loginList.innerHTML = items
-                    .map((l) => `<li>${l.created_at_display} — ${l.ip || '-'} <span class="muted">${l.user_agent || ''}</span></li>`)
+                    .map((l) => `<li>${escapeHtml(l.created_at_display)} — ${escapeHtml(l.ip || '-')} <span class="muted">${escapeHtml(l.user_agent || '')}</span></li>`)
                     .join("");
             })
             .catch(() => {
@@ -1601,11 +1613,11 @@ const setupSupportPage = () => {
                 const priorityClass = priority.toLowerCase();
                 return `
                     <li>
-                        <a class="support-link" href="/support/${query.id}">
+                        <a class="support-link" href="/support/${escapeHtml(query.id)}">
                             <div class="support-item">
                                 <div>
-                                    <strong>${query.subject || "Support query"}</strong>
-                                    <span class="meta">${dateLabel}</span>
+                                    <strong>${escapeHtml(query.subject || "Support query")}</strong>
+                                    <span class="meta">${escapeHtml(dateLabel)}</span>
                                 </div>
                                 <div class="support-tags">
                                     <span class="status-pill">${query.status || "Open"}</span>
@@ -1626,7 +1638,7 @@ const setupSupportPage = () => {
             })
             .catch((error) => {
                 if (!historyList) return;
-                historyList.innerHTML = `<li>${error.message}</li>`;
+                historyList.innerHTML = `<li>${escapeHtml(error.message)}</li>`;
             });
     };
 
@@ -1684,14 +1696,14 @@ const setupAdminDashboard = () => {
     const renderUsers = (users) => {
         if (!usersList) return;
         usersList.innerHTML = users.length
-            ? users.map((u) => `<li><strong>${u.name || 'User'}</strong> <span class="meta">${u.email || ''} · ${u.role || 'user'} · ${u.created_at_display || ''}</span></li>`).join("")
+            ? users.map((u) => `<li><strong>${escapeHtml(u.name || 'User')}</strong> <span class="meta">${escapeHtml(u.email || '')} · ${escapeHtml(u.role || 'user')} · ${escapeHtml(u.created_at_display || '')}</span></li>`).join("")
             : "<li>No users found.</li>";
     };
 
     const renderTransactions = (transactions) => {
         if (!txList) return;
         txList.innerHTML = transactions.length
-            ? transactions.map((tx) => `<li><strong>${tx.type || '-'}</strong> ${formatCurrency(tx.amount || 0)} <span class="meta">${tx.created_at_display || ''}</span></li>`).join("")
+            ? transactions.map((tx) => `<li><strong>${escapeHtml(tx.type || '-')}</strong> ${formatCurrency(tx.amount || 0)} <span class="meta">${escapeHtml(tx.created_at_display || '')}</span></li>`).join("")
             : "<li>No transactions found.</li>";
     };
 
@@ -1704,12 +1716,12 @@ const setupAdminDashboard = () => {
         supportList.innerHTML = items.map((item) => `
             <div class="admin-support-item card">
                 <div class="admin-support-meta">
-                    <strong>${item.subject || 'Support'}</strong>
-                    <span class="meta">${item.email || ''} · ${item.priority || 'Low'} · ${item.status || 'Open'} · ${item.created_at_display || ''}</span>
+                    <strong>${escapeHtml(item.subject || 'Support')}</strong>
+                    <span class="meta">${escapeHtml(item.email || '')} · ${escapeHtml(item.priority || 'Low')} · ${escapeHtml(item.status || 'Open')} · ${escapeHtml(item.created_at_display || '')}</span>
                 </div>
                 <div class="admin-support-reply">
-                    <textarea id="reply-${item.id}" rows="3" placeholder="Write a reply">${item.admin_reply || ''}</textarea>
-                    <button class="btn primary admin-reply-btn" data-query-id="${item.id}" type="button">Save Reply</button>
+                    <textarea id="reply-${escapeHtml(item.id)}" rows="3" placeholder="Write a reply">${escapeHtml(item.admin_reply || '')}</textarea>
+                    <button class="btn primary admin-reply-btn" data-query-id="${escapeHtml(item.id)}" type="button">Save Reply</button>
                 </div>
             </div>
         `).join("");

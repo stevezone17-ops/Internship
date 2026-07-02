@@ -16,6 +16,7 @@ from utils.helpers import (
     api_error,
     api_success,
     get_session_user_id,
+    get_session_account_id,
     login_required,
     verify_transaction_pin,
     verify_user_password,
@@ -53,21 +54,6 @@ def account_to_dict(account):
         "created_at_display": format_ist(created_at) if created_at else None,
     }
 
-
-def get_session_account_id():
-    account_id = session.get("account_id")
-    if account_id:
-        return account_id
-
-    user_id = session.get("user_id")
-    if not user_id:
-        return None
-
-    account = get_account_for_user(accounts_col, user_id)
-    if account:
-        session["account_id"] = str(account["_id"])
-        return session["account_id"]
-    return None
 
 @accounts_bp.route("/api/profile", methods=["GET"])
 @login_required
@@ -119,6 +105,9 @@ def profile_update_api():
     if name:
         updates["name"] = name
     if email:
+        existing = users_col.find_one({"email": email, "_id": {"$ne": user_obj_id}})
+        if existing:
+            return api_error("That email is already in use.", 400, endpoint="main.profile_page")
         updates["email"] = email
     if pin:
         if not pin.isdigit() or len(pin) < 4 or len(pin) > 6:
@@ -229,6 +218,8 @@ def delete_account(account_id):
     accounts_col.delete_one({"_id": account_obj_id})
     transactions_col.delete_many({"account_id": account_obj_id})
     notifications_col.delete_many({"account_id": account_obj_id})
+    cols["login_activity"].delete_many({"account_id": account_obj_id})
+    cols["scheduled_transfers"].delete_many({"user_id": account.get("user_id")})
     account_cache.pop(str(account_obj_id), None)
     recent_transactions.pop(str(account_obj_id), None)
 

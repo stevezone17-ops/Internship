@@ -2,28 +2,13 @@ from flask import Blueprint, render_template, session, redirect, url_for, flash
 from bson import ObjectId
 from models.db import get_collections
 from services.accounts import ACCOUNT_RULES, get_account_for_user
-from utils.helpers import login_required, get_session_user_id, format_ist
+from utils.helpers import login_required, get_session_user_id, get_session_account_id, format_ist
 
 main_bp = Blueprint("main", __name__)
 cols = get_collections()
 accounts_col = cols["accounts"]
 users_col = cols["users"]
 support_queries_col = cols["support_queries"]
-
-def get_session_account_id():
-    account_id = session.get("account_id")
-    if account_id:
-        return account_id
-
-    user_id = session.get("user_id")
-    if not user_id:
-        return None
-
-    account = get_account_for_user(accounts_col, user_id)
-    if account:
-        session["account_id"] = str(account["_id"])
-        return session["account_id"]
-    return None
 
 def account_required(view_func):
     from functools import wraps

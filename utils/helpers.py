@@ -63,6 +63,24 @@ def api_success(message, endpoint=None, payload=None, category="success"):
 def get_session_user_id():
     return session.get("user_id")
 
+def get_session_account_id():
+    account_id = session.get("account_id")
+    if account_id:
+        return account_id
+
+    user_id = session.get("user_id")
+    if not user_id:
+        return None
+
+    from models.db import get_collections
+    from services.accounts import get_account_for_user
+    cols = get_collections()
+    account = get_account_for_user(cols["accounts"], user_id)
+    if account:
+        session["account_id"] = str(account["_id"])
+        return session["account_id"]
+    return None
+
 def get_display_name(user):
     if not user:
         return "Unknown User"

@@ -143,14 +143,17 @@ def scheduled_transfers_run():
             if not receiver_account:
                 scheduled_transfers_col.update_one({"_id": s.get("_id")}, {"$set": {"status": "failed", "error": "recipient not found"}})
                 continue
-            # check balance
-            sender_balance = float(account.get("balance", 0.0))
+            # check balance and perform atomic debit
             sender_min_balance = float(account.get("min_balance", 0.0))
-            if amount > sender_balance or sender_balance - amount < sender_min_balance:
+            sender_result = accounts_col.find_one_and_update(
+                {"_id": account["_id"], "balance": {"$gte": float(amount) + sender_min_balance}},
+                {"$inc": {"balance": -float(amount)}},
+                return_document=True,
+            )
+            if not sender_result:
                 scheduled_transfers_col.update_one({"_id": s.get("_id")}, {"$set": {"status": "failed", "error": "insufficient funds"}})
                 continue
-            # perform transfer
-            accounts_col.update_one({"_id": account["_id"]}, {"$inc": {"balance": -float(amount)}})
+            # credit receiver
             accounts_col.update_one({"_id": receiver_account["_id"]}, {"$inc": {"balance": float(amount)}})
             insert_transaction(account["_id"], "transfer", float(amount), metadata={"to_account_id": str(receiver_account["_id"])})
             insert_transaction(receiver_account["_id"], "transfer", float(amount), metadata={"from_account_id": str(account["_id"])})

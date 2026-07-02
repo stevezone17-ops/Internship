@@ -114,7 +114,10 @@
             >
               Toggle Theme
             </button>
-            <a class="btn btn-logout" href="/logout">Logout</a>
+            <form method="POST" action="/logout" style="display:inline">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-logout" type="submit">Logout</button>
+            </form>
             {% else %}
             <a class="btn primary" href="/create">Get Started</a>
             <a class="btn ghost" href="/login">Login</a>
