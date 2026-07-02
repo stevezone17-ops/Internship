@@ -13,6 +13,7 @@
   <div class="message error">{{ error }}</div>
   {% endif %}
   <form method="POST" action="/setup-pin">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <label for="pin">PIN</label>
     <input
       id="pin"

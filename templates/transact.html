@@ -8,6 +8,7 @@
   <div class="card form-card" data-page="deposit">
     <h3>Deposit Money</h3>
     <form id="deposit-form" method="POST" action="/api/deposit">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <label for="deposit-amount">Amount</label>
       <input
         id="deposit-amount"
@@ -36,6 +37,7 @@
   <div class="card form-card" data-page="withdraw">
     <h3>Withdraw Money</h3>
     <form id="withdraw-form" method="POST" action="/api/withdraw">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <label for="withdraw-amount">Amount</label>
       <input
         id="withdraw-amount"
@@ -64,6 +66,7 @@
   <div class="card form-card" data-page="transfer">
     <h3>Transfer Money</h3>
     <form id="transfer-form" method="POST" action="/api/transfer">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <label for="transfer-to">Receiver Email</label>
       <input
         id="transfer-to"

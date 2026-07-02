@@ -12,6 +12,7 @@
         Share the details and choose a priority to help us route your request.
       </p>
       <form id="support-form" class="support-form">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <label for="support-subject">Subject</label>
         <input
           type="text"

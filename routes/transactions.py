@@ -1,10 +1,9 @@
 import io
+import re
 import time
-from datetime import timedelta
 import pandas as pd
 from flask import Blueprint, request, jsonify, session, redirect, url_for, flash, render_template, send_file
 from bson import ObjectId
-from werkzeug.security import check_password_hash, generate_password_hash
 
 from models.db import get_collections
 from services.accounts import (
@@ -83,6 +82,8 @@ def deposit():
 
     if amount is None or amount <= 0:
         return api_error("Please check your input.", 400, endpoint="main.transact_page", category="warning")
+    if amount > 10000:
+        return api_error("Please check your input.", 400, endpoint="main.transact_page", category="warning")
 
     user = users_col.find_one({"_id": ObjectId(get_session_user_id())})
     if not user:
@@ -109,8 +110,15 @@ def deposit():
     except Exception:
         return api_error("Invalid account ID.", 400, endpoint="main.transact_page")
 
-    new_balance = float(account.get("balance", 0.0)) + float(amount)
-    accounts_col.update_one({"_id": account_obj_id}, {"$set": {"balance": new_balance}})
+    result = accounts_col.find_one_and_update(
+        {"_id": account_obj_id},
+        {"$inc": {"balance": float(amount)}},
+        return_document=True,
+    )
+    if not result:
+        return api_error("Deposit failed. Please try again.", 500, endpoint="main.transact_page")
+
+    new_balance = float(result.get("balance", 0.0))
 
     tx_doc, warnings = insert_transaction(account_obj_id, "deposit", float(amount))
     add_notification(
@@ -211,8 +219,15 @@ def withdraw():
             return api_error("Current accounts must maintain a minimum balance of ₹5,000.", 400, endpoint="main.transact_page")
         return api_error(f"Minimum balance of ₹{min_balance:.0f} must be maintained.", 400, endpoint="main.transact_page")
 
-    new_balance = current_balance - float(amount)
-    accounts_col.update_one({"_id": account_obj_id}, {"$set": {"balance": new_balance}})
+    result = accounts_col.find_one_and_update(
+        {"_id": account_obj_id, "balance": {"$gte": float(amount)}},
+        {"$inc": {"balance": -float(amount)}},
+        return_document=True,
+    )
+    if not result:
+        return api_error("Withdrawal failed due to insufficient balance. Please try again.", 500, endpoint="main.transact_page")
+
+    new_balance = float(result.get("balance", 0.0))
 
     tx_doc, warnings = insert_transaction(account_obj_id, "withdraw", float(amount))
     add_notification(
@@ -308,11 +323,23 @@ def transfer():
             return api_error("Current accounts must maintain a minimum balance of ₹5,000.", 400, endpoint="main.transfer_page")
         return api_error(f"Minimum balance of ₹{sender_min_balance:.0f} must be maintained.", 400, endpoint="main.transfer_page")
 
-    sender_new_balance = sender_balance - float(amount)
-    receiver_new_balance = float(receiver_account.get("balance", 0.0)) + float(amount)
+    # Atomic debit from sender — only succeeds if balance is still sufficient
+    sender_result = accounts_col.find_one_and_update(
+        {"_id": sender_account["_id"], "balance": {"$gte": float(amount)}},
+        {"$inc": {"balance": -float(amount)}},
+        return_document=True,
+    )
+    if not sender_result:
+        return api_error("Transfer failed due to insufficient balance. Please try again.", 500, endpoint="main.transfer_page")
 
-    accounts_col.update_one({"_id": sender_account["_id"]}, {"$set": {"balance": sender_new_balance}})
-    accounts_col.update_one({"_id": receiver_account["_id"]}, {"$set": {"balance": receiver_new_balance}})
+    # Credit receiver
+    accounts_col.update_one(
+        {"_id": receiver_account["_id"]},
+        {"$inc": {"balance": float(amount)}},
+    )
+
+    sender_new_balance = float(sender_result.get("balance", 0.0))
+    receiver_new_balance = float(receiver_account.get("balance", 0.0)) + float(amount)
 
     tx_doc, warnings = insert_transaction(
         sender_account["_id"],
@@ -375,8 +402,8 @@ def export_csv(account_id):
             filters["timestamp"]["$lte"] = end_date
     if q:
         filters["$or"] = [
-            {"transaction_id": {"$regex": q, "$options": "i"}},
-            {"metadata": {"$regex": q, "$options": "i"}},
+            {"transaction_id": {"$regex": re.escape(q), "$options": "i"}},
+            {"metadata": {"$regex": re.escape(q), "$options": "i"}},
         ]
 
     sort_by = (request.args.get("sort_by") or "timestamp").strip()
@@ -474,8 +501,8 @@ def export_pdf(account_id):
             filters["timestamp"]["$lte"] = end_date
     if q:
         filters["$or"] = [
-            {"transaction_id": {"$regex": q, "$options": "i"}},
-            {"metadata": {"$regex": q, "$options": "i"}},
+            {"transaction_id": {"$regex": re.escape(q), "$options": "i"}},
+            {"metadata": {"$regex": re.escape(q), "$options": "i"}},
         ]
 
     sort_by = (request.args.get("sort_by") or "timestamp").strip()
@@ -632,8 +659,8 @@ def get_transactions(account_id):
 
     if q:
         filters["$or"] = [
-            {"transaction_id": {"$regex": q, "$options": "i"}},
-            {"metadata": {"$regex": q, "$options": "i"}},
+            {"transaction_id": {"$regex": re.escape(q), "$options": "i"}},
+            {"metadata": {"$regex": re.escape(q), "$options": "i"}},
         ]
 
     try:
@@ -644,6 +671,7 @@ def get_transactions(account_id):
 
     if page < 1: page = 1
     if limit < 1: limit = 10
+    if limit > 100: limit = 100
 
     skip = (page - 1) * limit
     total = transactions_col.count_documents(filters)

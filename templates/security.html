@@ -8,6 +8,7 @@
   <div class="card form-card">
     <h3>Change Password</h3>
     <form id="change-password-form">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <label for="current-password">Current Password</label>
       <input
         id="current-password"

@@ -8,6 +8,7 @@
   <div class="card">
     <h3>Add Beneficiary</h3>
     <form id="beneficiary-form">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <label for="benef-name">Name</label>
       <input
         id="benef-name"

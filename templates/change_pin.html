@@ -24,6 +24,7 @@
   </div>
 
   <form class="change-pin-form" id="change-pin-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <label for="change-pin-email">Current Account Email</label>
     <input
       id="change-pin-email"

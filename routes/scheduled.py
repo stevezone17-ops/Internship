@@ -118,10 +118,13 @@ def scheduled_transfer_delete(transfer_id):
 def scheduled_transfers_run():
     # This endpoint processes due scheduled transfers. In production run via cron.
     scheduler_token = os.environ.get("SCHEDULED_TRANSFER_TOKEN", "").strip()
-    if scheduler_token:
-        provided_token = (request.headers.get("X-Scheduler-Token") or "").strip()
-        if provided_token != scheduler_token:
-            return jsonify({"error": "Forbidden."}), 403
+    if not scheduler_token:
+        logger.warning("SCHEDULED_TRANSFER_TOKEN not set — rejecting request.")
+        return jsonify({"error": "Scheduler not configured."}), 503
+
+    provided_token = (request.headers.get("X-Scheduler-Token") or "").strip()
+    if provided_token != scheduler_token:
+        return jsonify({"error": "Forbidden."}), 403
 
     now = ist_now()
     due = list(scheduled_transfers_col.find({"scheduled_at": {"$lte": now}, "status": "scheduled"}))

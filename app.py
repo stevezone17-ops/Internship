@@ -1,7 +1,8 @@
 import os
+import secrets
 import time
 from datetime import timedelta
-from flask import Flask, jsonify, redirect, session, url_for, flash, request
+from flask import Flask, jsonify, redirect, session, url_for, flash, request, g
 
 from models.db import get_db
 from utils.logging_config import setup_logging
@@ -12,14 +13,44 @@ INACTIVITY_LIMIT_SECONDS = 600
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.environ.get("FLASK_SECRET_KEY", "super_secure_secret_key")
+
+    secret_key = os.environ.get("FLASK_SECRET_KEY")
+    if not secret_key:
+        secret_key = secrets.token_hex(32)
+        app.logger.warning("FLASK_SECRET_KEY not set. Using random key — sessions will not persist across restarts.")
+
+    app.secret_key = secret_key
 
     app.config.update(
         SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SECURE=False,
+        SESSION_COOKIE_SECURE=os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true",
         SESSION_COOKIE_SAMESITE="Lax",
         PERMANENT_SESSION_LIFETIME=timedelta(minutes=60),
     )
+
+    @app.before_request
+    def generate_csrf_token():
+        if "_csrf_token" not in session:
+            session["_csrf_token"] = secrets.token_hex(32)
+        g.csrf_token = session["_csrf_token"]
+
+    @app.template_global()
+    def csrf_token():
+        return g.get("csrf_token", session.get("_csrf_token", ""))
+
+    def validate_csrf():
+        if request.method not in ("POST", "PUT", "DELETE", "PATCH"):
+            return None
+        token = request.headers.get("X-CSRFToken") or request.form.get("_csrf_token")
+        if not token or not session.get("_csrf_token") or token != session["_csrf_token"]:
+            return jsonify({"error": "Invalid CSRF token."}), 403
+        return None
+
+    @app.before_request
+    def check_csrf():
+        if request.endpoint and request.endpoint.startswith("static"):
+            return None
+        return validate_csrf()
 
     setup_logging()
 
@@ -76,4 +107,5 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    app.run(debug=debug)

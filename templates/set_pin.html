@@ -7,6 +7,7 @@
 <section class="card form-card" data-page="set-pin">
   <h3>Set your PIN</h3>
   <form id="set-pin-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <label for="pin">New PIN</label>
     <input
       id="pin"

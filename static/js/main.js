@@ -1,8 +1,12 @@
 const apiRequest = async (url, options = {}) => {
+    const csrfToken = document.querySelector('input[name="_csrf_token"]');
+    const headers = {
+        "Content-Type": "application/json",
+        ...(csrfToken ? { "X-CSRFToken": csrfToken.value } : {}),
+        ...options.headers,
+    };
     const response = await fetch(url, {
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers,
         credentials: "same-origin",
         ...options,
     });
@@ -1088,10 +1092,12 @@ const setupTransferPage = () => {
                         amount: amount,
                         scheduled_at: scheduleAt && scheduleAt.value ? new Date(scheduleAt.value).toISOString() : null,
                     };
+                    const csrfEl = document.querySelector('input[name="_csrf_token"]');
+                    const csrfVal = csrfEl ? csrfEl.value : '';
                     const resp = await fetch("/api/scheduled-transfers", {
                         method: "POST",
                         credentials: "same-origin",
-                        headers: { "Content-Type": "application/json" },
+                        headers: { "Content-Type": "application/json", "X-CSRFToken": csrfVal },
                         body: JSON.stringify(payload),
                     });
                     const data = await resp.json();
@@ -1101,10 +1107,12 @@ const setupTransferPage = () => {
                     return;
                 }
 
+                const csrfEl2 = document.querySelector('input[name="_csrf_token"]');
+                const csrfVal2 = csrfEl2 ? csrfEl2.value : '';
                 const response = await fetch("/api/transfer", {
                     method: "POST",
                     credentials: "same-origin",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", "X-CSRFToken": csrfVal2 },
                     body: JSON.stringify({
                         receiver_email: receiverEmail,
                         amount: amount,
@@ -1289,7 +1297,9 @@ const setupBeneficiaries = () => {
             btn.addEventListener('click', async () => {
                 const id = btn.dataset.id;
                 try {
-                    await fetch(`/api/beneficiaries/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+                    const csrfEl3 = document.querySelector('input[name="_csrf_token"]');
+                    const csrfVal3 = csrfEl3 ? csrfEl3.value : '';
+                    await fetch(`/api/beneficiaries/${id}`, { method: 'DELETE', credentials: 'same-origin', headers: { "X-CSRFToken": csrfVal3 } });
                     setMessage(message, 'Beneficiary removed.', 'success');
                     await delay(300);
                     refresh();
