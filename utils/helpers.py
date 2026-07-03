@@ -95,9 +95,14 @@ def verify_user_password(user, password):
     from werkzeug.security import check_password_hash
     if not user or not password:
         return False
-    password_hash = user.get("password_hash")
+    password_hash = user.get("password_hash") or user.get("password")
     if not password_hash:
         return False
+
+    # Legacy compatibility: older data may contain a plaintext password in `password`.
+    if user.get("password") and not user.get("password_hash"):
+        return user.get("password") == password
+
     try:
         return check_password_hash(password_hash, password)
     except Exception:

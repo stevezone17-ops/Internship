@@ -19,7 +19,8 @@ def get_db():
     else:
         mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017/bank_simulator")
         client = MongoClient(mongo_uri)
-        _DB_CACHE = client.get_default_database() or client["bank_simulator"]
+        default_db = client.get_default_database()
+        _DB_CACHE = default_db if default_db is not None else client["bank_simulator"]
     
     _ensure_collections(_DB_CACHE)
     return _DB_CACHE
