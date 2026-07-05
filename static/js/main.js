@@ -91,12 +91,15 @@ const setupAlertDismissals = () => {
 };
 
 const setupSessionTimeoutWarning = () => {
+    if (window.__sessionTimeoutWarningController) return;
+
     const overlay = document.getElementById("session-warning-overlay");
     const timerEl = document.getElementById("session-warning-timer");
     const stayButton = document.getElementById("session-stay-logged-in");
     const logoutButton = document.getElementById("session-logout-now");
+    const modal = overlay ? overlay.querySelector(".session-warning-modal") : null;
 
-    if (!overlay || !timerEl || !stayButton || !logoutButton) return;
+    if (!overlay || !timerEl || !stayButton || !logoutButton || !modal) return;
     if (document.body.dataset.authenticated !== "true") return;
 
     const WARNING_DURATION_MS = 9 * 60 * 1000;
@@ -118,9 +121,15 @@ const setupSessionTimeoutWarning = () => {
         countdownTimer = null;
     };
 
+    const setScrollLocked = (locked) => {
+        document.body.style.overflow = locked ? "hidden" : "";
+        document.documentElement.style.overflow = locked ? "hidden" : "";
+    };
+
     const hideWarning = () => {
         overlay.hidden = true;
         warningVisible = false;
+        setScrollLocked(false);
         remainingSeconds = COUNTDOWN_START_SECONDS;
         if (countdownTimer) {
             window.clearInterval(countdownTimer);
@@ -143,7 +152,7 @@ const setupSessionTimeoutWarning = () => {
             remainingSeconds -= 1;
             updateTimerDisplay();
             if (remainingSeconds <= 0) {
-                window.location.href = "/logout/timeout";
+                window.location.assign("/logout/timeout");
             }
         }, 1000);
     };
@@ -151,6 +160,7 @@ const setupSessionTimeoutWarning = () => {
     const showWarning = () => {
         warningVisible = true;
         overlay.hidden = false;
+        setScrollLocked(true);
         remainingSeconds = COUNTDOWN_START_SECONDS;
         updateTimerDisplay();
         startCountdown();
@@ -160,17 +170,19 @@ const setupSessionTimeoutWarning = () => {
         clearTimers();
         warningTimer = window.setTimeout(showWarning, WARNING_DURATION_MS);
         timeoutTimer = window.setTimeout(() => {
-            window.location.href = "/logout/timeout";
+            window.location.assign("/logout/timeout");
         }, TIMEOUT_MS);
     };
 
     const refreshSession = async () => {
         try {
+            const csrfToken = document.querySelector('input[name="_csrf_token"]');
             await fetch("/api/session/refresh", {
                 method: "GET",
                 credentials: "same-origin",
                 headers: {
                     Accept: "application/json",
+                    ...(csrfToken ? { X-CSRFToken: csrfToken.value } : {}),
                 },
             });
         } catch (error) {
@@ -178,21 +190,46 @@ const setupSessionTimeoutWarning = () => {
         }
     };
 
-    const handleActivity = () => {
+    const handleActivity = (event) => {
+        const target = event && event.target;
+        if (!target) {
+            if (warningVisible) {
+                hideWarning();
+            }
+            resetTimers();
+            return;
+        }
+
+        if (warningVisible && (overlay === target || overlay.contains(target))) {
+            return;
+        }
+
         if (warningVisible) {
             hideWarning();
         }
         resetTimers();
     };
 
-    stayButton.addEventListener("click", async () => {
+    overlay.addEventListener("click", (event) => {
+        if (event.target === overlay) {
+            event.stopPropagation();
+        }
+    });
+
+    modal.addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
+
+    stayButton.addEventListener("click", async (event) => {
+        event.stopPropagation();
         await refreshSession();
         hideWarning();
         resetTimers();
     });
 
-    logoutButton.addEventListener("click", () => {
-        window.location.href = "/logout/timeout";
+    logoutButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        window.location.assign("/logout/timeout");
     });
 
     ["mousemove", "keydown", "click", "scroll", "touchstart"].forEach((eventName) => {
@@ -200,6 +237,7 @@ const setupSessionTimeoutWarning = () => {
     });
 
     resetTimers();
+    window.__sessionTimeoutWarningController = { hideWarning, resetTimers };
 };
 
 const formatCurrency = (value) => {
