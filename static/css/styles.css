@@ -617,6 +617,16 @@ select {
     padding: 20px;
     z-index: 2000;
     animation: fadeIn 0.2s ease;
+    pointer-events: none;
+}
+
+.session-warning-overlay[hidden] {
+    display: none;
+    pointer-events: none;
+}
+
+.session-warning-overlay:not([hidden]) {
+    pointer-events: auto;
 }
 
 .session-warning-modal {

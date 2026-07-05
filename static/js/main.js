@@ -91,7 +91,8 @@ const setupAlertDismissals = () => {
 };
 
 const setupSessionTimeoutWarning = () => {
-    if (window.__sessionTimeoutWarningController) return;
+    if (window.__sessionTimeoutWarningInitialized) return;
+    window.__sessionTimeoutWarningInitialized = true;
 
     const overlay = document.getElementById("session-warning-overlay");
     const timerEl = document.getElementById("session-warning-timer");
@@ -103,131 +104,131 @@ const setupSessionTimeoutWarning = () => {
     if (document.body.dataset.authenticated !== "true") return;
 
     const WARNING_DURATION_MS = 9 * 60 * 1000;
-    const TIMEOUT_MS = 10 * 60 * 1000;
-    const COUNTDOWN_START_SECONDS = 60;
+    const INACTIVITY_DURATION_MS = 10 * 60 * 1000;
+    const COUNTDOWN_SECONDS = 60;
 
+    let inactivityTimer = null;
     let warningTimer = null;
-    let timeoutTimer = null;
-    let countdownTimer = null;
-    let remainingSeconds = COUNTDOWN_START_SECONDS;
+    let countdownInterval = null;
+    let countdownSeconds = COUNTDOWN_SECONDS;
     let warningVisible = false;
 
-    const clearTimers = () => {
-        if (warningTimer) window.clearTimeout(warningTimer);
-        if (timeoutTimer) window.clearTimeout(timeoutTimer);
-        if (countdownTimer) window.clearInterval(countdownTimer);
-        warningTimer = null;
-        timeoutTimer = null;
-        countdownTimer = null;
+    const clearAllTimers = () => {
+        if (inactivityTimer) {
+            window.clearTimeout(inactivityTimer);
+            inactivityTimer = null;
+        }
+        if (warningTimer) {
+            window.clearTimeout(warningTimer);
+            warningTimer = null;
+        }
+        if (countdownInterval) {
+            window.clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
     };
 
     const setScrollLocked = (locked) => {
         document.body.style.overflow = locked ? "hidden" : "";
         document.documentElement.style.overflow = locked ? "hidden" : "";
+        overlay.style.pointerEvents = locked ? "auto" : "none";
     };
 
-    const hideWarning = () => {
-        overlay.hidden = true;
-        warningVisible = false;
-        setScrollLocked(false);
-        remainingSeconds = COUNTDOWN_START_SECONDS;
-        if (countdownTimer) {
-            window.clearInterval(countdownTimer);
-            countdownTimer = null;
-        }
-        timerEl.textContent = "01:00";
-    };
-
-    const updateTimerDisplay = () => {
-        const minutes = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
-        const seconds = String(remainingSeconds % 60).padStart(2, "0");
+    const updateCountdownDisplay = () => {
+        const minutes = String(Math.floor(countdownSeconds / 60)).padStart(2, "0");
+        const seconds = String(countdownSeconds % 60).padStart(2, "0");
         timerEl.textContent = `${minutes}:${seconds}`;
     };
 
     const startCountdown = () => {
-        if (countdownTimer) {
-            window.clearInterval(countdownTimer);
-        }
-        countdownTimer = window.setInterval(() => {
-            remainingSeconds -= 1;
-            updateTimerDisplay();
-            if (remainingSeconds <= 0) {
+        countdownSeconds = COUNTDOWN_SECONDS;
+        updateCountdownDisplay();
+        countdownInterval = window.setInterval(() => {
+            countdownSeconds -= 1;
+            updateCountdownDisplay();
+            if (countdownSeconds <= 0) {
                 window.location.assign("/logout/timeout");
             }
         }, 1000);
     };
 
     const showWarning = () => {
+        if (warningVisible) return;
         warningVisible = true;
         overlay.hidden = false;
         setScrollLocked(true);
-        remainingSeconds = COUNTDOWN_START_SECONDS;
-        updateTimerDisplay();
         startCountdown();
     };
 
-    const resetTimers = () => {
-        clearTimers();
-        warningTimer = window.setTimeout(showWarning, WARNING_DURATION_MS);
-        timeoutTimer = window.setTimeout(() => {
+    const hideWarning = () => {
+        warningVisible = false;
+        overlay.hidden = true;
+        setScrollLocked(false);
+        if (countdownInterval) {
+            window.clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+        countdownSeconds = COUNTDOWN_SECONDS;
+        updateCountdownDisplay();
+    };
+
+    const startInactivityTimers = () => {
+        clearAllTimers();
+        inactivityTimer = window.setTimeout(() => {
             window.location.assign("/logout/timeout");
-        }, TIMEOUT_MS);
+        }, INACTIVITY_DURATION_MS);
+
+        warningTimer = window.setTimeout(() => {
+            showWarning();
+        }, WARNING_DURATION_MS);
     };
 
     const refreshSession = async () => {
-        try {
-            const csrfToken = document.querySelector('input[name="_csrf_token"]');
-            await fetch("/api/session/refresh", {
-                method: "GET",
-                credentials: "same-origin",
-                headers: {
-                    Accept: "application/json",
-                    ...(csrfToken ? { X-CSRFToken: csrfToken.value } : {}),
-                },
-            });
-        } catch (error) {
-            console.warn("Failed to refresh session", error);
+        const csrfToken = document.querySelector('input[name="_csrf_token"]');
+        const response = await fetch("/api/session/refresh", {
+            method: "GET",
+            credentials: "same-origin",
+            headers: {
+                Accept: "application/json",
+                ...(csrfToken ? { "X-CSRFToken": csrfToken.value } : {}),
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Session refresh failed");
         }
     };
 
-    const handleActivity = (event) => {
-        const target = event && event.target;
-        if (!target) {
-            if (warningVisible) {
-                hideWarning();
-            }
-            resetTimers();
-            return;
-        }
-
-        if (warningVisible && (overlay === target || overlay.contains(target))) {
-            return;
-        }
-
-        if (warningVisible) {
-            hideWarning();
-        }
-        resetTimers();
+    const handleActivity = () => {
+        if (warningVisible) return;
+        startInactivityTimers();
     };
 
     overlay.addEventListener("click", (event) => {
-        if (event.target === overlay) {
-            event.stopPropagation();
-        }
+        event.preventDefault();
+        event.stopPropagation();
     });
 
     modal.addEventListener("click", (event) => {
+        event.preventDefault();
         event.stopPropagation();
     });
 
     stayButton.addEventListener("click", async (event) => {
+        event.preventDefault();
         event.stopPropagation();
-        await refreshSession();
-        hideWarning();
-        resetTimers();
+
+        try {
+            await refreshSession();
+            hideWarning();
+            startInactivityTimers();
+        } catch (error) {
+            console.warn("Failed to refresh session", error);
+        }
     });
 
     logoutButton.addEventListener("click", (event) => {
+        event.preventDefault();
         event.stopPropagation();
         window.location.assign("/logout/timeout");
     });
@@ -236,8 +237,7 @@ const setupSessionTimeoutWarning = () => {
         window.addEventListener(eventName, handleActivity, { passive: true });
     });
 
-    resetTimers();
-    window.__sessionTimeoutWarningController = { hideWarning, resetTimers };
+    startInactivityTimers();
 };
 
 const formatCurrency = (value) => {
