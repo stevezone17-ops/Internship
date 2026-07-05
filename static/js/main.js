@@ -90,6 +90,118 @@ const setupAlertDismissals = () => {
     });
 };
 
+const setupSessionTimeoutWarning = () => {
+    const overlay = document.getElementById("session-warning-overlay");
+    const timerEl = document.getElementById("session-warning-timer");
+    const stayButton = document.getElementById("session-stay-logged-in");
+    const logoutButton = document.getElementById("session-logout-now");
+
+    if (!overlay || !timerEl || !stayButton || !logoutButton) return;
+    if (document.body.dataset.authenticated !== "true") return;
+
+    const WARNING_DURATION_MS = 9 * 60 * 1000;
+    const TIMEOUT_MS = 10 * 60 * 1000;
+    const COUNTDOWN_START_SECONDS = 60;
+
+    let warningTimer = null;
+    let timeoutTimer = null;
+    let countdownTimer = null;
+    let remainingSeconds = COUNTDOWN_START_SECONDS;
+    let warningVisible = false;
+
+    const clearTimers = () => {
+        if (warningTimer) window.clearTimeout(warningTimer);
+        if (timeoutTimer) window.clearTimeout(timeoutTimer);
+        if (countdownTimer) window.clearInterval(countdownTimer);
+        warningTimer = null;
+        timeoutTimer = null;
+        countdownTimer = null;
+    };
+
+    const hideWarning = () => {
+        overlay.hidden = true;
+        warningVisible = false;
+        remainingSeconds = COUNTDOWN_START_SECONDS;
+        if (countdownTimer) {
+            window.clearInterval(countdownTimer);
+            countdownTimer = null;
+        }
+        timerEl.textContent = "01:00";
+    };
+
+    const updateTimerDisplay = () => {
+        const minutes = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
+        const seconds = String(remainingSeconds % 60).padStart(2, "0");
+        timerEl.textContent = `${minutes}:${seconds}`;
+    };
+
+    const startCountdown = () => {
+        if (countdownTimer) {
+            window.clearInterval(countdownTimer);
+        }
+        countdownTimer = window.setInterval(() => {
+            remainingSeconds -= 1;
+            updateTimerDisplay();
+            if (remainingSeconds <= 0) {
+                window.location.href = "/logout/timeout";
+            }
+        }, 1000);
+    };
+
+    const showWarning = () => {
+        warningVisible = true;
+        overlay.hidden = false;
+        remainingSeconds = COUNTDOWN_START_SECONDS;
+        updateTimerDisplay();
+        startCountdown();
+    };
+
+    const resetTimers = () => {
+        clearTimers();
+        warningTimer = window.setTimeout(showWarning, WARNING_DURATION_MS);
+        timeoutTimer = window.setTimeout(() => {
+            window.location.href = "/logout/timeout";
+        }, TIMEOUT_MS);
+    };
+
+    const refreshSession = async () => {
+        try {
+            await fetch("/api/session/refresh", {
+                method: "GET",
+                credentials: "same-origin",
+                headers: {
+                    Accept: "application/json",
+                },
+            });
+        } catch (error) {
+            console.warn("Failed to refresh session", error);
+        }
+    };
+
+    const handleActivity = () => {
+        if (warningVisible) {
+            hideWarning();
+        }
+        resetTimers();
+    };
+
+    stayButton.addEventListener("click", async () => {
+        await refreshSession();
+        hideWarning();
+        resetTimers();
+    });
+
+    logoutButton.addEventListener("click", () => {
+        window.location.href = "/logout/timeout";
+    });
+
+    ["mousemove", "keydown", "click", "scroll", "touchstart"].forEach((eventName) => {
+        window.addEventListener(eventName, handleActivity, { passive: true });
+    });
+
+    resetTimers();
+};
+
 const formatCurrency = (value) => {
     return new Intl.NumberFormat("en-IN", {
         style: "currency",
@@ -1951,6 +2063,7 @@ window.addEventListener("DOMContentLoaded", () => {
     setupCreateAccount();
     setupSignup();
     setupLogin();
+    setupSessionTimeoutWarning();
     setupForgotPassword();
     setupResetPassword();
     setupLoginFlash();

@@ -77,6 +77,20 @@ def logout():
     session.clear()
     return redirect(url_for("main.home_page"))
 
+@auth_bp.route("/logout/timeout")
+def logout_timeout():
+    session.clear()
+    flash("Session expired due to inactivity.", "error")
+    return redirect(url_for("auth.login_page"))
+
+@auth_bp.route("/api/session/refresh", methods=["GET"])
+def refresh_session():
+    if "user_id" not in session:
+        return jsonify({"error": "No active session."}), 401
+    session["last_activity"] = time.time()
+    session.modified = True
+    return jsonify({"message": "Session refreshed."})
+
 @auth_bp.route("/api/signup", methods=["POST"])
 def signup():
     data = request.get_json(silent=True)
