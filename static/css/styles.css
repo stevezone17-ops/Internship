@@ -696,6 +696,196 @@ select {
     text-decoration: underline;
 }
 
+/* --- Password Strength UI --- */
+.field-group {
+    display: grid;
+    gap: 8px;
+}
+
+.field-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 46px;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    border-radius: 999px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.password-toggle:hover {
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--text-primary);
+}
+
+.password-strength-card {
+    margin-top: 4px;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: rgba(248, 250, 252, 0.8);
+    display: grid;
+    gap: 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dark-mode .password-strength-card {
+    background: rgba(15, 23, 42, 0.7);
+    box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.08);
+}
+
+.strength-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.strength-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.strength-badge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--danger);
+    transition: color 0.2s ease;
+}
+
+.strength-meter {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.25);
+    overflow: hidden;
+}
+
+.strength-meter-bar {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--danger);
+    transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+.strength-tooltip {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+.password-requirements {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+}
+
+.requirement-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    transition: color 0.2s ease;
+}
+
+.requirement-item.pass {
+    color: var(--success);
+}
+
+.requirement-item.fail {
+    color: var(--danger);
+}
+
+.requirement-icon {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.requirement-item.pass .requirement-icon {
+    color: var(--success);
+}
+
+.requirement-item.fail .requirement-icon {
+    color: var(--danger);
+}
+
+.password-match-status {
+    font-size: 0.8rem;
+    color: var(--muted);
+    min-height: 1.1rem;
+}
+
+.password-match-status.is-match {
+    color: var(--success);
+}
+
+.password-match-status.is-mismatch {
+    color: var(--danger);
+}
+
+.caps-lock-warning {
+    font-size: 0.8rem;
+    color: var(--warning);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.auth-message {
+    min-height: 1.25rem;
+    margin-top: 10px;
+    font-size: 0.85rem;
+}
+
+.auth-btn[disabled] {
+    cursor: not-allowed;
+    opacity: 0.65;
+    background: var(--muted);
+}
+
+.auth-btn[disabled]:hover {
+    background: var(--muted);
+}
+
+@media (max-width: 480px) {
+    .auth-shell {
+        width: min(96vw, 440px);
+        padding: 16px;
+        padding-top: 40px;
+    }
+
+    .auth-card {
+        padding: 22px;
+    }
+
+    .password-strength-card {
+        padding: 12px;
+    }
+}
+
 /* --- Page Header --- */
 .page-header {
     margin-bottom: 24px;

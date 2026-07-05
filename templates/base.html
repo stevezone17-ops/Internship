@@ -114,13 +114,21 @@
             >
               Toggle Theme
             </button>
-            <form method="POST" action="/logout" style="display:inline">
-              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <form method="POST" action="/logout" style="display: inline">
+              <input
+                type="hidden"
+                name="_csrf_token"
+                value="{{ csrf_token() }}"
+              />
               <button class="btn btn-logout" type="submit">Logout</button>
             </form>
             {% else %}
-            <a class="btn primary" href="/create">Get Started</a>
-            <a class="btn ghost" href="/login">Login</a>
+            <a class="btn primary" href="{{ url_for('auth.signup_page') }}"
+              >Get Started</a
+            >
+            <a class="btn ghost" href="{{ url_for('auth.login_page') }}"
+              >Login</a
+            >
             {% endif %}
           </div>
         </header>
@@ -135,13 +143,13 @@
           {% for category, message in messages %}
           <div class="bank-alert {{ category }}" data-alert>
             <span class="bank-alert-icon" aria-hidden="true">
-              {% if category in ['success', 'message'] %}&#10003;{% elif category in
-              ['warning'] %}!{% else %}&#10007;{% endif %}
+              {% if category in ['success', 'message'] %}&#10003;{% elif
+              category in ['warning'] %}!{% else %}&#10007;{% endif %}
             </span>
             <span class="bank-alert-text">
               <strong class="bank-alert-title">
-                {% if category in ['success', 'message'] %}Success{% elif category in
-                ['warning'] %}Warning{% else %}Error{% endif %}
+                {% if category in ['success', 'message'] %}Success{% elif
+                category in ['warning'] %}Warning{% else %}Error{% endif %}
               </strong>
               <span class="bank-alert-body">{{ message }}</span>
             </span>
@@ -161,7 +169,10 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+      crossorigin="anonymous"
+    ></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   </body>
 </html>

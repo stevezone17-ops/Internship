@@ -213,6 +213,144 @@ const setupSignup = () => {
 
     if (!form) return;
 
+    const passwordInput = form.querySelector("#signup-password");
+    const confirmPasswordInput = form.querySelector("#signup-confirm-password");
+    const submitButton = form.querySelector("button[type='submit']");
+    const strengthBar = document.getElementById("password-strength-bar");
+    const strengthLabel = document.getElementById("password-strength-label");
+    const tooltip = document.getElementById("password-tooltip");
+    const capsLockWarning = document.getElementById("caps-lock-warning");
+    const matchStatus = document.getElementById("password-match-status");
+    const requirementItems = Array.from(form.querySelectorAll(".requirement-item"));
+    const passwordToggles = Array.from(form.querySelectorAll(".password-toggle"));
+
+    const updatePasswordUI = () => {
+        const value = passwordInput ? passwordInput.value : "";
+        const checks = {
+            length: value.length >= 8,
+            upper: /[A-Z]/.test(value),
+            lower: /[a-z]/.test(value),
+            number: /\d/.test(value),
+            special: /[!@#$%^&*]/.test(value),
+        };
+        const passedCount = Object.values(checks).filter(Boolean).length;
+        const variety = [checks.upper, checks.lower, checks.number, checks.special].filter(Boolean).length;
+        let score = passedCount * 20;
+        if (value.length >= 12) score += 8;
+        if (value.length >= 16) score += 8;
+        if (variety >= 3) score += 4;
+        score = Math.min(score, 100);
+
+        let level = "Weak";
+        let barColor = "var(--danger)";
+        if (passedCount >= 5) {
+            level = "Strong";
+            barColor = "var(--success)";
+        } else if (passedCount === 4) {
+            level = "Good";
+            barColor = "#ca8a04";
+        } else if (passedCount === 3) {
+            level = "Medium";
+            barColor = "var(--warning)";
+        }
+
+        if (strengthBar) {
+            strengthBar.style.width = `${Math.max(score, passedCount === 0 ? 8 : 12)}%`;
+            strengthBar.style.backgroundColor = barColor;
+        }
+        if (strengthLabel) {
+            strengthLabel.textContent = level;
+            strengthLabel.style.color = barColor;
+        }
+
+        requirementItems.forEach((item) => {
+            const key = item.dataset.requirement;
+            const passed = Boolean(checks[key]);
+            item.classList.toggle("pass", passed);
+            item.classList.toggle("fail", !passed);
+            const icon = item.querySelector(".requirement-icon");
+            if (icon) {
+                icon.textContent = passed ? "✓" : "✕";
+            }
+        });
+
+        const charPool = (checks.upper ? 26 : 0) + (checks.lower ? 26 : 0) + (checks.number ? 10 : 0) + (checks.special ? 32 : 0);
+        const entropy = charPool > 0 ? Math.round(Math.log2(Math.pow(charPool, Math.max(value.length, 1)))) : 0;
+        let explanation = "Start typing to evaluate your password strength.";
+        if (value) {
+            if (passedCount < 3) {
+                explanation = `Estimated entropy is ${entropy} bits. Add more variety and length to make it harder to guess.`;
+            } else if (passedCount < 5) {
+                explanation = `Estimated entropy is ${entropy} bits. You are close—finish the remaining requirements.`;
+            } else {
+                explanation = `Estimated entropy is ${entropy} bits. This password meets every requirement.`;
+            }
+        }
+        if (tooltip) {
+            tooltip.textContent = explanation;
+        }
+
+        const isStrong = passedCount === 5;
+        if (submitButton) {
+            submitButton.disabled = !isStrong;
+            submitButton.classList.toggle("is-disabled", !isStrong);
+        }
+    };
+
+    const updateMatchState = () => {
+        if (!matchStatus || !confirmPasswordInput || !passwordInput) return;
+        const passwordValue = passwordInput.value;
+        const confirmValue = confirmPasswordInput.value;
+        if (!confirmValue) {
+            matchStatus.textContent = "Passwords must match.";
+            matchStatus.classList.remove("is-match", "is-mismatch");
+            return;
+        }
+        const isMatch = confirmValue === passwordValue;
+        matchStatus.textContent = isMatch ? "Passwords match." : "Passwords do not match.";
+        matchStatus.classList.toggle("is-match", isMatch);
+        matchStatus.classList.toggle("is-mismatch", !isMatch);
+    };
+
+    const handleCapsLock = (event) => {
+        if (capsLockWarning) {
+            capsLockWarning.hidden = !event.getModifierState("CapsLock");
+        }
+    };
+
+    passwordToggles.forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+            const target = document.getElementById(toggle.dataset.target);
+            if (!target) return;
+            const shouldShow = target.type === "password";
+            target.type = shouldShow ? "text" : "password";
+            toggle.setAttribute("aria-pressed", String(shouldShow));
+            toggle.setAttribute("aria-label", shouldShow ? `Hide ${target.name || "password"}` : `Show ${target.name || "password"}`);
+            const icon = toggle.querySelector(".password-toggle-icon");
+            if (icon) {
+                icon.textContent = shouldShow ? "🙈" : "👁";
+            }
+        });
+    });
+
+    if (passwordInput) {
+        passwordInput.addEventListener("input", () => {
+            updatePasswordUI();
+            updateMatchState();
+        });
+        passwordInput.addEventListener("keyup", handleCapsLock);
+        passwordInput.addEventListener("keydown", handleCapsLock);
+    }
+
+    if (confirmPasswordInput) {
+        confirmPasswordInput.addEventListener("input", updateMatchState);
+        confirmPasswordInput.addEventListener("keyup", handleCapsLock);
+        confirmPasswordInput.addEventListener("keydown", handleCapsLock);
+    }
+
+    updatePasswordUI();
+    updateMatchState();
+
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
         setMessage(message, "");
@@ -224,8 +362,30 @@ const setupSignup = () => {
         };
 
         const confirmInput = form.querySelector("[name='confirm_password']");
+        if (passwordInput && !passwordInput.value) {
+            setMessage(message, "Please create a password before registering.", "error");
+            passwordInput.focus();
+            return;
+        }
+
+        if (!submitButton || !submitButton.disabled) {
+            const isStrong = passwordInput ? Object.values({
+                length: passwordInput.value.length >= 8,
+                upper: /[A-Z]/.test(passwordInput.value),
+                lower: /[a-z]/.test(passwordInput.value),
+                number: /\d/.test(passwordInput.value),
+                special: /[!@#$%^&*]/.test(passwordInput.value),
+            }).filter(Boolean).length === 5 : false;
+            if (!isStrong) {
+                setMessage(message, "Please create a strong password that meets all requirements.", "error");
+                passwordInput.focus();
+                return;
+            }
+        }
+
         if (confirmInput && confirmInput.value !== form.password.value) {
             setMessage(message, "Passwords do not match.", "error");
+            confirmPasswordInput.focus();
             return;
         }
 

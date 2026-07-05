@@ -1,13 +1,18 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <main class="auth-shell" data-page="signup">
   <section class="auth-card">
     <div class="auth-header">
       <h1>Create Account</h1>
       <p>Set up your banking profile in a few steps.</p>
     </div>
-    <form method="POST" action="/api/signup" class="auth-form">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <form
+      id="signup-form"
+      method="POST"
+      action="/api/signup"
+      class="auth-form"
+      novalidate
+    >
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
       <label for="signup-name">Full Name</label>
       <input
         id="signup-name"
@@ -26,14 +31,109 @@
         required
       />
 
-      <label for="signup-password">Password</label>
-      <input
-        id="signup-password"
-        name="password"
-        type="password"
-        placeholder="Create a password"
-        required
-      />
+      <div class="field-group">
+        <label for="signup-password">Password</label>
+        <div class="password-field">
+          <input
+            id="signup-password"
+            name="password"
+            type="password"
+            placeholder="Create a password"
+            required
+            autocomplete="new-password"
+            aria-required="true"
+            aria-describedby="password-strength"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            data-target="signup-password"
+            aria-label="Show password"
+            aria-pressed="false"
+          >
+            <span class="password-toggle-icon" aria-hidden="true">👁</span>
+          </button>
+        </div>
+
+        <div
+          class="password-strength-card"
+          id="password-strength"
+          aria-live="polite"
+        >
+          <div class="strength-header">
+            <span class="strength-title">Password Strength</span>
+            <span class="strength-badge" id="password-strength-label"
+              >Weak</span
+            >
+          </div>
+          <div class="strength-meter" aria-hidden="true">
+            <div class="strength-meter-bar" id="password-strength-bar"></div>
+          </div>
+          <div class="strength-tooltip" id="password-tooltip">
+            Start typing to evaluate your password strength.
+          </div>
+          <ul class="password-requirements">
+            <li class="requirement-item" data-requirement="length">
+              <span class="requirement-icon" aria-hidden="true">✕</span>
+              <span>At least 8 characters long</span>
+            </li>
+            <li class="requirement-item" data-requirement="upper">
+              <span class="requirement-icon" aria-hidden="true">✕</span>
+              <span>Contains an uppercase letter</span>
+            </li>
+            <li class="requirement-item" data-requirement="lower">
+              <span class="requirement-icon" aria-hidden="true">✕</span>
+              <span>Contains a lowercase letter</span>
+            </li>
+            <li class="requirement-item" data-requirement="number">
+              <span class="requirement-icon" aria-hidden="true">✕</span>
+              <span>Contains at least one number</span>
+            </li>
+            <li class="requirement-item" data-requirement="special">
+              <span class="requirement-icon" aria-hidden="true">✕</span>
+              <span>Contains at least one special character</span>
+            </li>
+          </ul>
+          <div
+            class="caps-lock-warning"
+            id="caps-lock-warning"
+            role="alert"
+            hidden
+          >
+            Caps Lock is on.
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="signup-confirm-password">Confirm Password</label>
+        <div class="password-field">
+          <input
+            id="signup-confirm-password"
+            name="confirm_password"
+            type="password"
+            placeholder="Re-enter your password"
+            autocomplete="new-password"
+            aria-describedby="password-match-status"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            data-target="signup-confirm-password"
+            aria-label="Show confirm password"
+            aria-pressed="false"
+          >
+            <span class="password-toggle-icon" aria-hidden="true">👁</span>
+          </button>
+        </div>
+        <div
+          class="password-match-status"
+          id="password-match-status"
+          aria-live="polite"
+        >
+          Passwords must match.
+        </div>
+      </div>
 
       <label for="signup-pin">Transaction PIN</label>
       <input
@@ -47,8 +147,11 @@
       />
       <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
 
-      <button class="auth-btn" type="submit">Create Account</button>
+      <button id="signup-submit" class="auth-btn" type="submit" disabled>
+        Create Account
+      </button>
     </form>
+    <div id="signup-message" class="auth-message" aria-live="polite"></div>
     <p class="auth-footnote">
       Already have an account? <a href="/login">Sign in</a>
     </p>

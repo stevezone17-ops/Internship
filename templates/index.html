@@ -1,7 +1,4 @@
-{% extends 'base.html' %}
-{% block content %}
-
-{# ── Hero ── #}
+{% extends 'base.html' %} {% block content %} {# ── Hero ── #}
 <section class="lp-hero">
   <div class="lp-hero-content">
     {% if session.get('user_name') %}
@@ -11,14 +8,13 @@
     {% endif %}
 
     <h1 class="lp-headline">
-      Banking that<br>
+      Banking that<br />
       <span class="lp-accent">just works.</span>
     </h1>
 
     <p class="lp-sub">
-      A full-featured banking simulation with real-time balances,
-      instant transfers, and a clean dashboard — built for learning
-      and demoing.
+      A full-featured banking simulation with real-time balances, instant
+      transfers, and a clean dashboard — built for learning and demoing.
     </p>
 
     {% if session.get('user_id') %}
@@ -28,8 +24,10 @@
     </div>
     {% else %}
     <div class="lp-cta-row">
-      <a class="btn primary lp-cta" href="/create">Create Free Account</a>
-      <a class="btn ghost" href="/login">Sign In</a>
+      <a class="btn primary lp-cta" href="{{ url_for('auth.signup_page') }}"
+        >Create Free Account</a
+      >
+      <a class="btn ghost" href="{{ url_for('auth.login_page') }}">Sign In</a>
     </div>
     {% endif %}
 
@@ -54,9 +52,7 @@
   <div class="lp-hero-visual">
     <div class="lp-mock-card">
       <div class="lp-mock-header">
-        <div class="lp-mock-dots">
-          <span></span><span></span><span></span>
-        </div>
+        <div class="lp-mock-dots"><span></span><span></span><span></span></div>
         <span class="lp-mock-title">Account Overview</span>
       </div>
       <div class="lp-mock-body">
@@ -79,7 +75,7 @@
           </div>
         </div>
         <div class="lp-mock-bar">
-          <div class="lp-mock-bar-fill" style="width:72%"></div>
+          <div class="lp-mock-bar-fill" style="width: 72%"></div>
         </div>
         <div class="lp-mock-bar-label">
           <span>Savings</span>
@@ -100,7 +96,17 @@
   <div class="lp-feature-grid">
     <div class="lp-feature">
       <div class="lp-feature-icon">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+        </svg>
       </div>
       <h3>Instant Transfers</h3>
       <p>Send money to any account in seconds with PIN-verified security.</p>
@@ -108,15 +114,39 @@
 
     <div class="lp-feature">
       <div class="lp-feature-icon">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M2 10h20" />
+        </svg>
       </div>
       <h3>Account Management</h3>
-      <p>Create savings or current accounts with configurable minimum balances.</p>
+      <p>
+        Create savings or current accounts with configurable minimum balances.
+      </p>
     </div>
 
     <div class="lp-feature">
       <div class="lp-feature-icon">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 3v18h18" />
+          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+        </svg>
       </div>
       <h3>Transaction History</h3>
       <p>Full audit trail with filters, search, and CSV/PDF export.</p>
@@ -124,7 +154,17 @@
 
     <div class="lp-feature">
       <div class="lp-feature-icon">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
       </div>
       <h3>Fraud Detection</h3>
       <p>Automatic high-value and high-frequency transaction monitoring.</p>
@@ -132,7 +172,18 @@
 
     <div class="lp-feature">
       <div class="lp-feature-icon">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 6v6l4 2" />
+        </svg>
       </div>
       <h3>Scheduled Transfers</h3>
       <p>Queue future-dated transfers that execute automatically.</p>
@@ -140,7 +191,20 @@
 
     <div class="lp-feature">
       <div class="lp-feature-icon">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 00-3-3.87" />
+          <path d="M16 3.13a4 4 0 010 7.75" />
+        </svg>
       </div>
       <h3>Admin Panel</h3>
       <p>User management, support queue, and system analytics dashboard.</p>
@@ -203,20 +267,21 @@
   </div>
 </section>
 
-{# ── CTA Banner ── #}
-{% if not session.get('user_id') %}
+{# ── CTA Banner ── #} {% if not session.get('user_id') %}
 <section class="lp-cta-banner">
   <h2>Ready to try it?</h2>
   <p>Create a free account and explore the full banking experience.</p>
   <a class="btn primary lp-cta" href="/create">Get Started Now</a>
 </section>
-{% endif %}
-
-{# ── Footer ── #}
+{% endif %} {# ── Footer ── #}
 <footer class="lp-footer">
   <div class="lp-footer-inner">
     <div class="lp-footer-brand">
-      <span class="brand-mark" style="width:28px;height:28px;font-size:0.7rem;border-radius:6px;">SB</span>
+      <span
+        class="brand-mark"
+        style="width: 28px; height: 28px; font-size: 0.7rem; border-radius: 6px"
+        >SB</span
+      >
       <strong>Simple Banking</strong>
     </div>
     <div class="lp-footer-links">
@@ -224,7 +289,9 @@
       <a href="/signup">Signup</a>
       <a href="/support">Support</a>
     </div>
-    <p class="lp-footer-copy">&copy; 2026 Simple Banking System &middot; Built with Flask + MongoDB</p>
+    <p class="lp-footer-copy">
+      &copy; 2026 Simple Banking System &middot; Built with Flask + MongoDB
+    </p>
   </div>
 </footer>
 
