@@ -93,20 +93,47 @@ def refresh_session():
 
 @auth_bp.route("/api/signup", methods=["POST"])
 def signup():
-    data = request.get_json(silent=True)
-    name = ((data or {}).get("name") or request.form.get("name") or "").strip()
-    email = ((data or {}).get("email") or request.form.get("email") or "").strip().lower()
-    password = ((data or {}).get("password") or request.form.get("password") or "").strip()
-    pin = ((data or {}).get("pin") or request.form.get("pin") or "").strip()
+    raw_json = request.get_json(silent=True)
+    form_data = request.form.to_dict(flat=True) if request.form else {}
+    if isinstance(raw_json, dict):
+        data = {**form_data, **raw_json}
+    else:
+        data = form_data
 
-    if not name or not email or not password:
-        return api_error("Please check your input.", 400, endpoint="auth.signup_page", category="warning")
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = (data.get("password") or "").strip()
+    confirm_password = (data.get("confirm_password") or "").strip()
+    pin = (data.get("pin") or "").strip()
+
+    logger.info(
+        "Signup request content_type=%s raw_body=%s json=%s form=%s parsed_name=%r parsed_email=%r parsed_password=%r parsed_pin=%r",
+        request.content_type,
+        request.get_data(as_text=True),
+        raw_json,
+        dict(request.form) if request.form else {},
+        name,
+        email,
+        password,
+        pin,
+    )
+
+    if not name:
+        return api_error("Full name is required.", 400, endpoint="auth.signup_page", category="warning")
+    if not email:
+        return api_error("Email is required.", 400, endpoint="auth.signup_page", category="warning")
+    if not password:
+        return api_error("Password is required.", 400, endpoint="auth.signup_page", category="warning")
     if len(name) > 100:
         return api_error("Name must be 100 characters or fewer.", 400, endpoint="auth.signup_page", category="warning")
     if len(password) < 8:
         return api_error("Password must be at least 8 characters.", 400, endpoint="auth.signup_page", category="warning")
-    if not pin or not pin.isdigit() or len(pin) < 4 or len(pin) > 6:
-        return api_error("Please check your input.", 400, endpoint="auth.signup_page", category="warning")
+    if confirm_password and confirm_password != password:
+        return api_error("Passwords do not match.", 400, endpoint="auth.signup_page", category="warning")
+    if not pin:
+        return api_error("Transaction PIN is required.", 400, endpoint="auth.signup_page", category="warning")
+    if not pin.isdigit() or len(pin) < 4 or len(pin) > 6:
+        return api_error("Transaction PIN must be 4 to 6 digits.", 400, endpoint="auth.signup_page", category="warning")
 
     existing = users_col.find_one({"email": email})
     if existing:

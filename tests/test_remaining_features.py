@@ -67,6 +67,27 @@ def login_as(client, user, account=None):
         sess["is_admin"] = user.get("role") == "admin"
 
 
+def test_signup_returns_specific_pin_validation_error(client):
+    with client.session_transaction() as sess:
+        sess["_csrf_token"] = "test-csrf-token"
+
+    response = client.post(
+        "/api/signup",
+        json={
+            "name": "Test User",
+            "email": "test@example.com",
+            "password": "StrongPass1!",
+            "pin": "abc",
+            "confirm_password": "StrongPass1!",
+            "_csrf_token": "test-csrf-token",
+        },
+        headers={"X-CSRFToken": "test-csrf-token"},
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "Transaction PIN must be 4 to 6 digits."
+
+
 def test_pin_lock_after_failed_attempts(client):
     user = create_user()
     account = create_account(user)
