@@ -248,3 +248,7 @@ If you found this project helpful, consider giving it a ⭐ on GitHub.
 Repository:
 
 https://github.com/stevezone17-ops/Internship
+
+License
+
+This project was developed as part of the Samsung Innovation Campus (SIC) Internship Program and is licensed under the MIT Licen
