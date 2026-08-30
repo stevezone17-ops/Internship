@@ -1,5 +1,4 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <main class="auth-shell" data-page="login">
   <section class="auth-card">
     <div class="auth-header">
@@ -7,7 +6,7 @@
       <p>Welcome back to Simple Banking</p>
     </div>
     <form method="POST" action="/api/login" class="auth-form">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
       <label for="login-email">Email</label>
       <input
         id="login-email"
@@ -25,6 +24,8 @@
         placeholder="Enter your password"
         required
       />
+
+      <a class="auth-forgot-link" href="/forgot">Forgot Password?</a>
 
       <button class="auth-btn" type="submit">Sign In</button>
     </form>

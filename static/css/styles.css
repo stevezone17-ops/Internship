@@ -679,6 +679,16 @@ select {
     background: #1d4ed8;
 }
 
+.auth-forgot-link {
+    color: var(--blue);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-forgot-link:hover {
+    text-decoration: underline;
+}
+
 .auth-footnote {
     margin-top: 16px;
     text-align: center;
