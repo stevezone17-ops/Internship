@@ -406,13 +406,15 @@ const setupForgotPassword = () => {
             const data = await Promise.all([
                 apiRequest("/api/password/forgot", {
                 method: "POST",
-                body: JSON.stringify({ email: form.email.value.trim() }),
+                body: JSON.stringify({
+                    email: form.email.value.trim(),
+                    password: form.password.value,
+                    confirm_password: form.confirm_password.value,
+                }),
                 }),
                 delay(500),
             ]).then(([result]) => result);
-            setMessage(message, "If the email exists, a reset link was created.", "success");
-            if (data.reset_link) {
-            }
+            setMessage(message, data.message, "success");
         } catch (error) {
             setMessage(message, error.message, "error");
         } finally {

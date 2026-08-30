@@ -53,6 +53,18 @@ def create_reset_token(users_col, email):
     return user, reset_token
 
 
+def update_password_by_email(users_col, email, new_password):
+    user = users_col.find_one({"email": email})
+    if not user:
+        return None
+
+    users_col.update_one(
+        {"_id": user["_id"]},
+        {"$set": {"password_hash": generate_password_hash(new_password)}},
+    )
+    return user
+
+
 def reset_password(users_col, token, new_password):
     user = users_col.find_one({"reset_token": token})
     if not user:

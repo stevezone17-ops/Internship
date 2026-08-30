@@ -7,6 +7,7 @@ from models.db import get_collections
 from services.accounts import (
     authenticate_user,
     create_reset_token,
+    update_password_by_email,
     mark_user_verified,
     reset_password,
     get_account_for_user,
@@ -215,18 +216,27 @@ def login():
 
 @auth_bp.route("/api/password/forgot", methods=["POST"])
 def forgot_password():
-    data = request.get_json(silent=True) or {}
+    data = request.get_json(silent=True) or request.form.to_dict(flat=True)
     email = (data.get("email") or "").strip().lower()
+    new_password = (data.get("password") or "").strip()
+    confirm_password = (data.get("confirm_password") or "").strip()
+
     if not email:
-        return api_error("Please check your input.", 400, endpoint="auth.forgot_page", category="warning")
+        return api_error("Email is required.", 400, endpoint="auth.forgot_page", category="warning")
+    if len(new_password) < 8:
+        return api_error("Password must be at least 8 characters.", 400, endpoint="auth.forgot_page", category="warning")
+    if new_password != confirm_password:
+        return api_error("Passwords do not match.", 400, endpoint="auth.forgot_page", category="warning")
 
-    user, token = create_reset_token(users_col, email)
-    if user and token:
-        reset_link = url_for("auth.reset_page", token=token, _external=True)
-        logger.info("Password reset link generated for %s", email)
-        return api_success("If the email exists, a reset link was generated.", endpoint="auth.forgot_page")
+    user = update_password_by_email(users_col, email, new_password)
+    if not user:
+        return api_error("No account was found with this email.", 404, endpoint="auth.forgot_page", category="warning")
 
-    return api_success("If the email exists, a reset link was generated.", endpoint="auth.forgot_page")
+    logger.info("Password updated for %s", email)
+    return api_success(
+        "Password updated successfully. You can now sign in with your new password.",
+        endpoint="auth.forgot_page",
+    )
 
 @auth_bp.route("/api/password/reset", methods=["POST"])
 def reset_password_api():
