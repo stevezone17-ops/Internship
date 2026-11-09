@@ -471,8 +471,15 @@ const setupResetPassword = () => {
 };
 
 const renderTransactions = (rows, transactions) => {
-    if (!transactions.length) {
-        rows.innerHTML = "<tr><td colspan='4' class='text-center'>No transactions yet.</td></tr>";
+    if (!rows) return;
+    if (!transactions || !transactions.length) {
+        rows.innerHTML = `<tr><td colspan='4' class='text-center'>
+            <div class="empty-state-table">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="empty-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <strong>No transactions found</strong>
+                <span>Try adjusting your filters, keywords, or date ranges.</span>
+            </div>
+        </td></tr>`;
         return;
     }
 
@@ -484,8 +491,8 @@ const renderTransactions = (rows, transactions) => {
                 : "-";
             const dateLabel = tx.formatted_time || formatTimestamp(tx.timestamp);
             
-            // Classification & Styling
-            let icon = "🔔";
+            // Classification & Styling with crisp SVGs
+            let iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3 21 7l-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/></svg>';
             let iconClass = "general";
             let amountClass = "amount-transfer";
             let amountPrefix = "";
@@ -494,19 +501,19 @@ const renderTransactions = (rows, transactions) => {
             const meta = tx.metadata || {};
             
             if (tx.type === "deposit") {
-                icon = "📥";
+                iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
                 iconClass = "deposit";
                 amountClass = "amount-credit";
                 amountPrefix = "+";
                 titleLabel = "Cash Deposit";
             } else if (tx.type === "withdraw") {
-                icon = "📤";
+                iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
                 iconClass = "withdraw";
                 amountClass = "amount-debit";
                 amountPrefix = "-";
                 titleLabel = "Cash Withdrawal";
             } else if (tx.type === "transfer") {
-                icon = "💸";
+                iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3 21 7l-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/></svg>';
                 iconClass = "transfer";
                 amountClass = "amount-transfer";
                 
@@ -515,12 +522,16 @@ const renderTransactions = (rows, transactions) => {
                     titleLabel = `Transfer Received`;
                     if (meta.sender_name) {
                         titleLabel += ` from ${meta.sender_name}`;
+                    } else if (meta.from_email) {
+                        titleLabel += ` from ${meta.from_email}`;
                     }
                 } else if (meta.to_account_id) {
                     amountPrefix = "-";
                     titleLabel = `Transfer Sent`;
                     if (meta.receiver_name) {
                         titleLabel += ` to ${meta.receiver_name}`;
+                    } else if (meta.to_email) {
+                        titleLabel += ` to ${meta.to_email}`;
                     }
                 } else {
                     titleLabel = "Account Transfer";
@@ -531,15 +542,19 @@ const renderTransactions = (rows, transactions) => {
                 <tr>
                     <td>
                         <div class="tx-details-cell">
-                            <div class="tx-icon-wrap ${iconClass}" aria-hidden="true">${icon}</div>
-                            <div>
+                            <div class="tx-icon-wrap ${iconClass}" aria-hidden="true">${iconSvg}</div>
+                            <div class="tx-text-wrap">
                                 <strong class="tx-title">${escapeHtml(titleLabel)}</strong>
-                                <span class="tx-subtitle">${escapeHtml(dateLabel)} <span class="divider">•</span> ID: ${escapeHtml(tx.transaction_id || "-")}</span>
+                                <span class="tx-subtitle">
+                                    ${escapeHtml(dateLabel)} 
+                                    <span class="tx-dot-divider">•</span> 
+                                    <span class="tx-id-badge">ID: ${escapeHtml(tx.transaction_id || "-")}</span>
+                                </span>
                             </div>
                         </div>
                     </td>
                     <td><span class="type-badge ${tx.type || 'general'}">${typeLabel}</span></td>
-                    <td><span class="status-badge ${statusLabel.toLowerCase()}">${statusLabel}</span></td>
+                    <td><span class="status-badge ${statusLabel.toLowerCase()}"><span class="status-indicator-dot"></span>${statusLabel}</span></td>
                     <td class="text-right">
                         <strong class="amount-val ${amountClass}">${amountPrefix}${formatCurrency(tx.amount)}</strong>
                     </td>

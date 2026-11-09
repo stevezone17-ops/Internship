@@ -1,87 +1,108 @@
-{% extends 'base.html' %} {% block content %}
-<section class="page-header transaction-header-layout">
-  <div>
-    <h2>Transaction History</h2>
-    <p>All deposits, withdrawals, and transfers in one statement view.</p>
-  </div>
-  <div class="header-actions">
-    <a class="btn ghost btn-export" id="export-csv" href="#" aria-label="Export CSV">
-      Export CSV
-    </a>
-    <a class="btn ghost btn-export" id="export-pdf" href="#" aria-label="Export PDF">
-      Export PDF
-    </a>
-  </div>
-</section>
+{% extends 'base.html' %}
+{% block title %}Transactions — Simple Banking System{% endblock %}
 
-<!-- Summary Cards -->
-<section class="summary-cards-container">
-  <div class="card summary-card">
-    <div class="summary-icon">#</div>
+{% block content %}
+<div class="transactions-shell" data-page="transactions" data-account-id="{{ account_id }}">
+  <!-- Header with Title and Export Actions -->
+  <header class="tx-header-layout">
     <div>
-      <span class="summary-label">Total Transactions</span>
-      <h3 id="summary-total-tx">0</h3>
+      <h1 class="tx-page-title">Transaction History</h1>
+      <p class="tx-page-sub">Comprehensive ledger of all deposits, withdrawals, and account transfers.</p>
     </div>
-  </div>
-  <div class="card summary-card">
-    <div class="summary-icon deposit">+</div>
-    <div>
-      <span class="summary-label">Total Deposits</span>
-      <h3 id="summary-total-deposits">₹0.00</h3>
+    <div class="tx-export-actions">
+      <a class="btn ghost btn-export" id="export-csv" href="#" aria-label="Export transactions as CSV">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <span>Export CSV</span>
+      </a>
+      <a class="btn ghost btn-export" id="export-pdf" href="#" aria-label="Export transactions as PDF statement">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
+        <span>Export PDF</span>
+      </a>
     </div>
-  </div>
-  <div class="card summary-card">
-    <div class="summary-icon withdrawal">-</div>
-    <div>
-      <span class="summary-label">Total Withdrawals</span>
-      <h3 id="summary-total-withdrawals">₹0.00</h3>
-    </div>
-  </div>
-  <div class="card summary-card">
-    <div class="summary-icon balance">₹</div>
-    <div>
-      <span class="summary-label">Current Balance</span>
-      <h3 id="summary-balance">₹0.00</h3>
-    </div>
-  </div>
-</section>
+  </header>
 
-<section class="grid">
-  <div class="card">
-    <h3>Transaction Insights</h3>
-    <div class="chart-wrap" style="height: 300px; position: relative;">
-      <canvas id="transactions-chart"></canvas>
+  <!-- Summary KPI Cards -->
+  <section class="summary-cards-container" aria-label="Transaction Volume Summary">
+    <div class="card summary-card">
+      <div class="summary-icon net">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+      </div>
+      <div class="summary-meta">
+        <span class="summary-label">Total Transactions</span>
+        <h3 class="summary-num" id="summary-total-tx">0</h3>
+      </div>
     </div>
-  </div>
-</section>
 
-<section
-  class="transactions-shell"
-  data-page="transactions"
-  data-account-id="{{ account_id }}"
->
-  <!-- Filters Card -->
+    <div class="card summary-card">
+      <div class="summary-icon deposit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <div class="summary-meta">
+        <span class="summary-label">Total Deposits</span>
+        <h3 class="summary-num text-success" id="summary-total-deposits">₹0.00</h3>
+      </div>
+    </div>
+
+    <div class="card summary-card">
+      <div class="summary-icon withdrawal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+      </div>
+      <div class="summary-meta">
+        <span class="summary-label">Total Withdrawals</span>
+        <h3 class="summary-num text-danger" id="summary-total-withdrawals">₹0.00</h3>
+      </div>
+    </div>
+
+    <div class="card summary-card highlight">
+      <div class="summary-icon balance">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+      </div>
+      <div class="summary-meta">
+        <span class="summary-label">Current Balance</span>
+        <h3 class="summary-num" id="summary-balance">₹0.00</h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- Volume Insights Chart Card -->
+  <section class="tx-chart-section">
+    <div class="card tx-chart-card">
+      <div class="card-header-clean">
+        <div>
+          <h3>Transaction Volume Overview</h3>
+          <p class="muted">Cumulative filtered deposits vs debits comparison</p>
+        </div>
+      </div>
+      <div class="chart-wrapper" style="height: 160px; position: relative;">
+        <canvas id="transactions-chart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter Card -->
   <div class="card filter-card">
     <form id="transaction-filters" class="modern-filter-form">
+      <!-- Search Input -->
       <div class="filter-row search-row">
         <div class="form-group search-group">
           <label for="filter-q">Search Transactions</label>
           <div class="search-input-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input
               id="filter-q"
               type="search"
               name="q"
-              placeholder="Search by transaction ID, notes, or counterparts..."
+              placeholder="Search by transaction ID, counterpart email, or description..."
             />
           </div>
         </div>
       </div>
 
+      <!-- Date Presets & Date Range -->
       <div class="filter-row split-row">
-        <!-- Date Filters & Presets -->
         <div class="form-group date-range-group">
           <div class="group-header">
-            <label>Date Range</label>
+            <label>Date Range & Presets</label>
             <div class="preset-pills">
               <button type="button" class="preset-pill active" data-range="all">All</button>
               <button type="button" class="preset-pill" data-range="1m">1M</button>
@@ -91,29 +112,30 @@
             </div>
           </div>
           <div class="range-inputs">
-            <input id="filter-start" type="date" name="start_date" placeholder="From Date" aria-label="From Date" />
+            <input id="filter-start" type="date" name="start_date" aria-label="From Date" />
             <span class="range-separator">to</span>
-            <input id="filter-end" type="date" name="end_date" placeholder="To Date" aria-label="To Date" />
+            <input id="filter-end" type="date" name="end_date" aria-label="To Date" />
           </div>
         </div>
 
-        <!-- Amount Range -->
+        <!-- Amount Range Filter -->
         <div class="form-group amount-range-group">
-          <label>Amount Range</label>
+          <label>Amount Range (₹)</label>
           <div class="range-inputs">
             <div class="amount-input-wrap">
-              <span class="currency-symbol">₹</span>
-              <input id="filter-min" type="number" step="0.01" name="min_amount" placeholder="Min Amount" aria-label="Min Amount" />
+              <span class="currency-prefix">₹</span>
+              <input id="filter-min" type="number" step="0.01" name="min_amount" placeholder="Min" aria-label="Minimum Amount" />
             </div>
             <span class="range-separator">to</span>
             <div class="amount-input-wrap">
-              <span class="currency-symbol">₹</span>
-              <input id="filter-max" type="number" step="0.01" name="max_amount" placeholder="Max Amount" aria-label="Max Amount" />
+              <span class="currency-prefix">₹</span>
+              <input id="filter-max" type="number" step="0.01" name="max_amount" placeholder="Max" aria-label="Maximum Amount" />
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Type, Sort, Direction and Action Buttons -->
       <div class="filter-row dropdown-row">
         <div class="form-group">
           <label for="filter-type">Transaction Type</label>
@@ -124,14 +146,16 @@
             <option value="transfer">Transfers</option>
           </select>
         </div>
+
         <div class="form-group">
-          <label for="filter-sort">Sort By</label>
+          <label for="filter-sort">Sort Field</label>
           <select id="filter-sort" name="sort_by">
             <option value="timestamp">Date & Time</option>
             <option value="amount">Amount</option>
             <option value="type">Transaction Type</option>
           </select>
         </div>
+
         <div class="form-group">
           <label for="filter-order">Direction</label>
           <select id="filter-order" name="order">
@@ -139,46 +163,64 @@
             <option value="asc">Oldest First</option>
           </select>
         </div>
+
         <div class="form-group filter-actions-group">
-          <button class="btn primary btn-apply" type="submit">Apply Filters</button>
-          <button class="btn ghost btn-reset" id="btn-reset-filters" type="button">Reset</button>
+          <button class="btn primary btn-apply" type="submit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Apply</span>
+          </button>
+          <button class="btn ghost btn-reset" id="btn-reset-filters" type="button">
+            <span>Reset</span>
+          </button>
         </div>
       </div>
     </form>
   </div>
 
-  <!-- Table Card -->
+  <!-- Data Table Card -->
   <div class="card table-card">
     <div class="table-responsive">
-      <table class="transaction-table modern-table">
+      <table class="transaction-table modern-table" aria-label="Transaction Ledger">
         <thead>
           <tr>
-            <th>Transaction Details</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th class="text-right">Amount</th>
+            <th scope="col">Transaction Details</th>
+            <th scope="col">Type</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="text-right">Amount</th>
           </tr>
         </thead>
         <tbody id="transaction-rows">
           <tr>
-            <td colspan="4" class="text-center">Loading your transactions...</td>
+            <td colspan="4" class="text-center">
+              <div class="table-loading-row">
+                <div class="spinner"></div>
+                <span>Retrieving account ledger...</span>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
+    <!-- Table Pagination Footer -->
     <div class="pagination-container">
       <div class="pagination-info" id="transactions-info">
         Showing 0 transactions
       </div>
       <div class="pagination" id="transactions-pagination">
-        <button class="btn ghost" id="transactions-prev" aria-label="Previous page">← Previous</button>
+        <button class="btn ghost btn-sm" id="transactions-prev" aria-label="Previous page">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <span>Previous</span>
+        </button>
         <span id="transactions-page" class="page-indicator">Page 1</span>
-        <button class="btn ghost" id="transactions-next" aria-label="Next page">Next →</button>
+        <button class="btn ghost btn-sm" id="transactions-next" aria-label="Next page">
+          <span>Next</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
       </div>
     </div>
   </div>
 
   <div class="message" id="transactions-message"></div>
-</section>
+</div>
 {% endblock %}
