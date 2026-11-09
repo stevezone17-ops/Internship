@@ -1,43 +1,99 @@
 {% extends 'base.html' %} {% block content %}
-<section class="page-header">
-  <h2>Support Query</h2>
-  <p>Review the details of your support request.</p>
-</section>
-
-<section class="card support-details">
-  <a class="btn ghost support-back" href="/support">Back to Support</a>
+<div class="support-details-container" style="max-width: 800px; margin: 0 auto;">
+  <!-- Back Link -->
+  <div style="margin-bottom: 1.25rem;">
+    <a class="btn secondary support-back" href="/support" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.45rem 0.85rem; text-decoration: none;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Support Tickets
+    </a>
+  </div>
 
   {% if error %}
-  <div class="message error">{{ error }}</div>
+  <div class="card" style="padding: 2rem; text-align: center; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
+    <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    <h3 style="margin: 0 0 0.5rem 0; font-size: 1.2rem; color: var(--text-primary);">Ticket Not Found</h3>
+    <p style="margin: 0 0 1.25rem 0; font-size: 0.9rem; color: var(--text-secondary);">{{ error }}</p>
+    <a href="/support" class="btn primary" style="display: inline-block;">Return to Help Desk</a>
+  </div>
   {% elif query %}
-  <div class="support-details-header">
-    <div>
-      <h3>{{ query.subject }}</h3>
-      <div class="support-details-meta">
-        <span>Created: {{ query.created_at_display }}</span>
-        {% if query.resolved_at_display %}
-        <span>Resolved: {{ query.resolved_at_display }}</span>
-        {% endif %}
+  <!-- Ticket Overview Card -->
+  <section class="card support-details" style="padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;">
+    <div class="support-details-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border);">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+          <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace;">TICKET #{{ query.id[-6:]|upper }}</span>
+        </div>
+        <h2 style="margin: 0 0 0.5rem 0; font-size: 1.4rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em;">{{ query.subject }}</h2>
+        <div class="support-details-meta" style="display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; color: var(--text-tertiary); flex-wrap: wrap;">
+          <span>Opened: <strong style="color: var(--text-secondary);">{{ query.created_at_display }}</strong></span>
+          {% if query.resolved_at_display %}
+          <span>• Resolved: <strong style="color: var(--success);">{{ query.resolved_at_display }}</strong></span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="support-tags" style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="status-pill status-{{ query.status|lower }}" style="font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; background: {% if query.status|lower == 'resolved' %}rgba(16, 185, 129, 0.1){% else %}rgba(245, 158, 11, 0.1){% endif %}; color: {% if query.status|lower == 'resolved' %}var(--success){% else %}var(--warning){% endif %}; border: 1px solid currentColor;">
+          {{ query.status }}
+        </span>
+        <span class="priority-pill priority-{{ query.priority|lower }}" style="font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 9999px; background: {% if query.priority|lower == 'high' %}rgba(239, 68, 68, 0.1){% elif query.priority|lower == 'medium' %}rgba(245, 158, 11, 0.1){% else %}rgba(59, 130, 246, 0.1){% endif %}; color: {% if query.priority|lower == 'high' %}var(--danger){% elif query.priority|lower == 'medium' %}var(--warning){% else %}var(--accent){% endif %};">
+          {{ query.priority }} Priority
+        </span>
       </div>
     </div>
-    <div class="support-tags">
-      <span class="status-pill">{{ query.status }}</span>
-      <span class="priority-pill {{ query.priority|lower }}"
-        >{{ query.priority }}</span
-      >
+
+    <!-- Inquiry Thread -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
+      <!-- Customer Message -->
+      <div class="support-detail-card" style="display: flex; gap: 1rem; align-items: flex-start;">
+        <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">
+          You
+        </div>
+        <div style="flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <strong style="font-size: 0.9rem; color: var(--text-primary);">Original Inquiry</strong>
+            <span style="font-size: 0.75rem; color: var(--text-tertiary);">{{ query.created_at_display }}</span>
+          </div>
+          <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap;">{{ query.message }}</p>
+        </div>
+      </div>
+
+      <!-- Staff Response (if any) -->
+      {% if query.admin_reply %}
+      <div class="support-detail-card admin-reply-thread" style="display: flex; gap: 1rem; align-items: flex-start;">
+        <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--accent) 0%, #1e40af 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);">
+          SB
+        </div>
+        <div style="flex: 1; background: rgba(14, 165, 233, 0.04); border: 1px solid rgba(14, 165, 233, 0.2); border-radius: var(--radius-lg); padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <strong style="font-size: 0.9rem; color: var(--text-primary);">Support Operations Concierge</strong>
+              <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); font-size: 0.68rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 9999px;">Staff Response</span>
+            </div>
+            {% if query.resolved_at_display %}
+            <span style="font-size: 0.75rem; color: var(--text-tertiary);">Resolved: {{ query.resolved_at_display }}</span>
+            {% endif %}
+          </div>
+          <p style="margin: 0; font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; white-space: pre-wrap;">{{ query.admin_reply }}</p>
+        </div>
+      </div>
+      {% else %}
+      <div style="padding: 1.25rem; background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius-md); text-align: center;">
+        <p style="margin: 0; font-size: 0.85rem; color: var(--text-tertiary);">
+          Your inquiry is currently in queue with our operations team. Typical resolution time is under 2 business hours.
+        </p>
+      </div>
+      {% endif %}
     </div>
-  </div>
-
-  <div class="support-detail-card">
-    <strong>Message</strong>
-    <p>{{ query.message }}</p>
-  </div>
-
-  {% if query.admin_reply %}
-  <div class="support-detail-card">
-    <strong>Admin reply</strong>
-    <p>{{ query.admin_reply }}</p>
-  </div>
-  {% endif %} {% endif %}
-</section>
+  </section>
+  {% endif %}
+</div>
 {% endblock %}

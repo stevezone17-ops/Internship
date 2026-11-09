@@ -2201,7 +2201,17 @@ const setupSupportPage = () => {
     const renderHistory = (queries) => {
         if (!historyList) return;
         if (!queries.length) {
-            historyList.innerHTML = "<li>No queries yet.</li>";
+            historyList.innerHTML = `
+                <div style="text-align: center; padding: 3rem 1.5rem; background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius-lg);">
+                    <div style="width: 44px; height: 44px; margin: 0 auto 0.75rem auto; border-radius: 50%; background: rgba(14, 165, 233, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <h4 style="margin: 0 0 0.25rem 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">No Support Queries</h4>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-tertiary);">You have not logged any inquiries yet. Submit a query on the left to get assistance.</p>
+                </div>
+            `;
             return;
         }
         historyList.innerHTML = queries
@@ -2209,17 +2219,26 @@ const setupSupportPage = () => {
                 const dateLabel = query.created_at_display || formatTimestamp(query.created_at);
                 const priority = query.priority || "Low";
                 const priorityClass = priority.toLowerCase();
+                const isResolved = (query.status || "").toLowerCase() === "resolved";
+                const statusBg = isResolved ? "rgba(16, 185, 129, 0.1)" : "rgba(245, 158, 11, 0.1)";
+                const statusColor = isResolved ? "var(--success)" : "var(--warning)";
+                const priorityColor = priorityClass === "high" ? "var(--danger)" : (priorityClass === "medium" ? "var(--warning)" : "var(--accent)");
+                const priorityBg = priorityClass === "high" ? "rgba(239, 68, 68, 0.1)" : (priorityClass === "medium" ? "rgba(245, 158, 11, 0.1)" : "rgba(59, 130, 246, 0.1)");
+
                 return `
                     <li>
-                        <a class="support-link" href="/support/${escapeHtml(query.id)}">
-                            <div class="support-item">
-                                <div>
-                                    <strong>${escapeHtml(query.subject || "Support query")}</strong>
-                                    <span class="meta">${escapeHtml(dateLabel)}</span>
+                        <a class="support-link" href="/support/${escapeHtml(query.id)}" style="text-decoration: none; color: inherit; display: block;">
+                            <div class="support-item" style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.15rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); transition: var(--transition-fast); gap: 1rem;">
+                                <div style="overflow: hidden;">
+                                    <strong style="display: block; font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(query.subject || "Support query")}</strong>
+                                    <span class="meta" style="font-size: 0.75rem; color: var(--text-tertiary);">${escapeHtml(dateLabel)}</span>
                                 </div>
-                                <div class="support-tags">
-                                    <span class="status-pill">${query.status || "Open"}</span>
-                                    <span class="priority-pill ${priorityClass}">${priority}</span>
+                                <div class="support-tags" style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+                                    <span class="status-pill" style="font-size: 0.72rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 9999px; background: ${statusBg}; color: ${statusColor}; border: 1px solid currentColor;">${query.status || "Open"}</span>
+                                    <span class="priority-pill ${priorityClass}" style="font-size: 0.72rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 9999px; background: ${priorityBg}; color: ${priorityColor};">${priority}</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-tertiary);">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
                                 </div>
                             </div>
                         </a>

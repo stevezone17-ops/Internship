@@ -3984,3 +3984,17 @@ select {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* =====================================================================
+   STAGE 7: CUSTOMER SUPPORT STYLING
+   ===================================================================== */
+.support-item:hover {
+    border-color: var(--accent) !important;
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+}
+@media (max-width: 860px) {
+    .support-grid-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
