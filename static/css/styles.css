@@ -3969,3 +3969,18 @@ select {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* =====================================================================
+   STAGE 6: PROFILE & SECURITY STYLING
+   ===================================================================== */
+@media (max-width: 860px) {
+    .profile-top-grid,
+    .security-grid-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
+@media (max-width: 540px) {
+    .profile-details-card {
+        grid-template-columns: 1fr !important;
+    }
+}

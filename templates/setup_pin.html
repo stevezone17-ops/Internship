@@ -1,45 +1,74 @@
 {% extends 'base.html' %} {% block content %}
-<section class="page-header">
-  <h2>Secure Your Account</h2>
-  <p>Create your 4-digit transaction PIN.</p>
-</section>
+<div class="setup-pin-container" style="max-width: 560px; margin: 0 auto;">
+  <header class="page-header" style="margin-bottom: 1.5rem; text-align: center;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+      <span class="badge" style="background: rgba(14, 165, 233, 0.1); color: var(--accent); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 9999px;">Account Protection</span>
+    </div>
+    <h2 style="font-size: 1.625rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0 0 0.35rem 0;">Secure Your Account</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Create a confidential 4-digit transaction PIN required for deposits, withdrawals, and wire transfers.</p>
+  </header>
 
-<section class="card form-card">
-  <h3>Set up your transaction PIN</h3>
-  <p class="muted helper-text">
-    This PIN will be required for deposits, withdrawals, and transfers.
-  </p>
-  {% if error %}
-  <div class="message error">{{ error }}</div>
-  {% endif %}
-  <form method="POST" action="/setup-pin">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-    <label for="pin">PIN</label>
-    <input
-      id="pin"
-      name="pin"
-      type="password"
-      inputmode="numeric"
-      pattern="\d{4}"
-      maxlength="4"
-      placeholder="Enter 4-digit PIN"
-      required
-    />
-    <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
+  <div class="card form-card" style="padding: 2rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-sm);">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+      <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(14, 165, 233, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <div>
+        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Set Initial PIN</h3>
+        <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">4-digit numeric code</p>
+      </div>
+    </div>
 
-    <label for="confirm-pin">Confirm PIN</label>
-    <input
-      id="confirm-pin"
-      name="confirm_pin"
-      type="password"
-      inputmode="numeric"
-      pattern="\d{4}"
-      maxlength="4"
-      placeholder="Re-enter PIN"
-      required
-    />
+    {% if error %}
+    <div class="message error" style="margin-bottom: 1.25rem;">{{ error }}</div>
+    {% endif %}
 
-    <button class="btn primary" type="submit">Save PIN</button>
-  </form>
-</section>
+    <form method="POST" action="/setup-pin">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+          <label for="pin" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin: 0;">Create 4-Digit PIN</label>
+          <a class="pin-help-link" href="/change-pin" style="font-size: 0.75rem; color: var(--accent); text-decoration: none;">Forgot PIN?</a>
+        </div>
+        <input
+          id="pin"
+          name="pin"
+          type="password"
+          inputmode="numeric"
+          pattern="\d{4}"
+          maxlength="4"
+          placeholder="••••"
+          required
+          style="letter-spacing: 0.35em; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary); text-align: center;"
+        />
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label for="confirm-pin" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Confirm 4-Digit PIN</label>
+        <input
+          id="confirm-pin"
+          name="confirm_pin"
+          type="password"
+          inputmode="numeric"
+          pattern="\d{4}"
+          maxlength="4"
+          placeholder="••••"
+          required
+          style="letter-spacing: 0.35em; font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary); text-align: center;"
+        />
+      </div>
+
+      <button class="btn primary" type="submit" style="width: 100%; padding: 0.75rem 1.25rem; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Save Transaction PIN
+      </button>
+    </form>
+  </div>
+</div>
 {% endblock %}

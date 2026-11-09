@@ -1,76 +1,104 @@
 {% extends 'base.html' %} {% block content %}
-<section class="page-header">
-  <h2>Change Transaction PIN</h2>
-  <p>Reset your PIN securely with your account password.</p>
-</section>
-
-<section
-  class="card change-pin-shell"
-  data-page="change-pin"
-  data-email="{{ account_email }}"
->
-  <div class="change-pin-header">
-    <div>
-      <p class="eyebrow">Security</p>
-      <h3>Forgot or want to change your PIN?</h3>
-      <p class="muted helper-text">
-        Enter your account password to set a new 4-digit transaction PIN.
-      </p>
+<div class="change-pin-page-container" style="max-width: 600px; margin: 0 auto;">
+  <!-- Page Header -->
+  <header class="page-header" style="margin-bottom: 1.5rem; text-align: center;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+      <span class="badge" style="background: rgba(14, 165, 233, 0.1); color: var(--accent); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 9999px;">Credential Reset</span>
     </div>
-    <div class="change-pin-badge">
-      <span class="change-pin-badge-label">Signed in as</span>
-      <strong>{{ account_email }}</strong>
+    <h2 style="font-size: 1.625rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0 0 0.35rem 0;">Change Transaction PIN</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Reset or update your 4-digit transaction authorization PIN securely with your account password.</p>
+  </header>
+
+  <section
+    class="card change-pin-shell"
+    data-page="change-pin"
+    data-email="{{ account_email }}"
+    style="padding: 2rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-sm);"
+  >
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.75rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(14, 165, 233, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">PIN Verification</h3>
+          <p style="margin: 0; font-size: 0.78rem; color: var(--text-secondary);">Authenticate with account password</p>
+        </div>
+      </div>
+      <div class="change-pin-badge" style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.4rem 0.75rem; font-size: 0.75rem; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace;">
+        Signed in as: <strong style="color: var(--text-primary);">{{ account_email }}</strong>
+      </div>
     </div>
-  </div>
 
-  <form class="change-pin-form" id="change-pin-form">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-    <label for="change-pin-email">Current Account Email</label>
-    <input
-      id="change-pin-email"
-      type="email"
-      value="{{ account_email }}"
-      autocomplete="email"
-      readonly
-      required
-    />
+    <form class="change-pin-form" id="change-pin-form">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
-    <label for="change-pin-password">Account Password</label>
-    <input
-      id="change-pin-password"
-      type="password"
-      autocomplete="current-password"
-      placeholder="Enter your account password"
-      required
-    />
+      <div class="form-group" style="margin-bottom: 1.15rem;">
+        <label for="change-pin-email" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Account Email</label>
+        <input
+          id="change-pin-email"
+          type="email"
+          value="{{ account_email }}"
+          autocomplete="email"
+          readonly
+          required
+          style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;"
+        />
+      </div>
 
-    <label for="change-pin-new">New Transaction PIN</label>
-    <input
-      id="change-pin-new"
-      type="password"
-      inputmode="numeric"
-      pattern="\d{4}"
-      maxlength="4"
-      placeholder="Enter 4-digit PIN"
-      required
-    />
+      <div class="form-group" style="margin-bottom: 1.15rem;">
+        <label for="change-pin-password" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Current Account Password</label>
+        <input
+          id="change-pin-password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Enter your account password"
+          required
+          style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.92rem;"
+        />
+      </div>
 
-    <label for="change-pin-confirm">Confirm New PIN</label>
-    <input
-      id="change-pin-confirm"
-      type="password"
-      inputmode="numeric"
-      pattern="\d{4}"
-      maxlength="4"
-      placeholder="Re-enter new PIN"
-      required
-    />
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="form-group">
+          <label for="change-pin-new" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">New 4-Digit PIN</label>
+          <input
+            id="change-pin-new"
+            type="password"
+            inputmode="numeric"
+            pattern="\d{4}"
+            maxlength="4"
+            placeholder="••••"
+            required
+            style="letter-spacing: 0.3em; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary);"
+          />
+        </div>
 
-    <button class="btn primary change-pin-submit" type="submit">
-      Update PIN
-    </button>
-  </form>
+        <div class="form-group">
+          <label for="change-pin-confirm" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Confirm New PIN</label>
+          <input
+            id="change-pin-confirm"
+            type="password"
+            inputmode="numeric"
+            pattern="\d{4}"
+            maxlength="4"
+            placeholder="••••"
+            required
+            style="letter-spacing: 0.3em; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary);"
+          />
+        </div>
+      </div>
 
-  <div class="message alert" id="change-pin-message"></div>
-</section>
+      <button class="btn primary change-pin-submit" type="submit" style="width: 100%; padding: 0.75rem 1.25rem; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Update Transaction PIN
+      </button>
+    </form>
+
+    <div class="message alert" id="change-pin-message" style="margin-top: 1.25rem;"></div>
+  </section>
+</div>
 {% endblock %}
