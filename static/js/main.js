@@ -1746,24 +1746,60 @@ const fetchBeneficiaries = async () => {
 
 const renderBeneficiariesList = (container, list) => {
     const target = container.querySelector('#beneficiaries-list');
+    const badge = container.querySelector('#benef-count-badge');
+    if (badge) {
+        badge.textContent = list.length;
+    }
     if (!target) return;
     if (!list.length) {
-        target.innerHTML = '<p>No beneficiaries saved.</p>';
+        target.innerHTML = `
+            <div style="text-align: center; padding: 3rem 1.5rem; background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius-lg);">
+                <div style="width: 48px; height: 48px; margin: 0 auto 0.75rem auto; border-radius: 50%; background: rgba(14, 165, 233, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <h4 style="margin: 0 0 0.25rem 0; font-size: 1rem; font-weight: 700; color: var(--text-primary);">No recipients saved yet</h4>
+                <p style="margin: 0; font-size: 0.82rem; color: var(--text-tertiary); max-width: 320px; margin: 0 auto;">Add a frequent recipient on the left to initiate 1-click transfers without re-entering email addresses.</p>
+            </div>
+        `;
         return;
     }
     target.innerHTML = list.map(b => {
-        const nameDisplay = b.nickname ? escapeHtml(b.nickname) + ' (' + escapeHtml(b.name) + ')' : escapeHtml(b.name);
+        const initials = (b.name || "U").trim().split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
         return `
-        <div class="beneficiary-card" data-id="${escapeHtml(b.id)}">
-            <div class="benef-row">
-                <div>
-                    <strong>${nameDisplay}</strong>
-                    <div class="muted">${escapeHtml(b.email)}</div>
+        <div class="beneficiary-card" data-id="${escapeHtml(b.id)}" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); transition: var(--transition-fast); gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.85rem; overflow: hidden;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent) 0%, #1e40af 100%); color: #ffffff; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(14,165,233,0.25);">
+                    ${escapeHtml(initials)}
                 </div>
-                <div class="benef-actions">
-                    <button class="btn ghost quick-transfer" data-email="${escapeHtml(b.email)}">Transfer</button>
-                    <button class="btn danger delete-benef" data-id="${escapeHtml(b.id)}">Delete</button>
+                <div style="overflow: hidden;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <strong style="color: var(--text-primary); font-size: 0.92rem; font-weight: 700;">${escapeHtml(b.name)}</strong>
+                        ${b.nickname ? `<span style="background: rgba(14,165,233,0.1); color: var(--accent); font-size: 0.7rem; font-weight: 600; padding: 0.1rem 0.45rem; border-radius: 9999px;">${escapeHtml(b.nickname)}</span>` : ''}
+                    </div>
+                    <div style="color: var(--text-tertiary); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${escapeHtml(b.email)}
+                    </div>
                 </div>
+            </div>
+            <div class="benef-actions" style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+                <button class="btn secondary quick-transfer" data-email="${escapeHtml(b.email)}" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; padding: 0.4rem 0.75rem;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                    Transfer
+                </button>
+                <button class="btn ghost delete-benef" data-id="${escapeHtml(b.id)}" data-name="${escapeHtml(b.name)}" title="Remove Beneficiary" style="padding: 0.4rem; color: var(--danger); border-radius: var(--radius-sm); border: 1px solid transparent;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
             </div>
         </div>`;
     }).join('');
@@ -1774,44 +1810,116 @@ const setupBeneficiaries = () => {
     if (!container) return;
     const form = document.getElementById('beneficiary-form');
     const message = document.getElementById('benef-message');
+    const searchInput = document.getElementById('benef-search-input');
 
-    const refresh = async () => {
-        const list = await fetchBeneficiaries();
-        renderBeneficiariesList(container, list);
-        // also populate transfer select if present
-        const select = document.getElementById('beneficiarySelect');
-        if (select) {
-            select.innerHTML = '<option value="">-- Choose saved beneficiary --</option>' +
-                list.map(b => {
-                    const label = b.nickname ? escapeHtml(b.nickname) + ' ('+escapeHtml(b.name)+')' : escapeHtml(b.name);
-                    return `<option value="${escapeHtml(b.email)}">${label} — ${escapeHtml(b.email)}</option>`;
-                }).join('');
-        }
-        // attach handlers for quick transfer and delete
+    // Delete modal elements
+    const deleteModal = document.getElementById('delete-benef-modal');
+    const deleteTargetName = document.getElementById('delete-benef-target-name');
+    const deleteCancelBtn = document.getElementById('delete-cancel-btn');
+    const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
+
+    let cachedList = [];
+    let pendingDeleteId = null;
+
+    const bindActions = () => {
         container.querySelectorAll('.quick-transfer').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const email = btn.dataset.email;
-                window.location.href = '/transfer';
-                // store chosen email temporarily
                 sessionStorage.setItem('quick_transfer_email', email);
+                window.location.href = '/transfer';
             });
         });
+
         container.querySelectorAll('.delete-benef').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const id = btn.dataset.id;
-                try {
-                    const csrfEl3 = document.querySelector('input[name="_csrf_token"]');
-                    const csrfVal3 = csrfEl3 ? csrfEl3.value : '';
-                    await fetch(`/api/beneficiaries/${id}`, { method: 'DELETE', credentials: 'same-origin', headers: { "X-CSRFToken": csrfVal3 } });
-                    setMessage(message, 'Beneficiary removed.', 'success');
-                    await delay(300);
-                    refresh();
-                } catch (err) {
-                    setMessage(message, 'Failed to remove beneficiary.', 'error');
+            btn.addEventListener('click', () => {
+                pendingDeleteId = btn.dataset.id;
+                const name = btn.dataset.name || "this recipient";
+                if (deleteModal && deleteTargetName) {
+                    deleteTargetName.textContent = name;
+                    deleteModal.style.display = 'flex';
+                } else if (confirm(`Remove ${name} from saved beneficiaries?`)) {
+                    executeDelete(pendingDeleteId);
                 }
             });
         });
     };
+
+    const executeDelete = async (id) => {
+        if (!id) return;
+        try {
+            const csrfEl3 = document.querySelector('input[name="_csrf_token"]');
+            const csrfVal3 = csrfEl3 ? csrfEl3.value : '';
+            await fetch(`/api/beneficiaries/${id}`, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: { "X-CSRFToken": csrfVal3 }
+            });
+            setMessage(message, 'Beneficiary removed successfully.', 'success');
+            if (deleteModal) deleteModal.style.display = 'none';
+            pendingDeleteId = null;
+            await delay(300);
+            refresh();
+        } catch (err) {
+            setMessage(message, 'Failed to remove beneficiary.', 'error');
+        }
+    };
+
+    if (deleteConfirmBtn) {
+        deleteConfirmBtn.addEventListener('click', () => {
+            if (pendingDeleteId) {
+                executeDelete(pendingDeleteId);
+            }
+        });
+    }
+
+    if (deleteCancelBtn) {
+        deleteCancelBtn.addEventListener('click', () => {
+            if (deleteModal) deleteModal.style.display = 'none';
+            pendingDeleteId = null;
+        });
+    }
+
+    if (deleteModal) {
+        deleteModal.addEventListener('click', (e) => {
+            if (e.target === deleteModal) {
+                deleteModal.style.display = 'none';
+                pendingDeleteId = null;
+            }
+        });
+    }
+
+    const refresh = async () => {
+        cachedList = await fetchBeneficiaries();
+        filterAndRender();
+
+        // also populate transfer select if present
+        const select = document.getElementById('beneficiarySelect');
+        if (select) {
+            select.innerHTML = '<option value="">-- Choose saved beneficiary --</option>' +
+                cachedList.map(b => {
+                    const label = b.nickname ? escapeHtml(b.nickname) + ' ('+escapeHtml(b.name)+')' : escapeHtml(b.name);
+                    return `<option value="${escapeHtml(b.email)}">${label} — ${escapeHtml(b.email)}</option>`;
+                }).join('');
+        }
+    };
+
+    const filterAndRender = () => {
+        const query = (searchInput?.value || "").trim().toLowerCase();
+        let displayList = cachedList;
+        if (query) {
+            displayList = cachedList.filter(b => 
+                (b.name && b.name.toLowerCase().includes(query)) ||
+                (b.email && b.email.toLowerCase().includes(query)) ||
+                (b.nickname && b.nickname.toLowerCase().includes(query))
+            );
+        }
+        renderBeneficiariesList(container, displayList);
+        bindActions();
+    };
+
+    if (searchInput) {
+        searchInput.addEventListener('input', filterAndRender);
+    }
 
     refresh();
 
@@ -1828,7 +1936,7 @@ const setupBeneficiaries = () => {
         }
         try {
             const data = await apiRequest('/api/beneficiaries', { method: 'POST', body: JSON.stringify({ name, email, nickname }) });
-            setMessage(message, data.message || 'Beneficiary added.', 'success');
+            setMessage(message, data.message || 'Beneficiary saved successfully.', 'success');
             form.reset();
             await delay(400);
             refresh();

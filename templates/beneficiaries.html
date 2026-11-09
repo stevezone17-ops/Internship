@@ -1,49 +1,156 @@
 {% extends 'base.html' %} {% block content %}
-<section class="page-header">
-  <h2>Beneficiaries</h2>
-  <p>Manage your saved recipients for faster transfers.</p>
-</section>
+<div class="beneficiaries-page-container" data-page="beneficiaries">
+  <!-- Page Header -->
+  <header class="page-header" style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <span class="badge" style="background: rgba(14, 165, 233, 0.1); color: var(--accent); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 9999px;">Address Book</span>
+          <span style="font-size: 0.8rem; color: var(--text-tertiary);">• Verified Recipients</span>
+        </div>
+        <h2 style="font-size: 1.625rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0 0 0.35rem 0;">Beneficiaries</h2>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; max-width: 600px;">Save trusted payees with custom aliases for fast, error-free peer-to-peer transfers.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <a href="/transfer" class="btn primary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.55rem 1rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          Send Money
+        </a>
+      </div>
+    </div>
+  </header>
 
-<section class="beneficiaries-shell" data-page="beneficiaries">
-  <div class="card">
-    <h3>Add Beneficiary</h3>
-    <form id="beneficiary-form">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-      <label for="benef-name">Name</label>
-      <input
-        id="benef-name"
-        name="name"
-        type="text"
-        placeholder="Full name"
-        required
-      />
+  <div style="display: grid; grid-template-columns: 1fr 1.65fr; gap: 1.75rem; align-items: start;" class="beneficiaries-grid-layout">
+    <!-- Left Column: Add Beneficiary Form -->
+    <div class="card" style="padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-sm);">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(14, 165, 233, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+          </svg>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">Add Beneficiary</h3>
+          <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Save a new payee to your registry</p>
+        </div>
+      </div>
 
-      <label for="benef-email">Email</label>
-      <input
-        id="benef-email"
-        name="email"
-        type="email"
-        placeholder="recipient@example.com"
-        required
-      />
+      <form id="beneficiary-form">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
-      <label for="benef-nick">Nickname (optional)</label>
-      <input
-        id="benef-nick"
-        name="nickname"
-        type="text"
-        placeholder="Nickname"
-      />
+        <div class="form-group" style="margin-bottom: 1.15rem;">
+          <label for="benef-name" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Full Legal Name</label>
+          <input
+            id="benef-name"
+            name="name"
+            type="text"
+            placeholder="e.g. John Doe"
+            required
+            style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.92rem;"
+          />
+        </div>
 
-      <button class="btn primary" type="submit">Add Beneficiary</button>
-      <p id="benef-message" class="message"></p>
-    </form>
+        <div class="form-group" style="margin-bottom: 1.15rem;">
+          <label for="benef-email" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Account Email Address</label>
+          <input
+            id="benef-email"
+            name="email"
+            type="email"
+            placeholder="john@example.com"
+            required
+            style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.92rem;"
+          />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="benef-nick" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">
+            Custom Alias / Nickname <span style="font-weight: 400; color: var(--text-tertiary);">(Optional)</span>
+          </label>
+          <input
+            id="benef-nick"
+            name="nickname"
+            type="text"
+            placeholder="e.g. Landlord, Office, Freelance"
+            style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.92rem;"
+          />
+        </div>
+
+        <button class="btn primary" type="submit" style="width: 100%; padding: 0.75rem 1.25rem; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Save Beneficiary
+        </button>
+
+        <p id="benef-message" class="message" style="margin-top: 1rem;"></p>
+      </form>
+    </div>
+
+    <!-- Right Column: Saved Beneficiaries Directory -->
+    <div class="card beneficiaries-list-card" style="padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-sm);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">Saved Recipients</h3>
+          <span id="benef-count-badge" class="badge" style="background: var(--bg); border: 1px solid var(--border); color: var(--text-secondary); font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 9999px;">0</span>
+        </div>
+        <!-- Real-time Search Box -->
+        <div style="position: relative; max-width: 240px; width: 100%;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none;">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            id="benef-search-input"
+            placeholder="Filter recipients..."
+            style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.45rem 0.75rem 0.45rem 2.2rem; font-size: 0.82rem; background: var(--bg); color: var(--text-primary);"
+          />
+        </div>
+      </div>
+
+      <!-- Beneficiaries List Container -->
+      <div id="beneficiaries-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="text-align: center; padding: 2rem 1rem; color: var(--text-tertiary);">
+          Loading saved beneficiaries...
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="card beneficiaries-list-card">
-    <h3>Saved Beneficiaries</h3>
-    <div id="beneficiaries-list">Loading...</div>
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-benef-modal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+    <div class="modal-card" style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); max-width: 420px; width: 100%; padding: 1.75rem; box-shadow: var(--shadow-xl);">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+        <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(239, 68, 68, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Remove Beneficiary</h3>
+          <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Are you sure you want to remove this payee?</p>
+        </div>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 1.25rem 0; line-height: 1.5;">
+        You will no longer see <strong id="delete-benef-target-name" style="color: var(--text-primary);"></strong> in your quick transfer selector.
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <button type="button" id="delete-cancel-btn" class="btn secondary" style="padding: 0.65rem 1rem; font-weight: 600;">
+          Cancel
+        </button>
+        <button type="button" id="delete-confirm-btn" class="btn danger" style="padding: 0.65rem 1rem; font-weight: 600; background: var(--danger); color: #fff; border: none;">
+          Remove
+        </button>
+      </div>
+    </div>
   </div>
-</section>
-
+</div>
 {% endblock %}

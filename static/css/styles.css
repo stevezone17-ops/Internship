@@ -3952,3 +3952,20 @@ select {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* =====================================================================
+   STAGE 5: BENEFICIARY DIRECTORY STYLING
+   ===================================================================== */
+.beneficiary-card {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.beneficiary-card:hover {
+    border-color: var(--accent) !important;
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+}
+@media (max-width: 860px) {
+    .beneficiaries-grid-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
