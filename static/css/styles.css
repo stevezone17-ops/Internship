@@ -4044,3 +4044,98 @@ select {
 .password-toggle:hover {
     color: var(--text-primary) !important;
 }
+
+/* =====================================================================
+   STAGE 10: ACCESSIBILITY, FOCUS RINGS, MICRO-INTERACTIONS & RESPONSIVE POLISH
+   ===================================================================== */
+
+/* High-Contrast Accessible Focus Rings (WCAG 2.1 AA) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--accent) !important;
+    outline-offset: 2px !important;
+}
+
+/* Micro-Interactions & Tactile Feedback */
+.btn:active,
+.auth-btn:active,
+.quick-chip:active,
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* Screen Reader Only Utility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Table Responsive Scrolling Container */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Modal Mobile Ergonomics */
+.modal-card {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Ultra-Compact Responsive Ergonomics (<= 480px) */
+@media (max-width: 480px) {
+    .page {
+        padding: 14px 12px 40px !important;
+    }
+
+    .page-header h2 {
+        font-size: 1.35rem !important;
+    }
+
+    .card {
+        padding: 16px !important;
+    }
+
+    .modal-card {
+        padding: 18px !important;
+        margin: 10px;
+    }
+
+    .transact-tab-btn {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.82rem !important;
+    }
+
+    .quick-chip {
+        font-size: 0.72rem !important;
+        padding: 0.2rem 0.5rem !important;
+    }
+
+    .btn, input, select, textarea {
+        min-height: 42px;
+    }
+}
+
+/* Accessibility: Respect Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
