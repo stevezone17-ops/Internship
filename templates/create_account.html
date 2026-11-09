@@ -1,42 +1,83 @@
 {% extends 'base.html' %} {% block content %}
-<section class="page-header">
-  <h2>Create an Account</h2>
-  <p>Enter your details to open a simulated account.</p>
-</section>
+<div class="create-account-container" style="max-width: 600px; margin: 0 auto; padding: 1rem 0;">
+  <!-- Header -->
+  <header class="page-header" style="margin-bottom: 1.5rem; text-align: center;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+      <span class="badge" style="background: rgba(14, 165, 233, 0.1); color: var(--accent); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 9999px;">Ledger Provisioning</span>
+    </div>
+    <h2 style="font-size: 1.625rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0 0 0.35rem 0;">Open Bank Account</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Configure your primary currency ledger and opening deposit allocation.</p>
+  </header>
 
-<section class="card form-card" data-page="create">
-  <form method="POST" action="/api/create_account" class="auth-form">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-    <label for="name">Full Name</label>
-    <input id="name" name="name" type="text" placeholder="Ava Banks" required />
+  <section class="card form-card" data-page="create" style="padding: 2rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-sm);">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+      <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+          <line x1="2" y1="10" x2="22" y2="10"></line>
+        </svg>
+      </div>
+      <div>
+        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Account Specifications</h3>
+        <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Select ledger tier and funding parameters</p>
+      </div>
+    </div>
 
-    <label for="email">Email</label>
-    <input
-      id="email"
-      name="email"
-      type="email"
-      placeholder="ava@bank.com"
-      required
-    />
+    <form id="create-account-form" method="POST" action="/api/create_account" class="auth-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
-    <label for="account_type">Account Type</label>
-    <select id="account_type" name="account_type" required>
-      <option value="">Select type</option>
-      <option value="savings">Savings (Min balance ₹1000)</option>
-      <option value="current">Current (Min balance ₹5000)</option>
-    </select>
+      <div class="form-group">
+        <label for="name" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Full Legal Name</label>
+        <input id="name" name="name" type="text" placeholder="Ava Banks" required style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.68rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.95rem;" />
+      </div>
 
-    <label for="initial_deposit">Initial Deposit</label>
-    <input
-      id="initial_deposit"
-      name="initial_deposit"
-      type="number"
-      min="0"
-      step="0.01"
-      value="0"
-    />
+      <div class="form-group">
+        <label for="email" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Email Address</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="ava@domain.com"
+          required
+          style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.68rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.95rem;"
+        />
+      </div>
 
-    <button class="btn primary" type="submit">Create Account</button>
-  </form>
-</section>
+      <div class="form-group">
+        <label for="account_type" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Account Tier</label>
+        <select id="account_type" name="account_type" required style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.68rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.92rem;">
+          <option value="">Select Account Tier</option>
+          <option value="savings">Savings Account (Minimum balance: ₹1,000)</option>
+          <option value="current">Current Account (Minimum balance: ₹5,000)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="initial_deposit" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Initial Opening Deposit (INR)</label>
+        <div style="position: relative;">
+          <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-tertiary); font-size: 1.1rem; pointer-events: none;">₹</span>
+          <input
+            id="initial_deposit"
+            name="initial_deposit"
+            type="number"
+            min="0"
+            step="0.01"
+            value="0"
+            style="padding-left: 2.25rem; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding-top: 0.65rem; padding-bottom: 0.65rem; background: var(--bg); color: var(--text-primary);"
+          />
+        </div>
+        <span style="display: block; font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.25rem;">Funds are instantly available in your dashboard upon activation.</span>
+      </div>
+
+      <button class="btn primary" type="submit" style="width: 100%; padding: 0.8rem 1.25rem; font-weight: 600; font-size: 0.98rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.5rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Provision Banking Account
+      </button>
+
+      <div class="message" id="create-message" style="margin-top: 0.5rem;"></div>
+    </form>
+  </section>
+</div>
 {% endblock %}

@@ -1,21 +1,52 @@
 {% extends 'base.html' %}
 {% block content %}
-<section class="page-header">
-  <h2>Email Verification</h2>
-  <p id="verify-message">{{ message }}</p>
-</section>
-
-<section class="card form-card">
-  {% if success is none %}
-  <form method="POST" action="/verify/{{ token }}">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-    <button class="btn primary" type="submit">Verify My Email</button>
-  </form>
-  {% elif success %}
-  <p>Your email is verified. You can now login and continue.</p>
-  <a class="btn primary" href="/login">Go to Login</a>
-  {% else %}
-  <p>Verification failed. Please request a new link from support.</p>
-  {% endif %}
-</section>
+<div class="verify-page-container" style="max-width: 500px; margin: 3rem auto; padding: 1rem;">
+  <section class="card form-card" style="padding: 2.25rem; border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--card); box-shadow: var(--shadow-lg); text-align: center;">
+    {% if success is none %}
+    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(14, 165, 233, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+        <polyline points="22,6 12,13 2,6"></polyline>
+      </svg>
+    </div>
+    <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.5rem 0;">Verify Email Address</h2>
+    <p id="verify-message" style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1.75rem 0; line-height: 1.5;">{{ message }}</p>
+    <form method="POST" action="/verify/{{ token }}">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+      <button class="btn primary" type="submit" style="width: 100%; padding: 0.8rem 1.25rem; font-weight: 600; font-size: 0.98rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Verify My Email
+      </button>
+    </form>
+    {% elif success %}
+    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    </div>
+    <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.5rem 0;">Email Confirmed</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1.75rem 0; line-height: 1.5;">Your email address has been verified. You can now access your full banking features.</p>
+    <a class="btn primary" href="/login" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.8rem 1.25rem; font-weight: 600; text-decoration: none;">
+      Proceed to Sign In
+    </a>
+    {% else %}
+    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); margin: 0 0 0.5rem 0;">Verification Expired</h2>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 1.75rem 0; line-height: 1.5;">This verification token is invalid or has expired. Please sign in or contact customer support for a fresh link.</p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+      <a class="btn secondary" href="/support" style="text-decoration: none; padding: 0.65rem 1rem;">Contact Support</a>
+      <a class="btn primary" href="/login" style="text-decoration: none; padding: 0.65rem 1rem;">Sign In</a>
+    </div>
+    {% endif %}
+  </section>
+</div>
 {% endblock %}

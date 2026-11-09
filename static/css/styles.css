@@ -4013,3 +4013,34 @@ select {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* =====================================================================
+   STAGE 9: AUTHENTICATION FLOW STYLING
+   ===================================================================== */
+.auth-shell {
+    width: 100%;
+}
+.auth-card {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+.auth-btn {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    border-radius: var(--radius-md) !important;
+    font-weight: 600 !important;
+    transition: var(--transition-fast) !important;
+}
+.auth-btn:hover {
+    background: var(--accent-hover) !important;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35) !important;
+    transform: translateY(-1px);
+}
+.password-toggle {
+    transition: var(--transition-fast);
+}
+.password-toggle:hover {
+    color: var(--text-primary) !important;
+}
