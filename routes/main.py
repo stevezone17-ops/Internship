@@ -39,7 +39,7 @@ def dashboard_page():
 @login_required
 @account_required
 def transact_page():
-    return render_template("transact.html")
+    return render_template("transact.html", account_id=get_session_account_id())
 
 @main_bp.route("/transfer")
 @login_required

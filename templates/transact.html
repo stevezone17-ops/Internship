@@ -1,103 +1,395 @@
 {% extends 'base.html' %} {% block content %}
-<section class="page-header">
-  <h2>Deposit or Withdraw</h2>
-  <p>Manage funds with instant balance updates.</p>
-</section>
+<div class="transact-page-container" data-page="transact" data-account-id="{{ account_id }}">
+  <!-- Page Header -->
+  <header class="page-header" style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <span class="badge" style="background: rgba(14, 165, 233, 0.1); color: var(--accent); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 9999px;">Treasury & Operations</span>
+          <span style="font-size: 0.8rem; color: var(--text-tertiary);">• Instant Settlement</span>
+        </div>
+        <h2 style="font-size: 1.625rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0 0 0.35rem 0;">Deposit or Withdraw</h2>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; max-width: 600px;">Move capital in and out of your high-yield banking account securely with real-time balance reconciliation.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <a href="/transfer" class="btn secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.55rem 1rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          Dedicated Send Money
+        </a>
+        <a href="/transactions" class="btn secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.55rem 1rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          Statement Log
+        </a>
+      </div>
+    </div>
+  </header>
 
-<section class="grid">
-  <div class="card form-card" data-page="deposit">
-    <h3>Deposit Money</h3>
-    <form id="deposit-form" method="POST" action="/api/deposit">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-      <label for="deposit-amount">Amount</label>
-      <input
-        id="deposit-amount"
-        name="amount"
-        type="number"
-        min="0.01"
-        step="0.01"
-        required
-      />
-      <label for="deposit-pin">Transaction PIN</label>
-      <input
-        id="deposit-pin"
-        name="pin"
-        type="password"
-        inputmode="numeric"
-        pattern="\d{4}"
-        placeholder="Enter PIN"
-        required
-      />
-      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
-      <button class="btn deposit" type="submit">Deposit</button>
-    </form>
-    <div class="message" id="deposit-message"></div>
+  <!-- Live Balance & Limits Banner -->
+  <div class="card" style="background: linear-gradient(135deg, var(--card) 0%, rgba(14, 165, 233, 0.04) 100%); border: 1px solid var(--border); padding: 1.25rem 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; align-items: center;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary);">Current Available Balance</span>
+          <span class="live-pill" style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; color: var(--success); font-weight: 600;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block;"></span> Live
+          </span>
+        </div>
+        <div style="font-size: 1.75rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); letter-spacing: -0.02em;" id="transact-balance-display">
+          ₹--
+        </div>
+      </div>
+      <div style="border-left: 1px solid var(--border); padding-left: 1.25rem;">
+        <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); display: block; margin-bottom: 0.35rem;">Per-Transaction Limit</span>
+        <span style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">₹10,000.00</span>
+        <span style="display: block; font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.2rem;">Single transaction ceiling</span>
+      </div>
+      <div style="border-left: 1px solid var(--border); padding-left: 1.25rem;">
+        <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); display: block; margin-bottom: 0.35rem;">Savings Threshold</span>
+        <span style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">₹1,000.00</span>
+        <span style="display: block; font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.2rem;">Mandatory reserve maintenance</span>
+      </div>
+    </div>
   </div>
 
-  <div class="card form-card" data-page="withdraw">
-    <h3>Withdraw Money</h3>
-    <form id="withdraw-form" method="POST" action="/api/withdraw">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-      <label for="withdraw-amount">Amount</label>
-      <input
-        id="withdraw-amount"
-        name="amount"
-        type="number"
-        min="0.01"
-        step="0.01"
-        required
-      />
-      <label for="withdraw-pin">Transaction PIN</label>
-      <input
-        id="withdraw-pin"
-        name="pin"
-        type="password"
-        inputmode="numeric"
-        pattern="\d{4,6}"
-        placeholder="Enter PIN"
-        required
-      />
-      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
-      <button class="btn withdraw" type="submit">Withdraw</button>
-    </form>
-    <div class="message" id="withdraw-message"></div>
+  <!-- Operational Mode Tabs -->
+  <div class="transact-nav-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+    <button class="transact-tab-btn active" data-target="deposit-panel" type="button" style="background: none; border: none; font-size: 0.95rem; font-weight: 600; color: var(--accent); padding: 0.6rem 1.25rem; border-radius: var(--radius-md); cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: var(--transition-fast);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <polyline points="19 12 12 19 5 12"></polyline>
+      </svg>
+      Deposit Funds
+    </button>
+    <button class="transact-tab-btn" data-target="withdraw-panel" type="button" style="background: none; border: none; font-size: 0.95rem; font-weight: 600; color: var(--text-tertiary); padding: 0.6rem 1.25rem; border-radius: var(--radius-md); cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: var(--transition-fast);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="19" x2="12" y2="5"></line>
+        <polyline points="5 12 12 5 19 12"></polyline>
+      </svg>
+      Withdraw Capital
+    </button>
+    <button class="transact-tab-btn" data-target="transfer-panel" type="button" style="background: none; border: none; font-size: 0.95rem; font-weight: 600; color: var(--text-tertiary); padding: 0.6rem 1.25rem; border-radius: var(--radius-md); cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: var(--transition-fast);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 1l4 4-4 4"></path>
+        <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+        <path d="M7 23l-4-4 4-4"></path>
+        <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+      </svg>
+      Direct Transfer
+    </button>
   </div>
 
-  <div class="card form-card" data-page="transfer">
-    <h3>Transfer Money</h3>
-    <form id="transfer-form" method="POST" action="/api/transfer">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-      <label for="transfer-to">Receiver Email</label>
-      <input
-        id="transfer-to"
-        name="receiver_email"
-        type="text"
-        placeholder="recipient@bank.com"
-        required
-      />
-      <label for="transfer-amount">Amount</label>
-      <input
-        id="transfer-amount"
-        name="amount"
-        type="number"
-        min="0.01"
-        step="0.01"
-        required
-      />
-      <label for="transfer-pin">Transaction PIN</label>
-      <input
-        id="transfer-pin"
-        name="pin"
-        type="password"
-        inputmode="numeric"
-        pattern="\d{4,6}"
-        placeholder="Enter PIN"
-        required
-      />
-      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
-      <button class="btn transfer" type="submit">Transfer</button>
-    </form>
-    <div class="message" id="transfer-message"></div>
+  <!-- Panels Container -->
+  <div class="transact-panels-container">
+    <!-- PANEL 1: DEPOSIT -->
+    <div class="transact-panel active" id="deposit-panel">
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.5rem; align-items: start;">
+        <div class="card form-card" data-page="deposit" style="padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+              </svg>
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">Deposit Funds</h3>
+              <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Add funds directly to your verified account via authenticated payment rails.</p>
+            </div>
+          </div>
+
+          <form id="deposit-form" method="POST" action="/api/deposit">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label for="deposit-amount" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Deposit Amount (INR)</label>
+              <div class="input-prefix-wrapper" style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-tertiary); font-size: 1.1rem; pointer-events: none;">₹</span>
+                <input
+                  id="deposit-amount"
+                  name="amount"
+                  type="number"
+                  min="0.01"
+                  max="10000"
+                  step="0.01"
+                  placeholder="0.00"
+                  required
+                  style="padding-left: 2.25rem; font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 700; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding-top: 0.65rem; padding-bottom: 0.65rem; background: var(--bg); color: var(--text-primary);"
+                />
+              </div>
+              <!-- Quick Amount Pills -->
+              <div style="display: flex; gap: 0.4rem; margin-top: 0.6rem; flex-wrap: wrap;">
+                <button type="button" class="btn ghost quick-chip" data-fill="#deposit-amount" data-val="500" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">+₹500</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#deposit-amount" data-val="1000" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">+₹1,000</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#deposit-amount" data-val="2500" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">+₹2,500</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#deposit-amount" data-val="5000" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">+₹5,000</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#deposit-amount" data-val="10000" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">+₹10,000</button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <label for="deposit-pin" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin: 0;">Transaction PIN</label>
+                <a class="pin-help-link" href="/change-pin" style="font-size: 0.75rem; color: var(--accent); text-decoration: none;">Forgot PIN?</a>
+              </div>
+              <input
+                id="deposit-pin"
+                name="pin"
+                type="password"
+                inputmode="numeric"
+                pattern="\d{4,6}"
+                placeholder="••••"
+                required
+                maxlength="6"
+                style="letter-spacing: 0.3em; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary);"
+              />
+            </div>
+
+            <button class="btn primary deposit" type="submit" style="width: 100%; padding: 0.75rem 1.25rem; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+              </svg>
+              Confirm & Deposit
+            </button>
+          </form>
+          <div class="message" id="deposit-message" style="margin-top: 1rem;"></div>
+        </div>
+
+        <!-- Information / Security Card -->
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="card" style="padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <h4 style="margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Deposit Protection</h4>
+            </div>
+            <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;">
+              <li>Instant credit to your balance upon PIN confirmation.</li>
+              <li>Zero processing fees on all domestic deposits.</li>
+              <li>Protected by bank-grade 256-bit encryption.</li>
+              <li>Maximum ₹10,000 per transaction batch.</li>
+            </ul>
+          </div>
+
+          <div class="card" style="padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--text-tertiary); margin-bottom: 0.4rem;">Regulatory Protocol</div>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">Deposits are immediately reflected in your transaction ledger and monthly audit statements with immutable reference IDs.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 2: WITHDRAW -->
+    <div class="transact-panel" id="withdraw-panel" style="display: none;">
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.5rem; align-items: start;">
+        <div class="card form-card" data-page="withdraw" style="padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(239, 68, 68, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">Withdraw Funds</h3>
+              <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Redeem funds from your account with 2-factor PIN verification.</p>
+            </div>
+          </div>
+
+          <form id="withdraw-form" method="POST" action="/api/withdraw">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label for="withdraw-amount" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Withdrawal Amount (INR)</label>
+              <div class="input-prefix-wrapper" style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-tertiary); font-size: 1.1rem; pointer-events: none;">₹</span>
+                <input
+                  id="withdraw-amount"
+                  name="amount"
+                  type="number"
+                  min="0.01"
+                  max="10000"
+                  step="0.01"
+                  placeholder="0.00"
+                  required
+                  style="padding-left: 2.25rem; font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 700; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding-top: 0.65rem; padding-bottom: 0.65rem; background: var(--bg); color: var(--text-primary);"
+                />
+              </div>
+              <!-- Quick Amount Pills -->
+              <div style="display: flex; gap: 0.4rem; margin-top: 0.6rem; flex-wrap: wrap;">
+                <button type="button" class="btn ghost quick-chip" data-fill="#withdraw-amount" data-val="500" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹500</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#withdraw-amount" data-val="1000" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹1,000</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#withdraw-amount" data-val="2500" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹2,500</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#withdraw-amount" data-val="5000" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹5,000</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#withdraw-amount" data-val="10000" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">Max (₹10,000)</button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <label for="withdraw-pin" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin: 0;">Transaction PIN</label>
+                <a class="pin-help-link" href="/change-pin" style="font-size: 0.75rem; color: var(--accent); text-decoration: none;">Forgot PIN?</a>
+              </div>
+              <input
+                id="withdraw-pin"
+                name="pin"
+                type="password"
+                inputmode="numeric"
+                pattern="\d{4,6}"
+                placeholder="••••"
+                required
+                maxlength="6"
+                style="letter-spacing: 0.3em; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary);"
+              />
+            </div>
+
+            <button class="btn withdraw" type="submit" style="width: 100%; padding: 0.75rem 1.25rem; font-weight: 600; font-size: 0.95rem; background: var(--danger); color: #ffffff; border: none; border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
+              Authorize Withdrawal
+            </button>
+          </form>
+          <div class="message" id="withdraw-message" style="margin-top: 1rem;"></div>
+        </div>
+
+        <!-- Withdrawal Guidelines -->
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="card" style="padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <h4 style="margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Reserve Policy</h4>
+            </div>
+            <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;">
+              <li>Savings accounts require minimum reserve of ₹1,000.</li>
+              <li>Current accounts require minimum reserve of ₹5,000.</li>
+              <li>Anti-fraud rate limiter allows 1 withdrawal per 5 seconds.</li>
+              <li>5 consecutive incorrect PIN attempts will trigger temporary safety lockout.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 3: TRANSFER -->
+    <div class="transact-panel" id="transfer-panel" style="display: none;">
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.5rem; align-items: start;">
+        <div class="card form-card" data-page="transfer" style="padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(59, 130, 246, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">Peer-to-Peer Transfer</h3>
+              <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Direct wire transfer to any registered account email.</p>
+            </div>
+          </div>
+
+          <form id="transfer-form" method="POST" action="/api/transfer">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label for="transfer-to" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Recipient Account Email</label>
+              <input
+                id="transfer-to"
+                name="receiver_email"
+                type="email"
+                placeholder="recipient@domain.com"
+                required
+                style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.95rem;"
+              />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label for="transfer-amount" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Transfer Amount (INR)</label>
+              <div class="input-prefix-wrapper" style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-tertiary); font-size: 1.1rem; pointer-events: none;">₹</span>
+                <input
+                  id="transfer-amount"
+                  name="amount"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="0.00"
+                  required
+                  style="padding-left: 2.25rem; font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 700; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding-top: 0.65rem; padding-bottom: 0.65rem; background: var(--bg); color: var(--text-primary);"
+                />
+              </div>
+              <!-- Quick Amount Pills -->
+              <div style="display: flex; gap: 0.4rem; margin-top: 0.6rem; flex-wrap: wrap;">
+                <button type="button" class="btn ghost quick-chip" data-fill="#transfer-amount" data-val="250" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹250</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#transfer-amount" data-val="500" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹500</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#transfer-amount" data-val="1000" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹1,000</button>
+                <button type="button" class="btn ghost quick-chip" data-fill="#transfer-amount" data-val="2500" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹2,500</button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <label for="transfer-pin" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin: 0;">Transaction PIN</label>
+                <a class="pin-help-link" href="/change-pin" style="font-size: 0.75rem; color: var(--accent); text-decoration: none;">Forgot PIN?</a>
+              </div>
+              <input
+                id="transfer-pin"
+                name="pin"
+                type="password"
+                inputmode="numeric"
+                pattern="\d{4,6}"
+                placeholder="••••"
+                required
+                maxlength="6"
+                style="letter-spacing: 0.3em; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary);"
+              />
+            </div>
+
+            <button class="btn primary transfer" type="submit" style="width: 100%; padding: 0.75rem 1.25rem; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              Send Transfer
+            </button>
+          </form>
+          <div class="message" id="transfer-message" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="card" style="padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <h4 style="margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Prefer Beneficiaries?</h4>
+            </div>
+            <p style="margin: 0 0 0.75rem 0; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;">You can save frequent payees to transfer with 1-click without re-typing their emails.</p>
+            <a href="/beneficiaries" class="btn secondary" style="display: inline-block; font-size: 0.8rem; padding: 0.4rem 0.8rem; text-decoration: none;">Manage Beneficiaries</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</section>
+</div>
 {% endblock %}

@@ -1,87 +1,240 @@
 {% extends 'base.html' %} {% block content %}
-<section class="page-header">
-  <h2>Send Money</h2>
-  <p>Move funds instantly with a clear, secure transfer flow.</p>
-</section>
-
-<section
-  class="transfer-shell"
-  data-page="transfer"
-  data-account-id="{{ account_id }}"
->
-  <div class="card transfer-card">
-    <div class="transfer-header">
+<div class="transfer-page-container" data-page="transfer" data-account-id="{{ account_id }}">
+  <!-- Page Header -->
+  <header class="page-header" style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
       <div>
-        <p class="eyebrow">Transfer</p>
-        <h3>Send Money</h3>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <span class="badge" style="background: rgba(14, 165, 233, 0.1); color: var(--accent); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 9999px;">Money Transfer</span>
+          <span style="font-size: 0.8rem; color: var(--text-tertiary);">• Direct Bank Wire</span>
+        </div>
+        <h2 style="font-size: 1.625rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0 0 0.35rem 0;">Send Money</h2>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; max-width: 600px;">Transfer capital directly to any registered account holder with real-time verification and zero platform fees.</p>
       </div>
-      <div class="balance-card" id="balance-card">
-        <span class="label">Available Balance</span>
-        <strong class="amount" id="transfer-balance">--</strong>
-        <span class="updated-time" id="balance-updated-time"></span>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <a href="/beneficiaries" class="btn secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.55rem 1rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          Manage Beneficiaries
+        </a>
+        <a href="/transact" class="btn secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.55rem 1rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+          Deposit / Withdraw
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div style="display: grid; grid-template-columns: 1.35fr 1fr; gap: 1.75rem; align-items: start;">
+    <!-- Main Transfer Card -->
+    <div class="card transfer-card" style="padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-sm);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(59, 130, 246, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">Transfer Details</h3>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Authenticate destination and transfer amount</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="transfer-form">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+        <!-- Beneficiary Quick Select -->
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label for="beneficiarySelect" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin: 0;">Select Saved Beneficiary</label>
+            <a href="/beneficiaries" style="font-size: 0.75rem; color: var(--accent); text-decoration: none;">+ Add New</a>
+          </div>
+          <select id="beneficiarySelect" style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.9rem;">
+            <option value="">-- Choose saved beneficiary --</option>
+          </select>
+        </div>
+
+        <!-- Receiver Email Input -->
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="receiverEmail" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Recipient Account Email</label>
+          <input
+            id="receiverEmail"
+            type="email"
+            placeholder="recipient@domain.com"
+            autocomplete="email"
+            required
+            style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary); font-size: 0.95rem;"
+          />
+        </div>
+
+        <!-- Transfer Amount Input -->
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="transferAmount" style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">Amount to Send (INR)</label>
+          <div class="input-prefix-wrapper" style="position: relative;">
+            <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-tertiary); font-size: 1.1rem; pointer-events: none;">₹</span>
+            <input
+              id="transferAmount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="0.00"
+              required
+              style="padding-left: 2.25rem; font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 700; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding-top: 0.65rem; padding-bottom: 0.65rem; background: var(--bg); color: var(--text-primary);"
+            />
+          </div>
+
+          <!-- Quick Amount Chips -->
+          <div class="quick-amounts" style="display: flex; gap: 0.4rem; margin-top: 0.6rem; flex-wrap: wrap;">
+            <button class="btn ghost" type="button" data-amount="100" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹100</button>
+            <button class="btn ghost" type="button" data-amount="500" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹500</button>
+            <button class="btn ghost" type="button" data-amount="1000" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹1,000</button>
+            <button class="btn ghost" type="button" data-amount="2500" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹2,500</button>
+            <button class="btn ghost" type="button" data-amount="5000" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">₹5,000</button>
+          </div>
+        </div>
+
+        <!-- PIN Verification Input -->
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label for="transferPin" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin: 0;">Transaction PIN</label>
+            <a class="pin-help-link" href="/change-pin" style="font-size: 0.75rem; color: var(--accent); text-decoration: none;">Forgot PIN?</a>
+          </div>
+          <input
+            id="transferPin"
+            type="password"
+            inputmode="numeric"
+            pattern="\d{4,6}"
+            placeholder="••••"
+            required
+            maxlength="6"
+            style="letter-spacing: 0.3em; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 1rem; background: var(--bg); color: var(--text-primary);"
+          />
+        </div>
+
+        <!-- Schedule Transfer Toggle -->
+        <div class="card" style="padding: 0.9rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg); margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
+            <input type="checkbox" id="scheduleCheck" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent);" />
+            <label for="scheduleCheck" style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); cursor: pointer; margin: 0;">Schedule this transfer for later</label>
+          </div>
+          <div id="scheduleDetails" style="display: none; padding-top: 0.5rem; border-top: 1px solid var(--border); margin-top: 0.5rem;">
+            <label for="scheduleAt" style="display: block; font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 0.3rem;">Execution Date & Time</label>
+            <input
+              id="scheduleAt"
+              type="datetime-local"
+              name="schedule_at"
+              style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.5rem; background: var(--card); color: var(--text-primary); font-size: 0.85rem;"
+            />
+          </div>
+        </div>
+
+        <!-- Transfer Button -->
+        <button class="btn primary" id="transferBtn" type="button" style="width: 100%; padding: 0.8rem 1.25rem; font-weight: 600; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          Review & Send Transfer
+        </button>
+
+        <p class="message" id="statusMsg" style="margin-top: 1rem;"></p>
       </div>
     </div>
 
-    <div class="transfer-form">
-      <label for="beneficiarySelect">Select Beneficiary</label>
-      <select id="beneficiarySelect">
-        <option value="">-- Choose saved beneficiary --</option>
-      </select>
-      <div class="muted"><a href="/beneficiaries">Manage beneficiaries</a></div>
-
-      <label for="receiverEmail">Receiver Email</label>
-      <input
-        id="receiverEmail"
-        type="email"
-        placeholder="recipient@bank.com"
-        autocomplete="email"
-        required
-      />
-
-      <label for="transferAmount">Amount (₹)</label>
-      <input
-        id="transferAmount"
-        type="number"
-        min="0.01"
-        step="0.01"
-        placeholder="0.00"
-        required
-      />
-
-      <label for="transferPin">Transaction PIN</label>
-      <input
-        id="transferPin"
-        type="password"
-        inputmode="numeric"
-        pattern="\d{4,6}"
-        placeholder="Enter PIN"
-        required
-      />
-      <a class="pin-help-link" href="/change-pin">Forgot PIN?</a>
-
-      <label for="scheduleCheck">Schedule transfer?</label>
-      <div class="schedule-row">
-        <input type="checkbox" id="scheduleCheck" />
-        <input
-          id="scheduleAt"
-          type="datetime-local"
-          name="schedule_at"
-        />
+    <!-- Right Column: Balance Card & Transfer Summary -->
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <!-- Available Balance Card -->
+      <div class="card" id="balance-card" style="padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--card) 0%, rgba(59, 130, 246, 0.05) 100%); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);">Available Balance</span>
+          <span class="live-pill" style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; color: var(--success); font-weight: 600;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block;"></span> Active
+          </span>
+        </div>
+        <div style="font-size: 2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.4rem;">
+          <strong class="amount" id="transfer-balance">₹--</strong>
+        </div>
+        <span class="updated-time" id="balance-updated-time" style="font-size: 0.75rem; color: var(--text-tertiary); display: block;">Reconciling with ledger...</span>
       </div>
 
-      <div class="quick-amounts">
-        <button class="btn ghost" type="button" data-amount="100">₹100</button>
-        <button class="btn ghost" type="button" data-amount="500">₹500</button>
-        <button class="btn ghost" type="button" data-amount="1000">
-          ₹1000
-        </button>
+      <!-- Transfer Security & Fee Breakdown -->
+      <div class="card" style="padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
+        <h4 style="margin: 0 0 1rem 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Wire Protocol Information</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.85rem;">
+          <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);">
+            <span style="color: var(--text-secondary);">Transfer Fee</span>
+            <span style="font-weight: 700; color: var(--success); font-family: 'JetBrains Mono', monospace;">₹0.00 (Free)</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);">
+            <span style="color: var(--text-secondary);">Settlement Speed</span>
+            <span style="font-weight: 600; color: var(--text-primary);">Instant (Real-time)</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);">
+            <span style="color: var(--text-secondary);">Security Protocol</span>
+            <span style="font-weight: 600; color: var(--text-primary);">256-Bit TLS & PIN</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Min Reserve Protected</span>
+            <span style="font-weight: 600; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">₹1,000.00</span>
+          </div>
+        </div>
       </div>
-
-      <button class="btn primary" id="transferBtn" type="button">
-        Transfer
-      </button>
-      <p class="message" id="statusMsg"></p>
     </div>
   </div>
-</section>
+
+  <!-- Confirmation Modal -->
+  <div id="transfer-confirm-modal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+    <div class="modal-card" style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); max-width: 460px; width: 100%; padding: 1.75rem; box-shadow: var(--shadow-xl); position: relative;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(59, 130, 246, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary);">Confirm Transfer</h3>
+          <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);">Review your transaction details before authorizing</p>
+        </div>
+      </div>
+
+      <div style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem;">
+          <span style="color: var(--text-secondary);">Recipient</span>
+          <strong id="modal-recipient" style="color: var(--text-primary); font-family: 'JetBrains Mono', monospace; word-break: break-all;">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem;">
+          <span style="color: var(--text-secondary);">Transfer Amount</span>
+          <strong id="modal-amount" style="color: var(--accent); font-size: 1.1rem; font-family: 'JetBrains Mono', monospace;">₹0.00</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem;">
+          <span style="color: var(--text-secondary);">Processing Fee</span>
+          <span style="color: var(--success); font-weight: 600;">₹0.00 (Zero Fee)</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.85rem;">
+          <span style="color: var(--text-secondary);">Total Deducted</span>
+          <strong id="modal-total" style="color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">₹0.00</strong>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <button type="button" id="modal-cancel-btn" class="btn secondary" style="padding: 0.65rem 1rem; font-weight: 600;">
+          Cancel
+        </button>
+        <button type="button" id="modal-confirm-btn" class="btn primary" style="padding: 0.65rem 1rem; font-weight: 600;">
+          Confirm & Send
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

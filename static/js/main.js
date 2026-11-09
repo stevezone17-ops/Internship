@@ -1211,6 +1211,68 @@ const setupTransact = () => {
 
     if (!depositForm || !withdrawForm || !transferForm) return;
 
+    // Transact page live balance loading
+    const transactContainer = document.querySelector("[data-page='transact']");
+    const balanceDisplay = document.getElementById("transact-balance-display");
+    const accountId = transactContainer ? (transactContainer.dataset.accountId || getAccountId()) : getAccountId();
+
+    const refreshTransactBalance = () => {
+        if (!accountId || !balanceDisplay) return;
+        apiRequest(`/api/account/${accountId}`)
+            .then((data) => {
+                if (data && data.balance !== undefined) {
+                    balanceDisplay.textContent = formatCurrency(data.balance);
+                }
+            })
+            .catch(() => {});
+    };
+    if (balanceDisplay) {
+        refreshTransactBalance();
+    }
+
+    // Tabs logic for transact page
+    const tabButtons = document.querySelectorAll(".transact-tab-btn");
+    const tabPanels = document.querySelectorAll(".transact-panel");
+    if (tabButtons.length) {
+        tabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const targetId = btn.dataset.target;
+                tabButtons.forEach((b) => {
+                    b.classList.remove("active");
+                    b.style.color = "var(--text-tertiary)";
+                    b.style.borderBottom = "none";
+                    b.style.background = "none";
+                });
+                btn.classList.add("active");
+                btn.style.color = "var(--accent)";
+                btn.style.background = "rgba(14, 165, 233, 0.08)";
+
+                tabPanels.forEach((panel) => {
+                    if (panel.id === targetId) {
+                        panel.style.display = "block";
+                        panel.classList.add("active");
+                    } else {
+                        panel.style.display = "none";
+                        panel.classList.remove("active");
+                    }
+                });
+            });
+        });
+    }
+
+    // Quick fill chips logic
+    const quickChips = document.querySelectorAll(".quick-chip");
+    if (quickChips.length) {
+        quickChips.forEach((chip) => {
+            chip.addEventListener("click", () => {
+                const targetInput = document.querySelector(chip.dataset.fill);
+                if (targetInput && chip.dataset.val) {
+                    targetInput.value = chip.dataset.val;
+                }
+            });
+        });
+    }
+
     depositForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         setMessage(depositMessage, "");
@@ -1239,6 +1301,9 @@ const setupTransact = () => {
                 `${data.message || "Amount deposited successfully."} New balance: ${formatCurrency(data.balance)}`,
                 "success"
             );
+            if (balanceDisplay && data.balance !== undefined) {
+                balanceDisplay.textContent = formatCurrency(data.balance);
+            }
             depositForm.reset();
         } catch (error) {
             if (error.message.includes("PIN not set")) {
@@ -1296,6 +1361,9 @@ const setupTransact = () => {
                 `${data.message || "Amount withdrawn successfully."} New balance: ${formatCurrency(data.balance)}`,
                 "success"
             );
+            if (balanceDisplay && data.balance !== undefined) {
+                balanceDisplay.textContent = formatCurrency(data.balance);
+            }
             withdrawForm.reset();
         } catch (error) {
             if (error.setupUrl || error.message.includes("PIN not set")) {
@@ -1354,6 +1422,9 @@ const setupTransact = () => {
                 `${data.message || "Money transferred successfully."} New balance: ${formatCurrency(data.balance)}`,
                 "success"
             );
+            if (balanceDisplay && data.balance !== undefined) {
+                balanceDisplay.textContent = formatCurrency(data.balance);
+            }
             transferForm.reset();
         } catch (error) {
             if (error.setupUrl || error.message.includes("PIN not set")) {
@@ -1382,6 +1453,17 @@ const setupTransferPage = () => {
     const transferBtn = document.getElementById("transferBtn");
     const statusMsg = document.getElementById("statusMsg");
     const quickButtons = container.querySelectorAll("[data-amount]");
+    const scheduleCheck = document.getElementById("scheduleCheck");
+    const scheduleDetails = document.getElementById("scheduleDetails");
+    const scheduleAt = document.getElementById("scheduleAt");
+
+    // Modal elements
+    const confirmModal = document.getElementById("transfer-confirm-modal");
+    const modalRecipient = document.getElementById("modal-recipient");
+    const modalAmount = document.getElementById("modal-amount");
+    const modalTotal = document.getElementById("modal-total");
+    const modalCancelBtn = document.getElementById("modal-cancel-btn");
+    const modalConfirmBtn = document.getElementById("modal-confirm-btn");
 
     if (!accountId) {
         setMessage(statusMsg, "No account found. Please log in.", "error");
@@ -1409,6 +1491,13 @@ const setupTransferPage = () => {
         });
     }
 
+    // Schedule details toggle
+    if (scheduleCheck && scheduleDetails) {
+        scheduleCheck.addEventListener("change", () => {
+            scheduleDetails.style.display = scheduleCheck.checked ? "block" : "none";
+        });
+    }
+
     // populate beneficiary select
     if (beneficiarySelect) {
         fetchBeneficiaries().then(list => {
@@ -1430,84 +1519,130 @@ const setupTransferPage = () => {
         });
     }
 
-    if (transferBtn) {
-        transferBtn.addEventListener("click", async () => {
-            const receiverEmail = emailInput?.value.trim();
-            const amount = amountInput?.value.trim();
-            const pin = pinInput?.value.trim();
-            const scheduleCheck = document.getElementById("scheduleCheck");
-            const scheduleAt = document.getElementById("scheduleAt");
+    // Modal close helpers
+    const closeModal = () => {
+        if (confirmModal) {
+            confirmModal.style.display = "none";
+        }
+    };
 
-            if (!receiverEmail || !amount || !pin) {
-                setMessage(statusMsg, "All fields are required.", "error");
+    if (modalCancelBtn) {
+        modalCancelBtn.addEventListener("click", closeModal);
+    }
+    if (confirmModal) {
+        confirmModal.addEventListener("click", (e) => {
+            if (e.target === confirmModal) closeModal();
+        });
+    }
+
+    const executeTransfer = async () => {
+        const receiverEmail = emailInput?.value.trim();
+        const amount = amountInput?.value.trim();
+        const pin = pinInput?.value.trim();
+
+        closeModal();
+        setMessage(statusMsg, "", "");
+        setButtonLoading(transferBtn, true, "Processing...");
+
+        try {
+            // If scheduling is requested, call scheduled-transfers API
+            if (scheduleCheck && scheduleCheck.checked) {
+                const payload = {
+                    receiver_email: receiverEmail,
+                    amount: amount,
+                    pin: pin,
+                    scheduled_at: scheduleAt && scheduleAt.value ? new Date(scheduleAt.value).toISOString() : null,
+                };
+                const csrfEl = document.querySelector('input[name="_csrf_token"]');
+                const csrfVal = csrfEl ? csrfEl.value : '';
+                const resp = await fetch("/api/scheduled-transfers", {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: { "Content-Type": "application/json", "X-CSRFToken": csrfVal },
+                    body: JSON.stringify(payload),
+                });
+                const data = await resp.json();
+                if (!resp.ok) throw new Error(data.error || data.message || "Unable to schedule transfer");
+                setMessage(statusMsg, "Transfer scheduled successfully.", "success");
+                if (amountInput) amountInput.value = "";
+                if (pinInput) pinInput.value = "";
                 return;
             }
 
-            setMessage(statusMsg, "", "");
-            setButtonLoading(transferBtn, true, "Processing...");
+            const csrfEl2 = document.querySelector('input[name="_csrf_token"]');
+            const csrfVal2 = csrfEl2 ? csrfEl2.value : '';
+            const response = await fetch("/api/transfer", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfVal2 },
+                body: JSON.stringify({
+                    receiver_email: receiverEmail,
+                    amount: amount,
+                    pin: pin,
+                }),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                if (data.require_pin_setup) {
+                    const setupUrl = data.setup_url || "/setup-pin";
+                    const error = new Error("PIN not set. Please set your transaction PIN.");
+                    error.setupUrl = setupUrl;
+                    throw error;
+                }
+                throw new Error(data.error || "Request failed");
+            }
 
-            try {
-                // If scheduling is requested, call scheduled-transfers API
-                if (scheduleCheck && scheduleCheck.checked) {
-                    const payload = {
-                        receiver_email: receiverEmail,
-                        amount: amount,
-                        pin: pin,
-                        scheduled_at: scheduleAt && scheduleAt.value ? new Date(scheduleAt.value).toISOString() : null,
-                    };
-                    const csrfEl = document.querySelector('input[name="_csrf_token"]');
-                    const csrfVal = csrfEl ? csrfEl.value : '';
-                    const resp = await fetch("/api/scheduled-transfers", {
-                        method: "POST",
-                        credentials: "same-origin",
-                        headers: { "Content-Type": "application/json", "X-CSRFToken": csrfVal },
-                        body: JSON.stringify(payload),
-                    });
-                    const data = await resp.json();
-                    if (!resp.ok) throw new Error(data.error || data.message || "Unable to schedule transfer");
-                    setMessage(statusMsg, "Transfer scheduled.", "success");
-                    if (amountInput) amountInput.value = "";
-                    return;
-                }
-
-                const csrfEl2 = document.querySelector('input[name="_csrf_token"]');
-                const csrfVal2 = csrfEl2 ? csrfEl2.value : '';
-                const response = await fetch("/api/transfer", {
-                    method: "POST",
-                    credentials: "same-origin",
-                    headers: { "Content-Type": "application/json", "X-CSRFToken": csrfVal2 },
-                    body: JSON.stringify({
-                        receiver_email: receiverEmail,
-                        amount: amount,
-                        pin: pin,
-                    }),
-                });
-                const data = await response.json();
-                if (!response.ok) {
-                    if (data.require_pin_setup) {
-                        const setupUrl = data.setup_url || "/setup-pin";
-                        const error = new Error("PIN not set. Please set your transaction PIN.");
-                        error.setupUrl = setupUrl;
-                        throw error;
-                    }
-                    throw new Error(data.error || "Request failed");
-                }
-
-                setMessage(statusMsg, "Transfer successful!", "success");
-                if (amountInput) amountInput.value = "";
-                if (pinInput) pinInput.value = "";
-                if (balanceEl && data.balance !== undefined) {
-                    balanceEl.textContent = formatCurrency(data.balance);
-                }
-            } catch (error) {
-                if (error.setupUrl || error.message.includes("PIN not set")) {
-                    setMessage(statusMsg, error.message, "error");
-                    window.location.href = error.setupUrl || "/setup-pin";
-                    return;
-                }
+            setMessage(statusMsg, `Transfer successful! Ref ID: ${data.transaction_id || "TXN-OK"}`, "success");
+            if (amountInput) amountInput.value = "";
+            if (pinInput) pinInput.value = "";
+            if (balanceEl && data.balance !== undefined) {
+                balanceEl.textContent = formatCurrency(data.balance);
+            }
+        } catch (error) {
+            if (error.setupUrl || error.message.includes("PIN not set")) {
                 setMessage(statusMsg, error.message, "error");
-            } finally {
-                setButtonLoading(transferBtn, false);
+                window.location.href = error.setupUrl || "/setup-pin";
+                return;
+            }
+            setMessage(statusMsg, error.message, "error");
+        } finally {
+            setButtonLoading(transferBtn, false);
+        }
+    };
+
+    if (modalConfirmBtn) {
+        modalConfirmBtn.addEventListener("click", executeTransfer);
+    }
+
+    if (transferBtn) {
+        transferBtn.addEventListener("click", () => {
+            const receiverEmail = emailInput?.value.trim();
+            const amount = amountInput?.value.trim();
+            const pin = pinInput?.value.trim();
+
+            if (!receiverEmail || !amount || !pin) {
+                setMessage(statusMsg, "All fields (recipient, amount, and PIN) are required.", "error");
+                return;
+            }
+
+            const numAmount = parseFloat(amount);
+            if (isNaN(numAmount) || numAmount <= 0) {
+                setMessage(statusMsg, "Please enter a valid positive transfer amount.", "error");
+                return;
+            }
+
+            // Populate confirmation modal
+            if (confirmModal && modalRecipient && modalAmount && modalTotal) {
+                modalRecipient.textContent = receiverEmail;
+                modalAmount.textContent = formatCurrency(numAmount);
+                modalTotal.textContent = formatCurrency(numAmount);
+                confirmModal.style.display = "flex";
+            } else {
+                // Fallback if modal is not in DOM
+                executeTransfer();
+            }
+        });
+    }
             }
         });
     }
