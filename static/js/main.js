@@ -747,6 +747,155 @@ const setupTransactions = () => {
     }
 };
 
+let dashTrendChartInstance = null;
+let dashBreakdownChartInstance = null;
+
+const renderDashboardCharts = (transactions, totalDeposits, totalWithdrawals) => {
+    if (typeof Chart === "undefined") return;
+    const isDark = document.documentElement.classList.contains("dark-mode");
+    const gridColor = isDark ? "rgba(255, 255, 255, 0.06)" : "rgba(15, 23, 42, 0.06)";
+    const textColor = isDark ? "#94a3b8" : "#64748b";
+
+    // 1. Monthly Financial Activity Trend
+    const trendCtx = document.getElementById("dashboard-trend-chart");
+    if (trendCtx) {
+        if (dashTrendChartInstance) {
+            dashTrendChartInstance.destroy();
+            dashTrendChartInstance = null;
+        }
+
+        const months = [];
+        const monthDeposits = {};
+        const monthDebits = {};
+        const now = new Date();
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const mKey = d.toLocaleString("default", { month: "short" });
+            months.push(mKey);
+            monthDeposits[mKey] = 0;
+            monthDebits[mKey] = 0;
+        }
+
+        (transactions || []).forEach((tx) => {
+            const tDate = new Date(tx.timestamp);
+            const mKey = tDate.toLocaleString("default", { month: "short" });
+            if (monthDeposits.hasOwnProperty(mKey)) {
+                if (tx.type === "deposit") {
+                    monthDeposits[mKey] += tx.amount;
+                } else {
+                    monthDebits[mKey] += tx.amount;
+                }
+            }
+        });
+
+        const depositData = months.map((m) => monthDeposits[m]);
+        const debitData = months.map((m) => monthDebits[m]);
+
+        dashTrendChartInstance = new Chart(trendCtx, {
+            type: "line",
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: "Deposits",
+                        data: depositData,
+                        borderColor: "#2563eb",
+                        backgroundColor: "rgba(37, 99, 235, 0.12)",
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                    },
+                    {
+                        label: "Withdrawals",
+                        data: debitData,
+                        borderColor: "#ef4444",
+                        backgroundColor: "rgba(239, 68, 68, 0.08)",
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: "index",
+                        intersect: false,
+                        callbacks: {
+                            label: (ctx) => ` ${ctx.dataset.label}: ₹${ctx.parsed.y.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`,
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: textColor, font: { family: "Inter, sans-serif", size: 11 } },
+                    },
+                    y: {
+                        grid: { color: gridColor },
+                        ticks: {
+                            color: textColor,
+                            font: { family: "Inter, sans-serif", size: 11 },
+                            callback: (val) => "₹" + (val >= 1000 ? (val / 1000).toFixed(0) + "k" : val),
+                        },
+                    },
+                },
+            },
+        });
+    }
+
+    // 2. Cash Flow Ratio Donut Chart
+    const donutCtx = document.getElementById("dashboard-breakdown-chart");
+    if (donutCtx) {
+        if (dashBreakdownChartInstance) {
+            dashBreakdownChartInstance.destroy();
+            dashBreakdownChartInstance = null;
+        }
+
+        const hasActivity = totalDeposits > 0 || totalWithdrawals > 0;
+        const chartData = hasActivity ? [totalDeposits, totalWithdrawals] : [1];
+        const bgColors = hasActivity
+            ? ["#2563eb", "#ef4444"]
+            : [isDark ? "#1e293b" : "#e2e8f0"];
+
+        dashBreakdownChartInstance = new Chart(donutCtx, {
+            type: "doughnut",
+            data: {
+                labels: hasActivity ? ["Deposits", "Debits"] : ["No Activity"],
+                datasets: [
+                    {
+                        data: chartData,
+                        backgroundColor: bgColors,
+                        borderWidth: 0,
+                        hoverOffset: hasActivity ? 4 : 0,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "75%",
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: hasActivity,
+                        callbacks: {
+                            label: (ctx) => ` ${ctx.label}: ₹${ctx.parsed.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`,
+                        },
+                    },
+                },
+            },
+        });
+    }
+};
+
 const setupDashboard = () => {
     const container = document.querySelector("[data-page='dashboard']");
     if (!container) return;
@@ -754,13 +903,33 @@ const setupDashboard = () => {
     const accountId = container.dataset.accountId || getAccountId();
     
     const nameEl = document.getElementById("account-name");
+    const holderNameEl = document.getElementById("dash-holder-name");
     const emailEl = document.getElementById("account-email");
     const typeEl = document.getElementById("account-type");
+    const typeBadge = document.getElementById("account-type-badge");
     const balanceEl = document.getElementById("account-balance");
-    const balanceSub = document.querySelector(".balance-sub");
+    const balanceSub = document.getElementById("balance-sub") || document.querySelector(".balance-sub");
     const message = document.getElementById("dashboard-message");
     const deleteBtn = document.getElementById("delete-account");
     const recentList = document.getElementById("recent-transactions");
+    const beneficiariesList = document.getElementById("dash-beneficiaries-list");
+    const totalDepositsEl = document.getElementById("dashboard-total-deposits");
+    const totalWithdrawalsEl = document.getElementById("dashboard-total-withdrawals");
+    const netFlowEl = document.getElementById("dashboard-net-flow");
+    const netBadgeEl = document.getElementById("dashboard-net-badge");
+    const totalTxCountEl = document.getElementById("dashboard-total-tx-count");
+    const donutInflowVal = document.getElementById("donut-inflow-val");
+    const donutOutflowVal = document.getElementById("donut-outflow-val");
+
+    // Dynamic greeting based on time of day
+    const hour = new Date().getHours();
+    let greetingText = "Welcome back";
+    if (hour < 12) greetingText = "Good morning";
+    else if (hour < 17) greetingText = "Good afternoon";
+    else greetingText = "Good evening";
+    const timeGreetingEl = document.getElementById("dash-time-greeting");
+    if (timeGreetingEl) timeGreetingEl.textContent = greetingText;
+
     const notificationList = document.getElementById("notification-list");
     const notificationPrev = document.getElementById("notifications-prev");
     const notificationNext = document.getElementById("notifications-next");
@@ -777,11 +946,15 @@ const setupDashboard = () => {
         return;
     }
 
+    // 1. Fetch Account Details
     apiRequest(`/api/account/${accountId}`)
         .then((data) => {
             if (nameEl) nameEl.textContent = data.name;
+            if (holderNameEl) holderNameEl.textContent = data.name;
             if (emailEl) emailEl.textContent = data.email;
-            if (typeEl) typeEl.textContent = `Account Type: ${data.account_type || "-"}`;
+            const acctTypeStr = (data.account_type || "Savings").toUpperCase();
+            if (typeEl) typeEl.textContent = `${acctTypeStr} ACCOUNT`;
+            if (typeBadge) typeBadge.textContent = `${acctTypeStr} ACCOUNT`;
             if (balanceEl) balanceEl.textContent = formatCurrency(data.balance);
             if (balanceSub) {
                 balanceSub.textContent = `Updated ${formatTimestamp(new Date())}`;
@@ -793,83 +966,183 @@ const setupDashboard = () => {
             setMessage(message, `Failed to load account: ${error.message}`, "error");
         });
 
+    // 2. Fetch Transactions & KPI Metrics & Render Charts
     apiRequest(`/api/transactions/${accountId}`)
         .then((data) => {
-            if (!recentList) return;
-            const slice = data.transactions.slice(0, 5);
-            if (!slice.length) {
-                recentList.innerHTML = "<li>No recent transactions.</li>";
-                return;
+            const summary = data.summary || {};
+            const totalDeposits = Number(summary.total_deposits || 0);
+            const totalWithdrawals = Number(summary.total_withdrawals || 0);
+            const netFlow = totalDeposits - totalWithdrawals;
+            const totalTx = Number(summary.total_transactions || (data.transactions ? data.transactions.length : 0));
+
+            if (totalDepositsEl) totalDepositsEl.textContent = formatCurrency(totalDeposits);
+            if (totalWithdrawalsEl) totalWithdrawalsEl.textContent = formatCurrency(totalWithdrawals);
+            if (donutInflowVal) donutInflowVal.textContent = formatCurrency(totalDeposits);
+            if (donutOutflowVal) donutOutflowVal.textContent = formatCurrency(totalWithdrawals);
+            if (totalTxCountEl) totalTxCountEl.textContent = totalTx;
+
+            if (netFlowEl) {
+                netFlowEl.textContent = (netFlow >= 0 ? "+" : "") + formatCurrency(netFlow);
+                netFlowEl.className = "metric-value " + (netFlow >= 0 ? "text-success" : "text-danger");
             }
-            recentList.innerHTML = slice
-                .map(
-                    (tx) =>
-                        `<li>${escapeHtml(tx.type)} ${formatCurrency(tx.amount)} <span class="meta">${
-                            escapeHtml(tx.formatted_time || formatTimestamp(tx.timestamp))
-                        }</span></li>`
-                )
-                .join("");
+            if (netBadgeEl) {
+                if (netFlow > 0) {
+                    netBadgeEl.textContent = "Positive";
+                    netBadgeEl.className = "trend-badge positive";
+                } else if (netFlow < 0) {
+                    netBadgeEl.textContent = "Deficit";
+                    netBadgeEl.className = "trend-badge negative";
+                } else {
+                    netBadgeEl.textContent = "Balanced";
+                    netBadgeEl.className = "trend-badge neutral";
+                }
+            }
+
+            // Render Recent Transactions
+            if (recentList) {
+                const slice = (data.transactions || []).slice(0, 5);
+                if (!slice.length) {
+                    recentList.innerHTML = `<div class="empty-state-mini">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="empty-icon"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                        <p>No transactions yet</p>
+                        <small>Make your first deposit or transfer to see activity here.</small>
+                    </div>`;
+                } else {
+                    recentList.innerHTML = slice.map((tx) => {
+                        const isCredit = tx.type === "deposit" || (tx.type === "transfer" && tx.metadata && tx.metadata.to_account_id === accountId);
+                        const isDebit = tx.type === "withdraw" || (tx.type === "transfer" && (!tx.metadata || tx.metadata.from_account_id === accountId));
+                        let iconSvg = '';
+                        let badgeClass = 'neutral';
+                        let typeTitle = tx.type.toUpperCase();
+
+                        if (isCredit) {
+                            badgeClass = 'credit';
+                            iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+                        } else if (isDebit) {
+                            badgeClass = 'debit';
+                            iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
+                        } else {
+                            iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3 21 7l-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/></svg>';
+                        }
+
+                        let detailNote = "";
+                        if (tx.metadata) {
+                            if (tx.metadata.to_email) detailNote = `To: ${escapeHtml(tx.metadata.to_email)}`;
+                            else if (tx.metadata.from_email) detailNote = `From: ${escapeHtml(tx.metadata.from_email)}`;
+                        }
+                        if (!detailNote) detailNote = tx.transaction_id ? `ID: ${tx.transaction_id.slice(-8)}` : "Verified transfer";
+
+                        return `<div class="dash-tx-item">
+                            <div class="dash-tx-left">
+                                <span class="dash-tx-icon ${badgeClass}">${iconSvg}</span>
+                                <div class="dash-tx-meta">
+                                    <strong class="dash-tx-title">${escapeHtml(typeTitle)}</strong>
+                                    <span class="dash-tx-note">${escapeHtml(detailNote)}</span>
+                                </div>
+                            </div>
+                            <div class="dash-tx-right">
+                                <strong class="dash-tx-amount ${isCredit ? 'text-success' : 'text-danger'}">
+                                    ${isCredit ? '+' : '-'}${formatCurrency(tx.amount)}
+                                </strong>
+                                <span class="dash-tx-time">${escapeHtml(tx.formatted_time || formatTimestamp(tx.timestamp))}</span>
+                            </div>
+                        </div>`;
+                    }).join("");
+                }
+            }
+
+            // Initialize / Update Chart.js Visualizations
+            renderDashboardCharts(data.transactions || [], totalDeposits, totalWithdrawals);
         })
-        .catch(() => {
-            if (recentList) recentList.innerHTML = "<li>Unable to load.</li>";
+        .catch((err) => {
+            console.error("Failed to load transactions for dashboard:", err);
+            if (recentList) recentList.innerHTML = `<div class="error-state-mini">Unable to load transactions.</div>`;
         });
 
+    // 3. Fetch Saved Beneficiaries for Dashboard Quick-Send
+    apiRequest("/api/beneficiaries")
+        .then((bData) => {
+            if (!beneficiariesList) return;
+            const list = bData.beneficiaries || [];
+            if (!list.length) {
+                beneficiariesList.innerHTML = `<div class="empty-state-mini">
+                    <p>No saved beneficiaries yet</p>
+                    <a href="/beneficiaries" class="link">Add your first recipient &rarr;</a>
+                </div>`;
+            } else {
+                beneficiariesList.innerHTML = list.slice(0, 4).map((b) => {
+                    const initials = (b.name || "U").slice(0, 2).toUpperCase();
+                    return `<div class="dash-benef-item">
+                        <div class="dash-benef-avatar">${escapeHtml(initials)}</div>
+                        <div class="dash-benef-info">
+                            <span class="dash-benef-name">${escapeHtml(b.name)}</span>
+                            <span class="dash-benef-email">${escapeHtml(b.email)}</span>
+                        </div>
+                        <a class="btn ghost btn-xs dash-benef-send-btn" href="/transfer?to=${encodeURIComponent(b.email)}">Send</a>
+                    </div>`;
+                }).join("");
+            }
+        })
+        .catch(() => {
+            if (beneficiariesList) beneficiariesList.innerHTML = `<div class="empty-state-mini"><p>Saved beneficiaries ready</p></div>`;
+        });
+
+    // 4. Notifications Feed
     const fetchNotifications = (page = notificationCurrentPage) => {
         apiRequest(`/api/notifications?page=${page}&limit=${notificationLimit}`)
             .then((data) => {
                 if (!notificationList) return;
                 notificationCurrentPage = data.page;
-                if (!data.notifications.length) {
-                    notificationList.innerHTML = "<li>No notifications yet.</li>";
+                if (!data.notifications || !data.notifications.length) {
+                    notificationList.innerHTML = `<li class="empty-notif">No notifications yet. You are all caught up!</li>`;
                 } else {
-                    notificationList.innerHTML = data.notifications
-                        .map((note) => {
-                            const isWarning = note.level === "warning";
-                            const msg = note.message || "";
-                            const metadata = note.metadata || {};
-                            const hasEmailPreview = Boolean(metadata.email_preview_html);
-                            const type = metadata.type || "";
-                            let icon = "🔔";
-                            if (isWarning) icon = "⚠️";
-                            else if (hasEmailPreview) icon = "📧";
-                            else if (type === "transfer" || msg.toLowerCase().includes("transfer")) icon = "📤";
-                            else if (type === "deposit" || msg.toLowerCase().includes("deposit")) icon = "➕";
-                            else if (type === "withdraw" || msg.toLowerCase().includes("withdraw")) icon = "➖";
-                            const timeLabel = note.created_at_display || formatTimestamp(note.created_at);
-                            const emailBadge = hasEmailPreview
-                                ? "<span class=\"email-badge\">Email Notification Sent</span>"
-                                : "";
-                            const emailPreview = hasEmailPreview
-                                ? `<details class="email-preview">
-                                        <summary>View email preview</summary>
-                                        <div class="email-preview-body">${metadata.email_preview_html}</div>
-                                   </details>`
-                                : "";
-                            const typeClass = type ? ` ${type}` : "";
-                            return `<li class="notification-item${typeClass} ${isWarning ? 'warning' : ''}">
-                                <span class="notif-icon">${icon}</span>
-                                <div class="notif-body">
-                                    <span class="notif-message">${escapeHtml(msg)}</span>
-                                    ${emailBadge}
-                                    ${emailPreview}
-                                    <span class="notif-time">${escapeHtml(timeLabel)}</span>
-                                </div>
-                            </li>`;
-                        })
-                        .join("");
+                    notificationList.innerHTML = data.notifications.map((note) => {
+                        const isWarning = note.level === "warning";
+                        const msg = note.message || "";
+                        const metadata = note.metadata || {};
+                        const hasEmailPreview = Boolean(metadata.email_preview_html);
+                        const type = metadata.type || "";
+                        let iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+                        if (isWarning) {
+                            iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+                        } else if (hasEmailPreview) {
+                            iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
+                        }
+
+                        const timeLabel = note.created_at_display || formatTimestamp(note.created_at);
+                        const emailBadge = hasEmailPreview
+                            ? `<span class="email-badge">Email Dispatched</span>`
+                            : "";
+                        const emailPreview = hasEmailPreview
+                            ? `<details class="email-preview">
+                                    <summary>View email payload</summary>
+                                    <div class="email-preview-body">${metadata.email_preview_html}</div>
+                               </details>`
+                            : "";
+                        return `<li class="notification-item ${isWarning ? 'warning' : ''}">
+                            <span class="notif-icon-badge ${isWarning ? 'warning' : 'info'}">${iconSvg}</span>
+                            <div class="notif-body">
+                                <div class="notif-content">${escapeHtml(msg)}</div>
+                                ${emailBadge}
+                                ${emailPreview}
+                                <span class="notif-time">${escapeHtml(timeLabel)}</span>
+                            </div>
+                        </li>`;
+                    }).join("");
                 }
+
                 if (notificationPage) {
-                    notificationPage.textContent = `Page ${data.page} of ${data.total_pages}`;
+                    notificationPage.textContent = `Page ${data.page} of ${data.total_pages || 1}`;
                 }
                 if (notificationPrev) notificationPrev.disabled = !data.has_prev;
                 if (notificationNext) notificationNext.disabled = !data.has_next;
             })
             .catch(() => {
-                if (notificationList) notificationList.innerHTML = "<li>Unable to load.</li>";
+                if (notificationList) notificationList.innerHTML = `<li>Unable to load notifications.</li>`;
             });
     };
 
-    // Migrate old notifications with ObjectIds once per session, then fetch
+    // 5. Migration & Notifications kickoff
     const migrationKey = "notifications_migrated";
     if (!sessionStorage.getItem(migrationKey)) {
         const csrfMig = document.querySelector('input[name="_csrf_token"]');
@@ -877,14 +1150,10 @@ const setupDashboard = () => {
             method: "POST",
             credentials: "same-origin",
             headers: { "Content-Type": "application/json", ...(csrfMig ? { "X-CSRFToken": csrfMig.value } : {}) },
-        })
-            .then(() => {
-                sessionStorage.setItem(migrationKey, "1");
-                fetchNotifications();
-            })
-            .catch(() => {
-                fetchNotifications();
-            });
+        }).finally(() => {
+            sessionStorage.setItem(migrationKey, "1");
+            fetchNotifications();
+        });
     } else {
         fetchNotifications();
     }
@@ -894,16 +1163,18 @@ const setupDashboard = () => {
             fetchNotifications(Math.max(1, notificationCurrentPage - 1));
         });
     }
-
     if (notificationNext) {
         notificationNext.addEventListener("click", () => {
             fetchNotifications(notificationCurrentPage + 1);
         });
     }
 
+    // 6. Delete Account Action
     if (deleteBtn) {
         deleteBtn.addEventListener("click", async () => {
-            if (!confirm("Delete this account and all transactions?")) return;
+            if (!confirm("Are you sure you want to delete this simulated account and all associated transaction records? This action cannot be undone.")) {
+                return;
+            }
             try {
                 await apiRequest(`/api/account/${accountId}`, { method: "DELETE" });
                 clearAccountId();
