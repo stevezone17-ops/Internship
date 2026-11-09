@@ -2310,38 +2310,113 @@ const setupAdminDashboard = () => {
     const txList = document.getElementById("admin-transactions-list");
     const supportList = document.getElementById("admin-support-list");
 
+    const refreshBtn = document.getElementById("admin-refresh-btn");
+
     const renderUsers = (users) => {
         if (!usersList) return;
         usersList.innerHTML = users.length
-            ? users.map((u) => `<li><strong>${escapeHtml(u.name || 'User')}</strong> <span class="meta">${escapeHtml(u.email || '')} · ${escapeHtml(u.role || 'user')} · ${escapeHtml(u.created_at_display || '')}</span></li>`).join("")
-            : "<li>No users found.</li>";
+            ? users.map((u) => {
+                const initials = (u.name || "U").trim().split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
+                const isAdmin = (u.role || "").toLowerCase() === "admin";
+                const roleBadge = isAdmin
+                    ? `<span style="background: rgba(147, 51, 234, 0.1); color: #9333ea; font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 9999px;">Admin</span>`
+                    : `<span style="background: var(--bg); color: var(--text-tertiary); font-size: 0.7rem; font-weight: 600; padding: 0.1rem 0.45rem; border-radius: 9999px; border: 1px solid var(--border);">Client</span>`;
+                return `
+                    <li style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; overflow: hidden;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: ${isAdmin ? 'linear-gradient(135deg, #9333ea, #4f46e5)' : 'linear-gradient(135deg, var(--accent), #1e40af)'}; color: #ffffff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                ${escapeHtml(initials)}
+                            </div>
+                            <div style="overflow: hidden;">
+                                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                    <strong style="font-size: 0.88rem; color: var(--text-primary); font-weight: 700;">${escapeHtml(u.name || 'User')}</strong>
+                                    ${roleBadge}
+                                </div>
+                                <div style="font-size: 0.76rem; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    ${escapeHtml(u.email || '')}
+                                </div>
+                            </div>
+                        </div>
+                        <span style="font-size: 0.74rem; color: var(--text-tertiary); flex-shrink: 0;">${escapeHtml(u.created_at_display || '')}</span>
+                    </li>
+                `;
+            }).join("")
+            : "<li style='padding: 1.5rem; text-align: center; color: var(--text-tertiary);'>No users found.</li>";
     };
 
     const renderTransactions = (transactions) => {
         if (!txList) return;
         txList.innerHTML = transactions.length
-            ? transactions.map((tx) => `<li><strong>${escapeHtml(tx.type || '-')}</strong> ${formatCurrency(tx.amount || 0)} <span class="meta">${escapeHtml(tx.created_at_display || '')}</span></li>`).join("")
-            : "<li>No transactions found.</li>";
+            ? transactions.map((tx) => {
+                const isDeposit = (tx.type || "").toLowerCase() === "deposit";
+                const isWithdraw = (tx.type || "").toLowerCase() === "withdraw";
+                const badgeColor = isDeposit ? "var(--success)" : (isWithdraw ? "var(--danger)" : "var(--accent)");
+                const badgeBg = isDeposit ? "rgba(16, 185, 129, 0.1)" : (isWithdraw ? "rgba(239, 68, 68, 0.1)" : "rgba(14, 165, 233, 0.1)");
+                const sign = isDeposit ? "+" : "-";
+                return `
+                    <li style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 9999px; background: ${badgeBg}; color: ${badgeColor};">
+                                ${escapeHtml(tx.type || '-')}
+                            </span>
+                            <span style="font-size: 0.75rem; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace;">
+                                ${escapeHtml(tx.transaction_id || tx.id ? String(tx.transaction_id || tx.id).slice(-8) : '')}
+                            </span>
+                        </div>
+                        <div style="text-align: right;">
+                            <strong style="font-size: 0.9rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: ${badgeColor};">
+                                ${sign}${formatCurrency(tx.amount || 0)}
+                            </strong>
+                            <div style="font-size: 0.72rem; color: var(--text-tertiary);">${escapeHtml(tx.created_at_display || '')}</div>
+                        </div>
+                    </li>
+                `;
+            }).join("")
+            : "<li style='padding: 1.5rem; text-align: center; color: var(--text-tertiary);'>No transactions found.</li>";
     };
 
     const renderSupport = (items) => {
         if (!supportList) return;
         if (!items.length) {
-            supportList.innerHTML = "<div>No support items.</div>";
+            supportList.innerHTML = "<div style='padding: 2rem; text-align: center; color: var(--text-tertiary);'>No support queries pending resolution.</div>";
             return;
         }
-        supportList.innerHTML = items.map((item) => `
-            <div class="admin-support-item card">
-                <div class="admin-support-meta">
-                    <strong>${escapeHtml(item.subject || 'Support')}</strong>
-                    <span class="meta">${escapeHtml(item.email || '')} · ${escapeHtml(item.priority || 'Low')} · ${escapeHtml(item.status || 'Open')} · ${escapeHtml(item.created_at_display || '')}</span>
+        supportList.innerHTML = items.map((item) => {
+            const isResolved = (item.status || "").toLowerCase() === "resolved";
+            const priority = (item.priority || "Low").toLowerCase();
+            const priorityColor = priority === "high" ? "var(--danger)" : (priority === "medium" ? "var(--warning)" : "var(--accent)");
+            const priorityBg = priority === "high" ? "rgba(239, 68, 68, 0.1)" : (priority === "medium" ? "rgba(245, 158, 11, 0.1)" : "rgba(59, 130, 246, 0.1)");
+            const statusColor = isResolved ? "var(--success)" : "var(--warning)";
+            const statusBg = isResolved ? "rgba(16, 185, 129, 0.1)" : "rgba(245, 158, 11, 0.1)";
+
+            return `
+            <div class="admin-support-item card" style="padding: 1.25rem 1.5rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg); box-shadow: var(--shadow-xs);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div>
+                        <strong style="font-size: 0.98rem; font-weight: 700; color: var(--text-primary); display: block; margin-bottom: 0.2rem;">${escapeHtml(item.subject || 'Support')}</strong>
+                        <div style="font-size: 0.78rem; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace;">
+                            User: <span style="color: var(--text-secondary);">${escapeHtml(item.email || '')}</span> · Submitted: ${escapeHtml(item.created_at_display || '')}
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="font-size: 0.72rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 9999px; background: ${statusBg}; color: ${statusColor}; border: 1px solid currentColor;">${item.status || 'Open'}</span>
+                        <span style="font-size: 0.72rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 9999px; background: ${priorityBg}; color: ${priorityColor};">${item.priority || 'Low'} Priority</span>
+                    </div>
                 </div>
-                <div class="admin-support-reply">
-                    <textarea id="reply-${escapeHtml(item.id)}" rows="3" placeholder="Write a reply">${escapeHtml(item.admin_reply || '')}</textarea>
-                    <button class="btn primary admin-reply-btn" data-query-id="${escapeHtml(item.id)}" type="button">Save Reply</button>
+                <div class="admin-support-reply" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                    <textarea id="reply-${escapeHtml(item.id)}" rows="2" placeholder="Type official administrative response..." style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.6rem 0.85rem; font-size: 0.88rem; background: var(--card); color: var(--text-primary); resize: vertical;">${escapeHtml(item.admin_reply || '')}</textarea>
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button class="btn primary admin-reply-btn" data-query-id="${escapeHtml(item.id)}" type="button" style="padding: 0.5rem 1rem; font-size: 0.84rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            ${isResolved ? "Update Reply" : "Resolve & Save Reply"}
+                        </button>
+                    </div>
                 </div>
             </div>
-        `).join("");
+        `;
+        }).join("");
 
         supportList.querySelectorAll(".admin-reply-btn").forEach((button) => {
             button.addEventListener("click", async () => {
@@ -2349,6 +2424,7 @@ const setupAdminDashboard = () => {
                 const textarea = document.getElementById(`reply-${queryId}`);
                 const reply = textarea ? textarea.value.trim() : "";
                 if (!reply) return;
+                setButtonLoading(button, true, "Saving...");
                 try {
                     await apiRequest(`/api/admin/support/${queryId}/reply`, {
                         method: "POST",
@@ -2357,6 +2433,8 @@ const setupAdminDashboard = () => {
                     fetchAdminData();
                 } catch (error) {
                     console.error(error);
+                } finally {
+                    setButtonLoading(button, false);
                 }
             });
         });
@@ -2383,6 +2461,12 @@ const setupAdminDashboard = () => {
                 console.error("Failed to load admin dashboard:", error);
             });
     };
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener("click", () => {
+            fetchAdminData();
+        });
+    }
 
     fetchAdminData();
 };

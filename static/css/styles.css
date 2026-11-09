@@ -3998,3 +3998,18 @@ select {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* =====================================================================
+   STAGE 8: ADMIN DASHBOARD STYLING
+   ===================================================================== */
+.admin-support-item {
+    transition: var(--transition-fast);
+}
+.admin-support-item:hover {
+    border-color: var(--accent) !important;
+}
+@media (max-width: 900px) {
+    .admin-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
