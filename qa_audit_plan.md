@@ -120,7 +120,7 @@ This document tracks the comprehensive end-to-end audit, defect identification, 
 | Defect ID | Severity | Category | Description | Root Cause | Status | Verification |
 |---|---|---|---|---|---|---|
 | **DEF-001** | Critical | Frontend JS | SyntaxError in `static/js/main.js` (`line 1646-1648`) | Duplicate dangling braces crashing script parsing | Identified | Pending Phase 8 |
-| **DEF-002** | High | Transactions | 500 error on transaction text search `q` in MongoDB | `$regex` applied directly to subdocument field `metadata` | Identified | Pending Phase 3 |
+| **DEF-002** | High | Transactions | 500 error on transaction text search `q` in MongoDB | `$regex` applied directly to subdocument field `metadata` | **Fixed** | Verified in `tests/test_transactions_audit.py::test_get_transactions_filtering_and_search` |
 | **DEF-003** | High | Email Service | ValueError in `build_transfer_email` & `build_transfer_received_email` | Argument ordering inverted (`receiver_name` passed to `amount`) | **Fixed** | Verified in `tests/test_banking_audit.py::test_transfer_valid_flow_and_no_email_value_error` |
 | **DEF-004** | High | Security / PIN | Inconsistent PIN length enforcement and missing `transaction_pin` update | `len(pin) == 4` checked in `profile_update_api`, 5-6 digit PINs orphaned | **Fixed** | Verified in `tests/test_auth_audit.py::test_pin_update_5_and_6_digit_propagates_to_transaction_pin` |
 | **DEF-005** | Medium | Admin RBAC | Admin API endpoints return HTML 302 redirects instead of 401/403 JSON | `admin_required` uses `redirect()` without checking `request.path.startswith("/api/")` | Identified | Pending Phase 7 |
@@ -137,7 +137,7 @@ This document tracks the comprehensive end-to-end audit, defect identification, 
 - [x] **Phase 0: Baseline & Environment Audit** (Complete repository mapping, initial defect discovery, baseline test verification)
 - [x] **Phase 1: Authentication & Account Management Audit & Fixes** (Registration, login, lockout, email validation, PIN setup/update)
 - [x] **Phase 2: Financial Operations & Consistency Audit** (Deposits, withdrawals, transfers, limits, min balance, race conditions, email notifications)
-- [ ] **Phase 3: Transaction History & Data Exports Audit** (Filters, search regex fix, CSV export, PDF export, IST formatting)
+- [x] **Phase 3: Transaction History & Data Exports Audit** (Filters, search regex fix, CSV export, PDF export, IST formatting)
 - [ ] **Phase 4: Beneficiaries Management Audit** (Duplicate checks, self-beneficiary prevention, IDOR protection)
 - [ ] **Phase 5: Profile, Security & CSRF Hardening Audit** (Password changes, PIN updates, session expiry, CSRF production guard, cookie flags)
 - [ ] **Phase 6: Notifications & Customer Support Audit** (Ticket creation, priority validation, admin replies, IDOR prevention, read/unread states)

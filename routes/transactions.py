@@ -457,9 +457,13 @@ def export_csv(account_id):
         if end_date:
             filters["timestamp"]["$lte"] = end_date
     if q:
+        safe_q = re.escape(q)
         filters["$or"] = [
-            {"transaction_id": {"$regex": re.escape(q), "$options": "i"}},
-            {"metadata": {"$regex": re.escape(q), "$options": "i"}},
+            {"transaction_id": {"$regex": safe_q, "$options": "i"}},
+            {"type": {"$regex": safe_q, "$options": "i"}},
+            {"metadata.to_account_id": {"$regex": safe_q, "$options": "i"}},
+            {"metadata.from_account_id": {"$regex": safe_q, "$options": "i"}},
+            {"metadata.note": {"$regex": safe_q, "$options": "i"}},
         ]
 
     sort_by = (request.args.get("sort_by") or "timestamp").strip()
@@ -556,9 +560,13 @@ def export_pdf(account_id):
         if end_date:
             filters["timestamp"]["$lte"] = end_date
     if q:
+        safe_q = re.escape(q)
         filters["$or"] = [
-            {"transaction_id": {"$regex": re.escape(q), "$options": "i"}},
-            {"metadata": {"$regex": re.escape(q), "$options": "i"}},
+            {"transaction_id": {"$regex": safe_q, "$options": "i"}},
+            {"type": {"$regex": safe_q, "$options": "i"}},
+            {"metadata.to_account_id": {"$regex": safe_q, "$options": "i"}},
+            {"metadata.from_account_id": {"$regex": safe_q, "$options": "i"}},
+            {"metadata.note": {"$regex": safe_q, "$options": "i"}},
         ]
 
     sort_by = (request.args.get("sort_by") or "timestamp").strip()
@@ -714,9 +722,13 @@ def get_transactions(account_id):
             filters["timestamp"]["$lte"] = end_date
 
     if q:
+        safe_q = re.escape(q)
         filters["$or"] = [
-            {"transaction_id": {"$regex": re.escape(q), "$options": "i"}},
-            {"metadata": {"$regex": re.escape(q), "$options": "i"}},
+            {"transaction_id": {"$regex": safe_q, "$options": "i"}},
+            {"type": {"$regex": safe_q, "$options": "i"}},
+            {"metadata.to_account_id": {"$regex": safe_q, "$options": "i"}},
+            {"metadata.from_account_id": {"$regex": safe_q, "$options": "i"}},
+            {"metadata.note": {"$regex": safe_q, "$options": "i"}},
         ]
 
     try:
