@@ -23,6 +23,7 @@ def get_db():
         _DB_CACHE = default_db if default_db is not None else client["bank_simulator"]
     
     _ensure_collections(_DB_CACHE)
+    _ensure_indexes(_DB_CACHE)
     return _DB_CACHE
 
 def _ensure_collections(db):
@@ -40,6 +41,41 @@ def _ensure_collections(db):
     for coll in required:
         if coll not in existing:
             db.create_collection(coll)
+
+def _ensure_indexes(db):
+    try:
+        db["users"].create_index("email", unique=True, sparse=True)
+    except Exception:
+        pass
+    try:
+        db["accounts"].create_index("user_id")
+        db["accounts"].create_index("email")
+    except Exception:
+        pass
+    try:
+        db["transactions"].create_index([("account_id", 1), ("timestamp", -1)])
+    except Exception:
+        pass
+    try:
+        db["notifications"].create_index([("account_id", 1), ("created_at", -1)])
+    except Exception:
+        pass
+    try:
+        db["support_queries"].create_index([("user_id", 1), ("created_at", -1)])
+    except Exception:
+        pass
+    try:
+        db["beneficiaries"].create_index([("user_id", 1), ("email", 1)])
+    except Exception:
+        pass
+    try:
+        db["login_activity"].create_index([("user_id", 1), ("created_at", -1)])
+    except Exception:
+        pass
+    try:
+        db["scheduled_transfers"].create_index([("scheduled_at", 1), ("status", 1)])
+    except Exception:
+        pass
 
 def get_collections():
     db = get_db()

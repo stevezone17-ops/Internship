@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: simple-banking-system
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
+      - key: MONGO_URI
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SCHEDULED_TRANSFER_TOKEN
+        generateValue: true
