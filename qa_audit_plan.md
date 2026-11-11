@@ -129,6 +129,7 @@ This document tracks the comprehensive end-to-end audit, defect identification, 
 | **DEF-008** | Low | Auth Validation | Missing RFC-compliant regex email validation | Registration accepts malformed email strings | **Fixed** | Verified in `tests/test_auth_audit.py::test_signup_invalid_email_format` |
 | **DEF-009** | Low | Accounts | Withdrawal missing transactional email notification | `withdraw()` did not invoke `build_withdraw_email` or `send_fake_email` | **Fixed** | Verified in `tests/test_banking_audit.py::test_withdraw_valid_flow` |
 | **DEF-010** | High | Auth / Timezone | TypeError in `reset_password` comparing naive and aware datetimes | BSON dates returned as naive UTC compared directly with `ist_now()` | **Fixed** | Verified in `tests/test_auth_audit.py::test_password_forgot_and_reset` |
+| **DEF-011** | High | Validation / Financial | `float("NaN")` and `float("Inf")` accepted in banking transactions | Python `float("nan") <= 0` is false, corrupting account balance with `NaN` | **Fixed** | Verified in `tests/test_concurrency_audit.py::test_extreme_amounts_and_non_numeric_handling` |
 
 ---
 
@@ -143,7 +144,7 @@ This document tracks the comprehensive end-to-end audit, defect identification, 
 - [x] **Phase 6: Notifications & Customer Support Audit** (Ticket creation, priority validation, admin replies, IDOR prevention, read/unread states)
 - [x] **Phase 7: Admin Dashboard & RBAC Enforcement** (Strict 401/403 on API, role verification, KPI metrics accuracy)
 - [x] **Phase 8: Frontend, UI/UX & JavaScript Audit** (Syntax fix in `main.js`, form validations, error display, accessibility)
-- [ ] **Phase 9: Concurrency, Edge Cases & Data Integrity Audit** (Double-spend prevention, negative amounts, boundary tests)
+- [x] **Phase 9: Concurrency, Edge Cases & Data Integrity Audit** (Double-spend prevention, negative amounts, boundary tests)
 - [ ] **Phase 10: MongoDB Atlas & Render Production Readiness Audit** (Indexes, environment configs, Gunicorn compatibility)
 - [ ] **Phase 11: End-to-End Regression Test Suite Execution** (Full test execution across all domains)
 - [ ] **Phase 12: Comprehensive Final Report Generation** (`QA_FINAL_REPORT.md` creation and sign-off)

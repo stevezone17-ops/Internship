@@ -1,3 +1,4 @@
+import math
 import re
 from datetime import datetime
 
@@ -16,6 +17,8 @@ def parse_amount(value):
     try:
         amount = float(value)
     except (TypeError, ValueError):
+        return None
+    if math.isnan(amount) or math.isinf(amount):
         return None
     return round(amount, 2)
 
