@@ -122,19 +122,20 @@ This document tracks the comprehensive end-to-end audit, defect identification, 
 | **DEF-001** | Critical | Frontend JS | SyntaxError in `static/js/main.js` (`line 1646-1648`) | Duplicate dangling braces crashing script parsing | Identified | Pending Phase 8 |
 | **DEF-002** | High | Transactions | 500 error on transaction text search `q` in MongoDB | `$regex` applied directly to subdocument field `metadata` | Identified | Pending Phase 3 |
 | **DEF-003** | High | Email Service | ValueError in `build_transfer_email` & `build_transfer_received_email` | Argument ordering inverted (`receiver_name` passed to `amount`) | Identified | Pending Phase 2 |
-| **DEF-004** | High | Security / PIN | Inconsistent PIN length enforcement and missing `transaction_pin` update | `len(pin) == 4` checked in `profile_update_api`, 5-6 digit PINs orphaned | Identified | Pending Phase 1/5 |
+| **DEF-004** | High | Security / PIN | Inconsistent PIN length enforcement and missing `transaction_pin` update | `len(pin) == 4` checked in `profile_update_api`, 5-6 digit PINs orphaned | **Fixed** | Verified in `tests/test_auth_audit.py::test_pin_update_5_and_6_digit_propagates_to_transaction_pin` |
 | **DEF-005** | Medium | Admin RBAC | Admin API endpoints return HTML 302 redirects instead of 401/403 JSON | `admin_required` uses `redirect()` without checking `request.path.startswith("/api/")` | Identified | Pending Phase 7 |
 | **DEF-006** | Medium | CSRF Security | Test CSRF bypass not strictly guarded against production environment | `app.config.get("TESTING")` not checking `FLASK_ENV == "production"` or `RENDER` | Identified | Pending Phase 5 |
 | **DEF-007** | Medium | Config | `SECRET_KEY` environment variable not checked in `app.py` | Only checks `FLASK_SECRET_KEY` despite documentation specifying `SECRET_KEY` | Identified | Pending Phase 5 |
-| **DEF-008** | Low | Auth Validation | Missing RFC-compliant regex email validation | Registration accepts malformed email strings | Identified | Pending Phase 1 |
+| **DEF-008** | Low | Auth Validation | Missing RFC-compliant regex email validation | Registration accepts malformed email strings | **Fixed** | Verified in `tests/test_auth_audit.py::test_signup_invalid_email_format` |
 | **DEF-009** | Low | Accounts | Withdrawal missing transactional email notification | `withdraw()` did not invoke `build_withdraw_email` or `send_fake_email` | Identified | Pending Phase 2 |
+| **DEF-010** | High | Auth / Timezone | TypeError in `reset_password` comparing naive and aware datetimes | BSON dates returned as naive UTC compared directly with `ist_now()` | **Fixed** | Verified in `tests/test_auth_audit.py::test_password_forgot_and_reset` |
 
 ---
 
 ## 5. Audit & Testing Execution Phases
 
 - [x] **Phase 0: Baseline & Environment Audit** (Complete repository mapping, initial defect discovery, baseline test verification)
-- [ ] **Phase 1: Authentication & Account Management Audit & Fixes** (Registration, login, lockout, email validation, PIN setup/update)
+- [x] **Phase 1: Authentication & Account Management Audit & Fixes** (Registration, login, lockout, email validation, PIN setup/update)
 - [ ] **Phase 2: Financial Operations & Consistency Audit** (Deposits, withdrawals, transfers, limits, min balance, race conditions, email notifications)
 - [ ] **Phase 3: Transaction History & Data Exports Audit** (Filters, search regex fix, CSV export, PDF export, IST formatting)
 - [ ] **Phase 4: Beneficiaries Management Audit** (Duplicate checks, self-beneficiary prevention, IDOR protection)

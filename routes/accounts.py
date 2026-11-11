@@ -22,6 +22,7 @@ from utils.helpers import (
     verify_user_password,
 )
 from utils.time_utils import ist_now, format_ist
+from utils.validators import is_valid_email
 from utils.logging_config import setup_logging
 
 logger = setup_logging()
@@ -106,6 +107,8 @@ def profile_update_api():
     if name:
         updates["name"] = name
     if email:
+        if not is_valid_email(email):
+            return api_error("Please enter a valid email address.", 400, endpoint="main.profile_page")
         existing = users_col.find_one({"email": email, "_id": {"$ne": user_obj_id}})
         if existing:
             return api_error("That email is already in use.", 400, endpoint="main.profile_page")
@@ -115,9 +118,8 @@ def profile_update_api():
             return api_error("PIN must be 4 to 6 digits.", 400, endpoint="main.profile_page")
         hashed_pin = generate_password_hash(pin)
         updates["pin"] = hashed_pin
-        if len(pin) == 4:
-            updates["transaction_pin"] = hashed_pin
-            updates["pin_updated_at"] = ist_now()
+        updates["transaction_pin"] = hashed_pin
+        updates["pin_updated_at"] = ist_now()
     if not updates:
         return api_error("No updates provided.", 400, endpoint="main.profile_page")
 
@@ -246,8 +248,8 @@ def set_pin_api():
 
     data = request.get_json(silent=True) or {}
     pin = (data.get("pin") or "").strip()
-    if not pin.isdigit() or len(pin) != 4:
-        return api_error("PIN must be exactly 4 digits.", 400, endpoint="main.set_pin_page")
+    if not pin.isdigit() or len(pin) < 4 or len(pin) > 6:
+        return api_error("PIN must be 4 to 6 digits.", 400, endpoint="main.set_pin_page")
 
     hashed_pin = generate_password_hash(pin)
     result = users_col.update_one(
@@ -280,8 +282,8 @@ def update_pin_api():
         return api_error("Please check your input.", 400, endpoint="main.profile_page", category="warning")
     if new_pin != confirm_pin:
         return api_error("New PIN entries do not match.", 400, endpoint="main.profile_page")
-    if not new_pin.isdigit() or len(new_pin) != 4:
-        return api_error("PIN must be exactly 4 digits.", 400, endpoint="main.profile_page")
+    if not new_pin.isdigit() or len(new_pin) < 4 or len(new_pin) > 6:
+        return api_error("PIN must be 4 to 6 digits.", 400, endpoint="main.profile_page")
     if current_pin == new_pin:
         return api_error("New PIN must be different from current PIN.", 400, endpoint="main.profile_page")
 
@@ -327,8 +329,8 @@ def change_pin_api():
 
     if not email or not password or not new_pin:
         return api_error("Please check your input.", 400, endpoint="main.change_pin_page", category="warning")
-    if not new_pin.isdigit() or len(new_pin) != 4:
-        return api_error("PIN must be exactly 4 digits.", 400, endpoint="main.change_pin_page")
+    if not new_pin.isdigit() or len(new_pin) < 4 or len(new_pin) > 6:
+        return api_error("PIN must be 4 to 6 digits.", 400, endpoint="main.change_pin_page")
 
     user = users_col.find_one({"_id": user_obj_id})
     if not user:

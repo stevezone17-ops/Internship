@@ -4,6 +4,7 @@ from datetime import timedelta
 from bson import ObjectId
 from werkzeug.security import check_password_hash, generate_password_hash
 from utils.time_utils import ist_now
+from utils.helpers import make_aware
 
 ACCOUNT_RULES = {
     "savings": {"min_balance": 1000.0, "label": "Savings"},
@@ -25,7 +26,7 @@ def mark_user_verified(users_col, token):
     if not user:
         return None, "Invalid verification token."
 
-    expires = user.get("verification_expires")
+    expires = make_aware(user.get("verification_expires"))
     if expires and ist_now() > expires:
         return None, "Verification token expired."
 
@@ -70,7 +71,7 @@ def reset_password(users_col, token, new_password):
     if not user:
         return None, "Invalid reset token."
 
-    expires = user.get("reset_expires")
+    expires = make_aware(user.get("reset_expires"))
     if expires and ist_now() > expires:
         return None, "Reset token expired."
 

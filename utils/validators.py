@@ -1,6 +1,15 @@
+import re
 from datetime import datetime
 
 from utils.time_utils import IST
+
+EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+
+
+def is_valid_email(email):
+    if not email or not isinstance(email, str):
+        return False
+    return bool(EMAIL_REGEX.match(email.strip()))
 
 
 def parse_amount(value):

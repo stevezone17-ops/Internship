@@ -123,8 +123,8 @@ def setup_pin_page():
     if pin != confirm_pin:
         flash("PIN entries do not match.", "danger")
         return redirect(url_for("main.setup_pin_page"))
-    if not pin.isdigit() or len(pin) != 4:
-        flash("PIN must be exactly 4 digits.", "warning")
+    if not pin.isdigit() or len(pin) < 4 or len(pin) > 6:
+        flash("PIN must be 4 to 6 digits.", "warning")
         return redirect(url_for("main.setup_pin_page"))
 
     hashed_pin = generate_password_hash(pin)

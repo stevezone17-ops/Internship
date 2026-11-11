@@ -21,6 +21,7 @@ from utils.helpers import (
     verify_user_password,
 )
 from utils.time_utils import ist_now
+from utils.validators import is_valid_email
 from utils.logging_config import setup_logging
 
 logger = setup_logging()
@@ -123,6 +124,8 @@ def signup():
         return api_error("Full name is required.", 400, endpoint="auth.signup_page", category="warning")
     if not email:
         return api_error("Email is required.", 400, endpoint="auth.signup_page", category="warning")
+    if not is_valid_email(email):
+        return api_error("Please enter a valid email address.", 400, endpoint="auth.signup_page", category="warning")
     if not password:
         return api_error("Password is required.", 400, endpoint="auth.signup_page", category="warning")
     if len(name) > 100:
