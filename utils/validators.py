@@ -17,7 +17,7 @@ def parse_amount(value):
         amount = float(value)
     except (TypeError, ValueError):
         return None
-    return amount
+    return round(amount, 2)
 
 
 def parse_date(value):

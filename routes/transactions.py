@@ -236,6 +236,28 @@ def withdraw():
     for warning in warnings:
         add_notification(notifications_col, account_obj_id, warning, level="warning")
 
+    email_to = user.get("email") if user else ""
+    if email_to:
+        subject, email_message, template_name, context = build_withdraw_email(
+            get_display_name(user), float(amount), new_balance
+        )
+        email_html = render_template(template_name, **context)
+        try:
+            send_fake_email(email_to, subject, email_message)
+            add_notification(
+                notifications_col,
+                account_obj_id,
+                f"Email notification sent: {subject}.",
+                metadata={
+                    "type": "withdraw",
+                    "email_subject": subject,
+                    "email_to": email_to,
+                    "email_preview_html": email_html,
+                },
+            )
+        except Exception as exc:
+            logger.warning("Withdraw email failed: %s", exc)
+
     logger.info("Withdraw %s from %s", amount, account_id)
     if request.is_json:
         return jsonify(
@@ -358,7 +380,7 @@ def transfer():
         if sender_email:
             try:
                 subject, email_message, template_name, context = build_transfer_email(
-                    sender_name, receiver_name, float(amount)
+                    sender_name, float(amount), receiver_name
                 )
                 email_html = render_template(template_name, **context)
                 send_fake_email(sender_email, subject, email_message)
@@ -381,7 +403,7 @@ def transfer():
         if receiver_email_addr:
             try:
                 subject, email_message, template_name, context = build_transfer_received_email(
-                    receiver_name, sender_name, float(amount)
+                    receiver_name, float(amount), sender_name
                 )
                 email_html = render_template(template_name, **context)
                 send_fake_email(receiver_email_addr, subject, email_message)
