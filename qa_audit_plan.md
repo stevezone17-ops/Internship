@@ -140,7 +140,7 @@ This document tracks the comprehensive end-to-end audit, defect identification, 
 - [x] **Phase 3: Transaction History & Data Exports Audit** (Filters, search regex fix, CSV export, PDF export, IST formatting)
 - [x] **Phase 4: Beneficiaries Management Audit** (Duplicate checks, self-beneficiary prevention, IDOR protection)
 - [x] **Phase 5: Profile, Security & CSRF Hardening Audit** (Password changes, PIN updates, session expiry, CSRF production guard, cookie flags)
-- [ ] **Phase 6: Notifications & Customer Support Audit** (Ticket creation, priority validation, admin replies, IDOR prevention, read/unread states)
+- [x] **Phase 6: Notifications & Customer Support Audit** (Ticket creation, priority validation, admin replies, IDOR prevention, read/unread states)
 - [ ] **Phase 7: Admin Dashboard & RBAC Enforcement** (Strict 401/403 on API, role verification, KPI metrics accuracy)
 - [ ] **Phase 8: Frontend, UI/UX & JavaScript Audit** (Syntax fix in `main.js`, form validations, error display, accessibility)
 - [ ] **Phase 9: Concurrency, Edge Cases & Data Integrity Audit** (Double-spend prevention, negative amounts, boundary tests)

@@ -89,7 +89,7 @@ def support_history_api():
                 "subject": query.get("subject", ""),
                 "priority": query.get("priority", "Low"),
                 "status": query.get("status", "Open"),
-                "created_at": created_at.isoformat(),
+                "created_at": created_at.isoformat() if created_at else None,
                 "created_at_display": format_ist(created_at),
                 "resolved_at": resolved_at.isoformat() if resolved_at else None,
                 "resolved_at_display": format_ist(resolved_at),
