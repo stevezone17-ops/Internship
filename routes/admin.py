@@ -28,6 +28,8 @@ def admin_required(view_func):
     def wrapper(*args, **kwargs):
         user_id = session.get("user_id")
         if not user_id:
+            if request.path.startswith("/api/"):
+                return jsonify({"error": "Please login first."}), 401
             return redirect(url_for("auth.login_page"))
         user = None
         try:
@@ -35,6 +37,8 @@ def admin_required(view_func):
         except Exception as exc:
             logger.warning("Failed to fetch user for admin check: %s", exc)
         if not is_admin_user(user):
+            if request.path.startswith("/api/"):
+                return jsonify({"error": "Forbidden: Admin privileges required."}), 403
             flash("You do not have access to the admin dashboard.", "danger")
             return redirect(url_for("main.dashboard_page"))
         session["is_admin"] = True
