@@ -119,7 +119,7 @@ This document tracks the comprehensive end-to-end audit, defect identification, 
 
 | Defect ID | Severity | Category | Description | Root Cause | Status | Verification |
 |---|---|---|---|---|---|---|
-| **DEF-001** | Critical | Frontend JS | SyntaxError in `static/js/main.js` (`line 1646-1648`) | Duplicate dangling braces crashing script parsing | Identified | Pending Phase 8 |
+| **DEF-001** | Critical | Frontend JS | SyntaxError in `static/js/main.js` (`line 1646-1648`) | Duplicate dangling braces crashing script parsing | **Fixed** | Verified with Node.js parser `node -c static/js/main.js` |
 | **DEF-002** | High | Transactions | 500 error on transaction text search `q` in MongoDB | `$regex` applied directly to subdocument field `metadata` | **Fixed** | Verified in `tests/test_transactions_audit.py::test_get_transactions_filtering_and_search` |
 | **DEF-003** | High | Email Service | ValueError in `build_transfer_email` & `build_transfer_received_email` | Argument ordering inverted (`receiver_name` passed to `amount`) | **Fixed** | Verified in `tests/test_banking_audit.py::test_transfer_valid_flow_and_no_email_value_error` |
 | **DEF-004** | High | Security / PIN | Inconsistent PIN length enforcement and missing `transaction_pin` update | `len(pin) == 4` checked in `profile_update_api`, 5-6 digit PINs orphaned | **Fixed** | Verified in `tests/test_auth_audit.py::test_pin_update_5_and_6_digit_propagates_to_transaction_pin` |
@@ -142,7 +142,7 @@ This document tracks the comprehensive end-to-end audit, defect identification, 
 - [x] **Phase 5: Profile, Security & CSRF Hardening Audit** (Password changes, PIN updates, session expiry, CSRF production guard, cookie flags)
 - [x] **Phase 6: Notifications & Customer Support Audit** (Ticket creation, priority validation, admin replies, IDOR prevention, read/unread states)
 - [x] **Phase 7: Admin Dashboard & RBAC Enforcement** (Strict 401/403 on API, role verification, KPI metrics accuracy)
-- [ ] **Phase 8: Frontend, UI/UX & JavaScript Audit** (Syntax fix in `main.js`, form validations, error display, accessibility)
+- [x] **Phase 8: Frontend, UI/UX & JavaScript Audit** (Syntax fix in `main.js`, form validations, error display, accessibility)
 - [ ] **Phase 9: Concurrency, Edge Cases & Data Integrity Audit** (Double-spend prevention, negative amounts, boundary tests)
 - [ ] **Phase 10: MongoDB Atlas & Render Production Readiness Audit** (Indexes, environment configs, Gunicorn compatibility)
 - [ ] **Phase 11: End-to-End Regression Test Suite Execution** (Full test execution across all domains)

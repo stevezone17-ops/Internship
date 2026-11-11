@@ -1643,9 +1643,6 @@ const setupTransferPage = () => {
             }
         });
     }
-            }
-        });
-    }
 };
 
 const setupSetPin = () => {
