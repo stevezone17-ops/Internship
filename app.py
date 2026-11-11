@@ -14,16 +14,21 @@ INACTIVITY_LIMIT_SECONDS = 600
 def create_app():
     app = Flask(__name__)
 
-    secret_key = os.environ.get("FLASK_SECRET_KEY")
+    secret_key = os.environ.get("FLASK_SECRET_KEY") or os.environ.get("SECRET_KEY")
     if not secret_key:
         secret_key = secrets.token_hex(32)
-        app.logger.warning("FLASK_SECRET_KEY not set. Using random key — sessions will not persist across restarts.")
+        app.logger.warning("FLASK_SECRET_KEY / SECRET_KEY not set. Using random key — sessions will not persist across restarts.")
 
     app.secret_key = secret_key
 
+    is_production = os.environ.get("FLASK_ENV") == "production" or bool(os.environ.get("RENDER"))
+    session_cookie_secure = os.environ.get(
+        "SESSION_COOKIE_SECURE", "true" if is_production else "false"
+    ).lower() == "true"
+
     app.config.update(
         SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SECURE=os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true",
+        SESSION_COOKIE_SECURE=session_cookie_secure,
         SESSION_COOKIE_SAMESITE="Lax",
         PERMANENT_SESSION_LIFETIME=timedelta(minutes=60),
     )
@@ -41,8 +46,13 @@ def create_app():
     def validate_csrf():
         if request.method not in ("POST", "PUT", "DELETE", "PATCH"):
             return None
-        if app.config.get("TESTING") and not request.headers.get("X-CSRFToken") and not request.form.get("_csrf_token"):
-            return None
+        is_prod = (
+            os.environ.get("FLASK_ENV") == "production"
+            or bool(os.environ.get("RENDER"))
+        )
+        if app.config.get("TESTING") and not is_prod:
+            if not request.headers.get("X-CSRFToken") and not request.form.get("_csrf_token"):
+                return None
         token = request.headers.get("X-CSRFToken") or request.form.get("_csrf_token")
         if not token or not session.get("_csrf_token") or token != session["_csrf_token"]:
             return jsonify({"error": "Invalid CSRF token."}), 403
