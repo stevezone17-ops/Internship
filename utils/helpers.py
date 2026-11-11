@@ -28,7 +28,7 @@ def login_required(view_func):
     return wrapper
 
 def api_error(message, status_code=400, endpoint=None, category="danger"):
-    if request.is_json:
+    if request.is_json or request.path.startswith("/api/"):
         return jsonify({"error": message}), status_code
     flash(message, category)
     if endpoint:
@@ -44,7 +44,7 @@ def api_error(message, status_code=400, endpoint=None, category="danger"):
 
 def api_success(message, endpoint=None, payload=None, category="success"):
     payload = payload or {}
-    if request.is_json:
+    if request.is_json or request.path.startswith("/api/"):
         body = {"message": message}
         body.update(payload)
         return jsonify(body)

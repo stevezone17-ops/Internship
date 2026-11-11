@@ -6,6 +6,7 @@ from utils.helpers import (
     api_success,
     login_required,
 )
+from utils.validators import is_valid_email
 from utils.logging_config import setup_logging
 
 logger = setup_logging()
@@ -32,6 +33,8 @@ def beneficiaries_api():
 
     if not name or not email:
         return api_error("Name and email are required.", 400, endpoint="main.beneficiaries_page", category="warning")
+    if not is_valid_email(email):
+        return api_error("Please enter a valid email address.", 400, endpoint="main.beneficiaries_page", category="warning")
 
     # Prevent adding own account as beneficiary
     session_email = (session.get("user_email") or "").strip().lower()
