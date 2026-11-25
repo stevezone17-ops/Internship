@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050e14" />
+      <stop offset="40%" stop-color="#08151D" />
+      <stop offset="85%" stop-color="#101C25" />
+      <stop offset="100%" stop-color="#103F38" />
+    </linearGradient>
+
+    <radialGradient id="emerald-glow" cx="80%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#0D9488" stop-opacity="0.22" />
+      <stop offset="40%" stop-color="#103F38" stop-opacity="0.14" />
+      <stop offset="80%" stop-color="#08151D" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="mint-glow" cx="25%" cy="85%" r="45%">
+      <stop offset="0%" stop-color="#2DD4BF" stop-opacity="0.12" />
+      <stop offset="50%" stop-color="#0D9488" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#08151D" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="tower-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#103F38" stop-opacity="0.35" />
+      <stop offset="60%" stop-color="#08151D" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#050e14" stop-opacity="0.9" />
+    </linearGradient>
+
+    <linearGradient id="tower-grad-2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0D9488" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#08151D" stop-opacity="0.8" />
+    </linearGradient>
+
+    <pattern id="grid-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#2DD4BF" stroke-width="0.75" stroke-opacity="0.07" />
+    </pattern>
+
+    <pattern id="dot-pattern" width="30" height="30" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#FFFFFF" fill-opacity="0.06" />
+    </pattern>
+
+    <linearGradient id="horizon-fade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#08151D" stop-opacity="0" />
+      <stop offset="80%" stop-color="#08151D" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#08151D" stop-opacity="0.98" />
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Base Background -->
+  <rect width="1920" height="1080" fill="url(#bg-grad)" />
+
+  <!-- Grid overlay for technical precision -->
+  <rect width="1920" height="1080" fill="url(#grid-pattern)" />
+  <rect width="1920" height="1080" fill="url(#dot-pattern)" />
+
+  <!-- Ambient Light Orbs -->
+  <rect width="1920" height="1080" fill="url(#emerald-glow)" />
+  <rect width="1920" height="1080" fill="url(#mint-glow)" />
+
+  <!-- Modern Financial Center Architectural Silhouette Silhouettes (Backdrop) -->
+  <g opacity="0.45">
+    <!-- Tower 1 -->
+    <path d="M 1520 180 L 1680 240 L 1680 1080 L 1520 1080 Z" fill="url(#tower-grad-1)" stroke="#0D9488" stroke-width="0.5" stroke-opacity="0.3" />
+    <line x1="1600" y1="210" x2="1600" y2="1080" stroke="#2DD4BF" stroke-width="0.5" stroke-opacity="0.2" />
+    <!-- Tower 2 (Apex) -->
+    <path d="M 1320 280 L 1480 340 L 1480 1080 L 1320 1080 Z" fill="url(#tower-grad-2)" stroke="#0D9488" stroke-width="0.5" stroke-opacity="0.25" />
+    <!-- Tower 3 (Low wide banking pavilion) -->
+    <path d="M 1080 440 L 1260 480 L 1260 1080 L 1080 1080 Z" fill="url(#tower-grad-1)" stroke="#2DD4BF" stroke-width="0.5" stroke-opacity="0.15" />
+    <!-- Tower 4 (Far Left Ambient) -->
+    <path d="M 180 360 L 320 400 L 320 1080 L 180 1080 Z" fill="url(#tower-grad-1)" stroke="#0D9488" stroke-width="0.5" stroke-opacity="0.15" />
+  </g>
+
+  <!-- Architectural Diagonal Raylines -->
+  <g opacity="0.25">
+    <line x1="0" y1="1080" x2="1920" y2="280" stroke="#0D9488" stroke-width="1" stroke-dasharray="8 8" />
+    <line x1="300" y1="1080" x2="1920" y2="420" stroke="#2DD4BF" stroke-width="0.75" />
+    <line x1="960" y1="0" x2="1920" y2="720" stroke="#103F38" stroke-width="1.5" />
+  </g>
+
+  <!-- High-contrast Vignette / Shadow Overlay to Guarantee Text Legibility -->
+  <rect width="1920" height="1080" fill="url(#horizon-fade)" />
+  <rect width="1000" height="1080" fill="#08151D" fill-opacity="0.65" />
+</svg>

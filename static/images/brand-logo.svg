@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" fill="none">
+  <!-- Minimal Geometric Fintech Logo: Structural Stability, Trust, Forward Momentum -->
+  <defs>
+    <linearGradient id="logo-emerald-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0D9488" />
+      <stop offset="100%" stop-color="#103F38" />
+    </linearGradient>
+    <linearGradient id="logo-mint-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2DD4BF" />
+      <stop offset="100%" stop-color="#0D9488" />
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Frame -->
+  <rect width="40" height="40" rx="10" fill="#08151D" />
+  <rect width="38" height="38" x="1" y="1" rx="9" stroke="url(#logo-emerald-grad)" stroke-width="1" stroke-opacity="0.4" fill="none" />
+
+  <!-- Precision Geometric Interlocking Pillars & Diamond Movement -->
+  <!-- Left Pillar / Foundation -->
+  <path d="M10 28V15L17 11V24L10 28Z" fill="url(#logo-emerald-grad)" />
+  <!-- Center Uplink / Diamond Apex -->
+  <path d="M17 11L24 7L30 11L23 15L17 11Z" fill="url(#logo-mint-grad)" />
+  <!-- Right Pillar / Growth -->
+  <path d="M23 15L30 11V25L23 29V15Z" fill="#2DD4BF" fill-opacity="0.9" />
+  <!-- Dynamic Base Anchor -->
+  <path d="M17 24L23 20V29L17 33V24Z" fill="#0D9488" fill-opacity="0.7" />
+</svg>

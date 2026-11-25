@@ -1,298 +1,778 @@
-{% extends 'base.html' %} {% block content %} {# ── Hero ── #}
-<section class="lp-hero">
-  <div class="lp-hero-content">
-    {% if session.get('user_name') %}
-    <span class="lp-badge">Welcome back, {{ session['user_name'] }}</span>
-    {% else %}
-    <span class="lp-badge">Open-source banking simulator</span>
-    {% endif %}
+{% extends 'base.html' %}
 
-    <h1 class="lp-headline">
-      Banking that<br />
-      <span class="lp-accent">just works.</span>
-    </h1>
+{% block title %}Simple Banking — Modern Institutional Digital Banking Platform{% endblock %}
 
-    <p class="lp-sub">
-      A full-featured banking simulation with real-time balances, instant
-      transfers, and a clean dashboard — built for learning and demoing.
-    </p>
+{% block content %}
+<div class="lp-container">
 
-    {% if session.get('user_id') %}
-    <div class="lp-cta-row">
-      <a class="btn primary lp-cta" href="/dashboard">Go to Dashboard</a>
-      <a class="btn ghost" href="/transfer">Send Money</a>
-    </div>
-    {% else %}
-    <div class="lp-cta-row">
-      <a class="btn primary lp-cta" href="{{ url_for('auth.signup_page') }}"
-        >Create Free Account</a
-      >
-      <a class="btn ghost" href="{{ url_for('auth.login_page') }}">Sign In</a>
-    </div>
-    {% endif %}
+  {# ────────────────────────────────────────────────────────────────────────
+     SECTION 1: CINEMATIC HERO (#overview)
+     ──────────────────────────────────────────────────────────────────────── #}
+  <section class="lp-hero-section" id="overview">
+    <div class="lp-hero-backdrop" aria-hidden="true"></div>
+    <div class="lp-hero-wrapper">
+      
+      {# Left Column: Editorial Headline & Value Narrative #}
+      <div class="lp-hero-content">
+        <div class="lp-hero-tag">
+          <span class="lp-tag-dot" aria-hidden="true"></span>
+          <span>SIMPLE BANKING &middot; DIGITAL FINANCE PLATFORM</span>
+        </div>
 
-    <div class="lp-stats">
-      <div class="lp-stat">
-        <strong>256-bit</strong>
-        <span>Encryption</span>
+        <h1 class="lp-hero-headline">
+          YOUR MONEY.<br />
+          YOUR CONTROL.<br />
+          <span class="lp-highlight-mint">YOUR BANKING.</span>
+        </h1>
+
+        <p class="lp-hero-lead">
+          A high-precision digital banking simulation platform engineered for institutional trust,
+          instant fund transfers, real-time balance tracking, and enterprise-grade ledger integrity.
+        </p>
+
+        <div class="lp-hero-actions">
+          {% if session.get('user_id') %}
+          <a class="btn lp-btn-primary lp-btn-lg" href="/dashboard">
+            <span>Go to Dashboard</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a class="btn lp-btn-outline lp-btn-lg" href="/transfer">
+            <span>Send Money</span>
+          </a>
+          {% else %}
+          <a class="btn lp-btn-primary lp-btn-lg" href="{{ url_for('auth.signup_page') }}">
+            <span>Open Free Account</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a class="btn lp-btn-outline lp-btn-lg" href="#capabilities">
+            <span>Explore Banking</span>
+          </a>
+          {% endif %}
+        </div>
+
+        <div class="lp-hero-badge">
+          <span class="lp-badge-pulse" aria-hidden="true"></span>
+          <span>EDUCATIONAL BANKING PLATFORM &middot; SIMULATION ENVIRONMENT</span>
+        </div>
       </div>
-      <div class="lp-stat-divider"></div>
-      <div class="lp-stat">
-        <strong>Real-time</strong>
-        <span>Updates</span>
-      </div>
-      <div class="lp-stat-divider"></div>
-      <div class="lp-stat">
-        <strong>Instant</strong>
-        <span>Transfers</span>
-      </div>
-    </div>
-  </div>
 
-  <div class="lp-hero-visual">
-    <div class="lp-mock-card">
-      <div class="lp-mock-header">
-        <div class="lp-mock-dots"><span></span><span></span><span></span></div>
-        <span class="lp-mock-title">Account Overview</span>
-      </div>
-      <div class="lp-mock-body">
-        <div class="lp-mock-label">Total Balance</div>
-        <div class="lp-mock-amount">₹2,45,800.00</div>
-        <div class="lp-mock-row">
-          <div class="lp-mock-mini">
-            <span class="lp-mock-dot green"></span>
-            <div>
-              <small>Deposits</small>
-              <strong>₹3,20,000</strong>
+      {# Right Column: Realistic Banking Product Preview Panel #}
+      <div class="lp-hero-preview" aria-label="Simple Banking Interface Preview">
+        <div class="lp-product-card">
+          
+          {# Card Header #}
+          <div class="lp-card-header">
+            <div class="lp-card-account-pill">
+              <span class="lp-account-type-dot"></span>
+              <span class="lp-account-title">Primary Savings</span>
+              <span class="lp-account-mask">&bull;&bull;&bull;&bull; 4829</span>
+            </div>
+            <div class="lp-card-status-pill">
+              <span class="lp-status-live-dot"></span>
+              <span>Demo Account</span>
             </div>
           </div>
-          <div class="lp-mock-mini">
-            <span class="lp-mock-dot red"></span>
-            <div>
-              <small>Withdrawals</small>
-              <strong>₹74,200</strong>
+
+          {# Available Liquidity Hero #}
+          <div class="lp-card-hero">
+            <div class="lp-card-label-row">
+              <span class="lp-card-eyebrow">Available Liquidity</span>
+              <span class="lp-currency-badge">INR &middot; ₹</span>
+            </div>
+            <div class="lp-card-balance">₹2,45,800<span class="lp-balance-cents">.00</span></div>
+            <div class="lp-card-trend">
+              <span class="lp-trend-icon">&uarr;</span>
+              <strong>+4.8%</strong> vs last month &middot; Real-time sync
             </div>
           </div>
-        </div>
-        <div class="lp-mock-bar">
-          <div class="lp-mock-bar-fill" style="width: 72%"></div>
-        </div>
-        <div class="lp-mock-bar-label">
-          <span>Savings</span>
-          <span>72%</span>
+
+          {# Telemetry Micro-Cards #}
+          <div class="lp-card-metrics">
+            <div class="lp-metric-tile">
+              <span class="lp-metric-label">Inflow (30d)</span>
+              <strong class="lp-metric-val lp-val-pos">+₹45,000.00</strong>
+            </div>
+            <div class="lp-metric-divider"></div>
+            <div class="lp-metric-tile">
+              <span class="lp-metric-label">Outflow (30d)</span>
+              <strong class="lp-metric-val lp-val-neg">&minus;₹14,999.00</strong>
+            </div>
+          </div>
+
+          {# Sparkline Graphic #}
+          <div class="lp-card-chart" aria-hidden="true">
+            <svg viewBox="0 0 320 54" class="lp-sparkline-svg" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0D9488" stop-opacity="0.28" />
+                  <stop offset="100%" stop-color="#0D9488" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+              <path d="M0,45 Q40,38 80,42 T160,25 T240,28 T320,8 L320,54 L0,54 Z" fill="url(#chartGrad)" />
+              <path d="M0,45 Q40,38 80,42 T160,25 T240,28 T320,8" fill="none" stroke="#0D9488" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="320" cy="8" r="4" fill="#2DD4BF" stroke="#FFFFFF" stroke-width="2" />
+            </svg>
+          </div>
+
+          {# Demonstration Ledger Rows #}
+          <div class="lp-card-ledger">
+            <div class="lp-ledger-title">Recent Activity</div>
+
+            <div class="lp-ledger-row">
+              <div class="lp-tx-avatar lp-tx-in">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+              </div>
+              <div class="lp-tx-info">
+                <strong class="lp-tx-name">Salary Credit &middot; Apex Corp</strong>
+                <span class="lp-tx-date">Today, 09:30 AM &middot; Automated</span>
+              </div>
+              <div class="lp-tx-amount lp-val-pos">+₹45,000.00</div>
+            </div>
+
+            <div class="lp-ledger-row">
+              <div class="lp-tx-avatar lp-tx-out">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+              </div>
+              <div class="lp-tx-info">
+                <strong class="lp-tx-name">Bank Transfer &middot; John Smith</strong>
+                <span class="lp-tx-date">Yesterday, 04:15 PM &middot; Verified</span>
+              </div>
+              <div class="lp-tx-amount lp-val-neg">&minus;₹12,500.00</div>
+            </div>
+
+            <div class="lp-ledger-row">
+              <div class="lp-tx-avatar lp-tx-out">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+              </div>
+              <div class="lp-tx-info">
+                <strong class="lp-tx-name">Cloud Hosting Services</strong>
+                <span class="lp-tx-date">24 Nov, 11:00 AM &middot; Debit</span>
+              </div>
+              <div class="lp-tx-amount lp-val-neg">&minus;₹2,499.00</div>
+            </div>
+          </div>
+
+          {# Quick Actions Preview #}
+          <div class="lp-card-footer-actions">
+            <span class="lp-quick-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3 21 7l-4 4M3 7h18M7 21l-4-4 4-4M21 17H3"/></svg>
+              <span>Transfer</span>
+            </span>
+            <span class="lp-quick-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              <span>Deposit</span>
+            </span>
+            <span class="lp-quick-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Statement</span>
+            </span>
+          </div>
+
         </div>
       </div>
+
     </div>
-  </div>
-</section>
+  </section>
 
-{# ── Features ── #}
-<section class="lp-features">
-  <div class="lp-section-header">
-    <h2>Everything you need</h2>
-    <p>Core banking features wrapped in a clean interface.</p>
-  </div>
-
-  <div class="lp-feature-grid">
-    <div class="lp-feature">
-      <div class="lp-feature-icon">
-        <svg
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
-        </svg>
+  {# ────────────────────────────────────────────────────────────────────────
+     SECTION 2: OVERLAPPING CAPABILITIES STRIP (#capabilities)
+     ──────────────────────────────────────────────────────────────────────── #}
+  <section class="lp-strip-container" id="capabilities">
+    <div class="lp-strip-card">
+      
+      <div class="lp-strip-col">
+        <span class="lp-strip-num">01 &mdash; MANAGE</span>
+        <h3 class="lp-strip-title">Account Management</h3>
+        <p class="lp-strip-desc">
+          Inspect real-time balances, configure minimum thresholds, and track savings and current accounts seamlessly.
+        </p>
       </div>
-      <h3>Instant Transfers</h3>
-      <p>Send money to any account in seconds with PIN-verified security.</p>
+
+      <div class="lp-strip-col">
+        <span class="lp-strip-num">02 &mdash; TRANSFER</span>
+        <h3 class="lp-strip-title">Money Movement</h3>
+        <p class="lp-strip-desc">
+          Execute instant PIN-verified transfers, maintain an address book of saved beneficiaries, and schedule future payments.
+        </p>
+      </div>
+
+      <div class="lp-strip-col">
+        <span class="lp-strip-num">03 &mdash; MONITOR</span>
+        <h3 class="lp-strip-title">Financial Insights</h3>
+        <p class="lp-strip-desc">
+          Gain visibility into cash flow distributions, search historical ledgers, and generate verified PDF and CSV reports.
+        </p>
+      </div>
+
+      <div class="lp-strip-col">
+        <span class="lp-strip-num">04 &mdash; PROTECT</span>
+        <h3 class="lp-strip-title">Account Security</h3>
+        <p class="lp-strip-desc">
+          Benefit from PBKDF2 cryptographic protection, automated brute-force lockouts, and immutable audit logging.
+        </p>
+      </div>
+
     </div>
+  </section>
 
-    <div class="lp-feature">
-      <div class="lp-feature-icon">
-        <svg
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <rect x="2" y="3" width="20" height="14" rx="2" />
-          <path d="M2 10h20" />
-        </svg>
-      </div>
-      <h3>Account Management</h3>
-      <p>
-        Create savings or current accounts with configurable minimum balances.
+  {# ────────────────────────────────────────────────────────────────────────
+     SECTION 3: EDITORIAL PRODUCT SHOWCASE (#solutions)
+     (Alternating 2-Column Bands Inspired by Reference Layout)
+     ──────────────────────────────────────────────────────────────────────── #}
+  <section class="lp-showcase-section" id="solutions">
+    
+    <div class="lp-section-intro">
+      <div class="lp-section-eyebrow">CAPABILITY SHOWCASE</div>
+      <h2 class="lp-section-title">Banking, built around you.</h2>
+      <p class="lp-section-desc">
+        Institutional clarity meets intuitive interaction. Every capability is designed with
+        commercial realism, strict validation, and uncompromising security.
       </p>
     </div>
 
-    <div class="lp-feature">
-      <div class="lp-feature-icon">
-        <svg
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M3 3v18h18" />
-          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
-        </svg>
+    <div class="lp-showcase-stack">
+
+      {# Band 1: Account & Liquidity Overview #}
+      <div class="lp-showcase-band">
+        <div class="lp-showcase-copy">
+          <div class="lp-band-badge">01 &middot; UNIFIED LIQUIDITY</div>
+          <h3 class="lp-band-title">Your finances at a glance.</h3>
+          <p class="lp-band-text">
+            Experience complete financial visibility with immediate balance synchronization,
+            configurable privacy masking, and automated inflow versus outflow telemetry.
+          </p>
+          <ul class="lp-band-list">
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Instant balance privacy toggle to obscure sensitive figures in public spaces</span>
+            </li>
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Separate tracking for multiple accounts with enforced minimum balance thresholds</span>
+            </li>
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>High-frequency transaction monitoring and live financial analytics</span>
+            </li>
+          </ul>
+        </div>
+        <div class="lp-showcase-visual">
+          <div class="lp-mockup-frame">
+            <div class="lp-mockup-top">
+              <span class="lp-mockup-dot"></span>
+              <span class="lp-mockup-title">Institutional Overview</span>
+            </div>
+            <div class="lp-mockup-body">
+              <div class="lp-mock-hero-box">
+                <span class="lp-mock-eyebrow">Available Liquidity</span>
+                <div class="lp-mock-amount">₹2,45,800.00</div>
+                <div class="lp-mock-status-row">
+                  <span class="lp-status-chip lp-chip-success">Account Active</span>
+                  <span class="lp-mock-muted">Acc: &bull;&bull;&bull;&bull; 4829</span>
+                </div>
+              </div>
+              <div class="lp-mock-grid-2">
+                <div class="lp-mock-tile">
+                  <span class="lp-tile-lbl">Deposits (Month)</span>
+                  <strong class="lp-tile-val text-success">₹3,20,000</strong>
+                </div>
+                <div class="lp-mock-tile">
+                  <span class="lp-tile-lbl">Withdrawals (Month)</span>
+                  <strong class="lp-tile-val text-danger">₹74,200</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <h3>Transaction History</h3>
-      <p>Full audit trail with filters, search, and CSV/PDF export.</p>
-    </div>
 
-    <div class="lp-feature">
-      <div class="lp-feature-icon">
-        <svg
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-        </svg>
+      {# Band 2: Money Movement & Transfers #}
+      <div class="lp-showcase-band lp-band-reverse">
+        <div class="lp-showcase-copy">
+          <div class="lp-band-badge">02 &middot; PRECISION TRANSFERS</div>
+          <h3 class="lp-band-title">Move money with absolute confidence.</h3>
+          <p class="lp-band-text">
+            Execute intra-bank transfers with instant recipient verification, transaction PIN authorization,
+            and scheduled payments that automatically dispatch on your chosen calendar date.
+          </p>
+          <ul class="lp-band-list">
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Mandatory 4-digit cryptographic PIN authorization prevents unauthorized fund dispatch</span>
+            </li>
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Address book of saved beneficiaries with instant auto-fill and validation</span>
+            </li>
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Atomic balance updates guaranteeing non-negative limits and zero ghost debits</span>
+            </li>
+          </ul>
+        </div>
+        <div class="lp-showcase-visual">
+          <div class="lp-mockup-frame">
+            <div class="lp-mockup-top">
+              <span class="lp-mockup-dot"></span>
+              <span class="lp-mockup-title">Transfer Authorization</span>
+            </div>
+            <div class="lp-mockup-body">
+              <div class="lp-mock-transfer-card">
+                <div class="lp-transfer-field">
+                  <span class="lp-field-label">Recipient Account</span>
+                  <div class="lp-field-value">
+                    <strong>Priya Sharma</strong> &middot; Acc #100234
+                  </div>
+                </div>
+                <div class="lp-transfer-field">
+                  <span class="lp-field-label">Transfer Amount</span>
+                  <div class="lp-field-amount">₹12,500.00</div>
+                </div>
+                <div class="lp-transfer-field">
+                  <span class="lp-field-label">Security Authorization</span>
+                  <div class="lp-pin-indicator">
+                    <span class="lp-pin-dot active">&bull;</span>
+                    <span class="lp-pin-dot active">&bull;</span>
+                    <span class="lp-pin-dot active">&bull;</span>
+                    <span class="lp-pin-dot active">&bull;</span>
+                    <span class="lp-pin-verified">PIN Verified</span>
+                  </div>
+                </div>
+                <div class="lp-transfer-btn-mock">Execute Transfer &rarr;</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <h3>Fraud Detection</h3>
-      <p>Automatic high-value and high-frequency transaction monitoring.</p>
-    </div>
 
-    <div class="lp-feature">
-      <div class="lp-feature-icon">
-        <svg
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 6v6l4 2" />
-        </svg>
+      {# Band 3: Transaction Ledger & Statements #}
+      <div class="lp-showcase-band">
+        <div class="lp-showcase-copy">
+          <div class="lp-band-badge">03 &middot; AUDITED HISTORY</div>
+          <h3 class="lp-band-title">Understand every transaction.</h3>
+          <p class="lp-band-text">
+            Inspect a comprehensive audit ledger with multi-field search, transaction type filters,
+            and export capabilities in CSV and signed PDF formats.
+          </p>
+          <ul class="lp-band-list">
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Instant filtering across deposits, withdrawals, transfers, and scheduled payments</span>
+            </li>
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>One-click export of official financial statements in PDF or spreadsheet CSV</span>
+            </li>
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Tamper-evident timestamping with transaction reference identifiers</span>
+            </li>
+          </ul>
+        </div>
+        <div class="lp-showcase-visual">
+          <div class="lp-mockup-frame">
+            <div class="lp-mockup-top">
+              <span class="lp-mockup-dot"></span>
+              <span class="lp-mockup-title">Audit Ledger &amp; Statements</span>
+            </div>
+            <div class="lp-mockup-body">
+              <div class="lp-mock-table">
+                <div class="lp-mock-th">
+                  <span>Type / Reference</span>
+                  <span>Date</span>
+                  <span style="text-align: right">Amount</span>
+                </div>
+                <div class="lp-mock-tr">
+                  <div>
+                    <strong>Deposit</strong>
+                    <small>TX-98421</small>
+                  </div>
+                  <div>25 Nov, 10:20</div>
+                  <div class="text-success" style="text-align: right">+₹45,000.00</div>
+                </div>
+                <div class="lp-mock-tr">
+                  <div>
+                    <strong>Transfer Out</strong>
+                    <small>TX-98418</small>
+                  </div>
+                  <div>24 Nov, 16:45</div>
+                  <div class="text-danger" style="text-align: right">&minus;₹12,500.00</div>
+                </div>
+                <div class="lp-mock-tr">
+                  <div>
+                    <strong>Scheduled Tx</strong>
+                    <small>TX-98390</small>
+                  </div>
+                  <div>23 Nov, 08:00</div>
+                  <div class="text-danger" style="text-align: right">&minus;₹2,499.00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <h3>Scheduled Transfers</h3>
-      <p>Queue future-dated transfers that execute automatically.</p>
-    </div>
 
-    <div class="lp-feature">
-      <div class="lp-feature-icon">
-        <svg
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M23 21v-2a4 4 0 00-3-3.87" />
-          <path d="M16 3.13a4 4 0 010 7.75" />
-        </svg>
+      {# Band 4: Security Architecture #}
+      <div class="lp-showcase-band lp-band-reverse">
+        <div class="lp-showcase-copy">
+          <div class="lp-band-badge">04 &middot; SECURITY CORE</div>
+          <h3 class="lp-band-title">Stay in complete control.</h3>
+          <p class="lp-band-text">
+            Enterprise security mechanisms protect every session. From brute-force lockout safeguards
+            to detailed security logs, your financial simulation remains tamper-evident.
+          </p>
+          <ul class="lp-band-list">
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>5-attempt brute-force rate-limiting protects accounts from credential stuffing</span>
+            </li>
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>PBKDF2-SHA256 password and transaction PIN hashing with cryptographically unique salts</span>
+            </li>
+            <li>
+              <svg class="lp-check-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Immutable security audit log tracking logins, password updates, and PIN modifications</span>
+            </li>
+          </ul>
+        </div>
+        <div class="lp-showcase-visual">
+          <div class="lp-mockup-frame">
+            <div class="lp-mockup-top">
+              <span class="lp-mockup-dot"></span>
+              <span class="lp-mockup-title">Security Center</span>
+            </div>
+            <div class="lp-mockup-body">
+              <div class="lp-mock-security-box">
+                <div class="lp-sec-score-row">
+                  <div>
+                    <span class="lp-sec-eyebrow">Security Status</span>
+                    <strong class="lp-sec-status">Hardened &middot; Protected</strong>
+                  </div>
+                  <span class="lp-status-chip lp-chip-success">100% Secure</span>
+                </div>
+                <div class="lp-sec-rules-list">
+                  <div class="lp-sec-rule">
+                    <span class="lp-rule-icon">&check;</span>
+                    <span>PBKDF2-SHA256 PIN Hashing Enabled</span>
+                  </div>
+                  <div class="lp-sec-rule">
+                    <span class="lp-rule-icon">&check;</span>
+                    <span>Brute-force Lockout Threshold: 5 Attempts</span>
+                  </div>
+                  <div class="lp-sec-rule">
+                    <span class="lp-rule-icon">&check;</span>
+                    <span>Session CSRF Protection Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <h3>Admin Panel</h3>
-      <p>User management, support queue, and system analytics dashboard.</p>
-    </div>
-  </div>
-</section>
 
-{# ── How it works ── #}
-<section class="lp-how">
-  <div class="lp-section-header">
-    <h2>How it works</h2>
-    <p>Three steps to start banking.</p>
-  </div>
+    </div>
+  </section>
 
-  <div class="lp-steps">
-    <div class="lp-step">
-      <div class="lp-step-num">1</div>
-      <h3>Create Account</h3>
-      <p>Sign up with your name, email, and a 4-digit transaction PIN.</p>
+  {# ────────────────────────────────────────────────────────────────────────
+     SECTION 4: HORIZONTAL 3-STEP WALKTHROUGH (#how-it-works)
+     ──────────────────────────────────────────────────────────────────────── #}
+  <section class="lp-steps-section" id="how-it-works">
+    <div class="lp-section-intro">
+      <div class="lp-section-eyebrow">SYSTEM ONBOARDING</div>
+      <h2 class="lp-section-title">How it works</h2>
+      <p class="lp-section-desc">
+        Three simple steps to explore the entire digital banking architecture.
+      </p>
     </div>
-    <div class="lp-step-arrow">&rarr;</div>
-    <div class="lp-step">
-      <div class="lp-step-num">2</div>
-      <h3>Deposit Funds</h3>
-      <p>Add money to your account and watch the balance update instantly.</p>
-    </div>
-    <div class="lp-step-arrow">&rarr;</div>
-    <div class="lp-step">
-      <div class="lp-step-num">3</div>
-      <h3>Start Transferring</h3>
-      <p>Send money to other users with real-time notifications.</p>
-    </div>
-  </div>
-</section>
 
-{# ── Tech Stack ── #}
-<section class="lp-tech">
-  <div class="lp-section-header">
-    <h2>Built with modern tools</h2>
-    <p>A clean stack designed for reliability and speed.</p>
-  </div>
+    <div class="lp-steps-grid">
+      
+      <div class="lp-step-card">
+        <div class="lp-step-badge">01</div>
+        <h3 class="lp-step-name">Create your account</h3>
+        <p class="lp-step-explanation">
+          Register with your name, email, and choose a secure password alongside a mandatory 4-digit transaction PIN.
+        </p>
+        <div class="lp-step-feature">&check; Instant activation &middot; No identity delays</div>
+      </div>
 
-  <div class="lp-tech-grid">
-    <div class="lp-tech-item">
-      <strong>Flask</strong>
-      <span>Python web framework</span>
-    </div>
-    <div class="lp-tech-item">
-      <strong>MongoDB</strong>
-      <span>Document database</span>
-    </div>
-    <div class="lp-tech-item">
-      <strong>Vanilla JS</strong>
-      <span>No framework overhead</span>
-    </div>
-    <div class="lp-tech-item">
-      <strong>Inter</strong>
-      <span>Clean typography</span>
-    </div>
-  </div>
-</section>
+      <div class="lp-step-card">
+        <div class="lp-step-badge">02</div>
+        <h3 class="lp-step-name">Set up your banking</h3>
+        <p class="lp-step-explanation">
+          Initialize your savings or current accounts with configurable minimum balances and simulated starter deposits.
+        </p>
+        <div class="lp-step-feature">&check; Configurable deposit amounts</div>
+      </div>
 
-{# ── CTA Banner ── #} {% if not session.get('user_id') %}
-<section class="lp-cta-banner">
-  <h2>Ready to try it?</h2>
-  <p>Create a free account and explore the full banking experience.</p>
-  <a class="btn primary lp-cta" href="/create">Get Started Now</a>
-</section>
-{% endif %} {# ── Footer ── #}
-<footer class="lp-footer">
-  <div class="lp-footer-inner">
-    <div class="lp-footer-brand">
-      <span
-        class="brand-mark"
-        style="width: 28px; height: 28px; font-size: 0.7rem; border-radius: 6px"
-        >SB</span
-      >
-      <strong>Simple Banking</strong>
-    </div>
-    <div class="lp-footer-links">
-      <a href="/login">Login</a>
-      <a href="/signup">Signup</a>
-      <a href="/support">Support</a>
-    </div>
-    <p class="lp-footer-copy">
-      &copy; 2026 Simple Banking System &middot; Built with Flask + MongoDB
-    </p>
-  </div>
-</footer>
+      <div class="lp-step-card">
+        <div class="lp-step-badge">03</div>
+        <h3 class="lp-step-name">Manage your finances</h3>
+        <p class="lp-step-explanation">
+          Execute instant transfers, schedule future payments, save verified beneficiaries, and export official statements.
+        </p>
+        <div class="lp-step-feature">&check; Real-time updates &middot; Full audit trail</div>
+      </div>
 
+    </div>
+  </section>
+
+  {# ────────────────────────────────────────────────────────────────────────
+     SECTION 5: ENTERPRISE SECURITY ARCHITECTURE (#security)
+     ──────────────────────────────────────────────────────────────────────── #}
+  <section class="lp-security-section" id="security">
+    <div class="lp-security-inner">
+      <div class="lp-security-header">
+        <div class="lp-sec-badge">VERIFIED ARCHITECTURE</div>
+        <h2 class="lp-sec-title">Enterprise security at every level.</h2>
+        <p class="lp-sec-lead">
+          Simple Banking implements genuine, production-grade security patterns across
+          cryptography, rate limiting, and state verification.
+        </p>
+      </div>
+
+      <div class="lp-security-grid">
+        
+        <div class="lp-sec-card">
+          <div class="lp-sec-card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h4 class="lp-sec-card-title">Cryptographic PIN Security</h4>
+          <p class="lp-sec-card-text">
+            Transaction PINs and user passwords are never stored in plain text. They are hashed using PBKDF2 with SHA-256 and salt.
+          </p>
+        </div>
+
+        <div class="lp-sec-card">
+          <div class="lp-sec-card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h4 class="lp-sec-card-title">Brute-Force Rate Limiting</h4>
+          <p class="lp-sec-card-text">
+            Automated defensive tracking locks accounts after 5 consecutive failed attempts, preventing automated dictionary and credential stuffing attacks.
+          </p>
+        </div>
+
+        <div class="lp-sec-card">
+          <div class="lp-sec-card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <h4 class="lp-sec-card-title">Immutable Audit Trail</h4>
+          <p class="lp-sec-card-text">
+            Every transaction, deposit, withdrawal, login, and profile modification is recorded in an immutable ledger with timestamps and origin data.
+          </p>
+        </div>
+
+        <div class="lp-sec-card">
+          <div class="lp-sec-card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h4 class="lp-sec-card-title">Atomic Balance Integrity</h4>
+          <p class="lp-sec-card-text">
+            Double-entry transactions are validated server-side. Transfers are executed atomically to ensure funds cannot disappear or create negative balances.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  {# ────────────────────────────────────────────────────────────────────────
+     SECTION 6: CLOSING CALL TO ACTION
+     ──────────────────────────────────────────────────────────────────────── #}
+  <section class="lp-cta-section">
+    <div class="lp-cta-card">
+      <div class="lp-cta-tag">GET STARTED WITH SIMPLE BANKING</div>
+      <h2 class="lp-cta-heading">Ready to experience modern digital banking?</h2>
+      <p class="lp-cta-text">
+        Explore the full banking simulation environment. Completely free, no real funds required,
+        and built to demonstrate production-grade fintech architecture.
+      </p>
+      <div class="lp-cta-btn-group">
+        {% if session.get('user_id') %}
+        <a class="btn lp-btn-primary lp-btn-lg" href="/dashboard">Return to Dashboard</a>
+        <a class="btn lp-btn-ghost lp-btn-lg" href="/transfer">Send a Transfer</a>
+        {% else %}
+        <a class="btn lp-btn-primary lp-btn-lg" href="{{ url_for('auth.signup_page') }}">Create Free Account</a>
+        <a class="btn lp-btn-ghost lp-btn-lg" href="{{ url_for('auth.login_page') }}">Sign In to Demo</a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  {# ────────────────────────────────────────────────────────────────────────
+     SECTION 7: MULTI-COLUMN FINTECH FOOTER & SIMULATION DISCLOSURE (#about)
+     ──────────────────────────────────────────────────────────────────────── #}
+  <footer class="lp-footer" id="about">
+    <div class="lp-footer-container">
+      
+      <div class="lp-footer-grid">
+        
+        {# Col 1: Brand & Status #}
+        <div class="lp-footer-brand-col">
+          <div class="lp-footer-logo-row">
+            <img src="{{ url_for('static', filename='images/brand-logo.svg') }}" alt="Simple Banking" width="30" height="30" />
+            <span class="lp-footer-brand-name">Simple Banking</span>
+          </div>
+          <p class="lp-footer-motto">
+            A modern, production-grade digital banking simulation environment built for education,
+            testing, and technical verification.
+          </p>
+          <div class="lp-footer-status">
+            <span class="lp-status-live-dot"></span>
+            <span>SYSTEM STATUS: OPERATIONAL</span>
+          </div>
+        </div>
+
+        {# Col 2: Platform Links #}
+        <div class="lp-footer-col">
+          <h4 class="lp-footer-col-title">Platform</h4>
+          <ul class="lp-footer-nav">
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/transfer">Send Money</a></li>
+            <li><a href="/transact">Deposit &amp; Withdraw</a></li>
+            <li><a href="/transactions">Audit Ledger</a></li>
+            <li><a href="/beneficiaries">Beneficiaries</a></li>
+            <li><a href="/support">Help &amp; Support</a></li>
+          </ul>
+        </div>
+
+        {# Col 3: Architecture & Security #}
+        <div class="lp-footer-col">
+          <h4 class="lp-footer-col-title">Security &amp; Tech</h4>
+          <ul class="lp-footer-nav">
+            <li><a href="#security">PBKDF2-SHA256 Encryption</a></li>
+            <li><a href="#security">Brute-Force Rate Limiting</a></li>
+            <li><a href="#security">Immutable Audit Stream</a></li>
+            <li><a href="#security">CSRF Session Guards</a></li>
+            <li><a href="#security">Atomic State Changes</a></li>
+          </ul>
+        </div>
+
+        {# Col 4: Legal & Compliance #}
+        <div class="lp-footer-col">
+          <h4 class="lp-footer-col-title">Governance</h4>
+          <ul class="lp-footer-nav">
+            <li><button class="lp-footer-modal-btn" data-modal="modal-simulation-disclaimer" type="button">Simulation Disclosure</button></li>
+            <li><button class="lp-footer-modal-btn" data-modal="modal-terms" type="button">Terms of Simulation</button></li>
+            <li><button class="lp-footer-modal-btn" data-modal="modal-privacy" type="button">Privacy &amp; Data Policy</button></li>
+            <li><button class="lp-footer-modal-btn" data-modal="modal-security" type="button">Security Standards</button></li>
+          </ul>
+        </div>
+
+      </div>
+
+      {# Footer Bottom Bar #}
+      <div class="lp-footer-bottom">
+        <div class="lp-footer-copy">
+          &copy; 2026 Simple Banking System. All rights reserved.
+        </div>
+        <div class="lp-footer-disclaimer-text">
+          <strong>Educational Platform Notice:</strong> Simple Banking is an educational banking simulation platform
+          developed strictly for software demonstration, testing, and learning purposes. It does not provide real-world
+          commercial banking services, deposit accounts, loans, or regulatory-insured financial instruments.
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  {# ────────────────────────────────────────────────────────────────────────
+     ACCESSIBLE MODAL DIALOGS FOR FOOTER LEGAL LINKS
+     ──────────────────────────────────────────────────────────────────────── #}
+  <dialog class="lp-modal" id="modal-simulation-disclaimer" aria-labelledby="disclaimer-title">
+    <div class="lp-modal-box">
+      <div class="lp-modal-header">
+        <h3 class="lp-modal-title" id="disclaimer-title">Simulation Disclosure</h3>
+        <button class="lp-modal-close" type="button" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="lp-modal-body">
+        <p><strong>Educational Banking Platform Notice</strong></p>
+        <p>
+          Simple Banking is a simulated fintech environment. All accounts, account numbers, balances,
+          and transactions depicted on this platform are demonstration records intended solely for
+          software engineering education, architectural inspection, and UI/UX design testing.
+        </p>
+        <p>
+          This application does not hold banking licenses, does not process real currency or government-issued tender,
+          and is not affiliated with the Reserve Bank of India (RBI), Federal Deposit Insurance Corporation (FDIC),
+          or any other monetary regulatory authority. Never enter real banking credentials, PINs, or confidential
+          financial information.
+        </p>
+      </div>
+      <div class="lp-modal-footer">
+        <button class="btn lp-btn-primary lp-modal-close-btn" type="button">Acknowledge</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="lp-modal" id="modal-terms" aria-labelledby="terms-title">
+    <div class="lp-modal-box">
+      <div class="lp-modal-header">
+        <h3 class="lp-modal-title" id="terms-title">Terms of Simulation</h3>
+        <button class="lp-modal-close" type="button" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="lp-modal-body">
+        <p>
+          By accessing the Simple Banking simulation platform, you acknowledge and agree that:
+        </p>
+        <ul>
+          <li>All funds and transactions are fictional and cannot be redeemed for fiat or digital currency.</li>
+          <li>You may not use this system for unlawful activities, automated spam, or abusive denial-of-service testing.</li>
+          <li>Data stored within demo databases may be reset or purged periodically during automated testing cycles.</li>
+        </ul>
+      </div>
+      <div class="lp-modal-footer">
+        <button class="btn lp-btn-primary lp-modal-close-btn" type="button">Understood</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="lp-modal" id="modal-privacy" aria-labelledby="privacy-title">
+    <div class="lp-modal-box">
+      <div class="lp-modal-header">
+        <h3 class="lp-modal-title" id="privacy-title">Privacy &amp; Data Handling</h3>
+        <button class="lp-modal-close" type="button" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="lp-modal-body">
+        <p>
+          We respect user privacy within our simulation environment:
+        </p>
+        <ul>
+          <li>Password credentials and transaction PINs are stored exclusively as one-way salted PBKDF2-SHA256 hashes.</li>
+          <li>We do not sell, transfer, or distribute user registration records to third-party commercial entities.</li>
+          <li>Simulated transaction logs are maintained strictly for educational demonstration of double-entry ledger systems.</li>
+        </ul>
+      </div>
+      <div class="lp-modal-footer">
+        <button class="btn lp-btn-primary lp-modal-close-btn" type="button">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="lp-modal" id="modal-security" aria-labelledby="sec-title">
+    <div class="lp-modal-box">
+      <div class="lp-modal-header">
+        <h3 class="lp-modal-title" id="sec-title">Security Standards</h3>
+        <button class="lp-modal-close" type="button" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="lp-modal-body">
+        <p>
+          Our application implements multi-layered security controls:
+        </p>
+        <ul>
+          <li><strong>PBKDF2-SHA256:</strong> Industrial-standard cryptographic key derivation for all credentials.</li>
+          <li><strong>Brute-Force Protection:</strong> Account lockout initiated after 5 consecutive failed authentication attempts.</li>
+          <li><strong>CSRF Mitigation:</strong> Cryptographic token verification on every state-mutating HTTP POST request.</li>
+          <li><strong>Atomic Operations:</strong> Non-negative balance constraints enforced at the database driver layer.</li>
+        </ul>
+      </div>
+      <div class="lp-modal-footer">
+        <button class="btn lp-btn-primary lp-modal-close-btn" type="button">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+</div>
 {% endblock %}

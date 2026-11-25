@@ -372,32 +372,34 @@ const setupLoginFlash = () => {
 };
 
 const setupThemeToggle = () => {
-    const toggle = document.getElementById("theme-toggle");
-    if (!toggle) return;
+    const toggles = document.querySelectorAll(".theme-toggle, #theme-toggle");
+    if (!toggles.length) return;
 
     const updateLabel = () => {
         const isDark = document.documentElement.classList.contains("dark-mode");
-        const label = toggle.querySelector(".theme-label");
-        const iconSvg = toggle.querySelector(".theme-icon-svg");
-        if (label) {
-            label.textContent = isDark ? "Light" : "Dark";
-        } else {
-            toggle.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
-        }
-        if (iconSvg) {
-            iconSvg.innerHTML = isDark
-                ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
-                : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-        }
-        toggle.setAttribute("aria-pressed", isDark ? "true" : "false");
+        toggles.forEach((toggle) => {
+            const label = toggle.querySelector(".theme-label");
+            const iconSvg = toggle.querySelector(".theme-icon-svg");
+            if (label) {
+                label.textContent = isDark ? "Light" : "Dark";
+            }
+            if (iconSvg) {
+                iconSvg.innerHTML = isDark
+                    ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+                    : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+            }
+            toggle.setAttribute("aria-pressed", isDark ? "true" : "false");
+        });
     };
 
     updateLabel();
 
-    toggle.addEventListener("click", () => {
-        const isDark = document.documentElement.classList.toggle("dark-mode");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-        updateLabel();
+    toggles.forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+            const isDark = document.documentElement.classList.toggle("dark-mode");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+            updateLabel();
+        });
     });
 };
 
@@ -2525,6 +2527,100 @@ const setupAdminDashboard = () => {
     fetchAdminData();
 };
 
+const setupLandingPage = () => {
+    // 1. Mobile Drawer Navigation
+    const mobileToggle = document.getElementById("lp-mobile-toggle");
+    const mobileDrawer = document.getElementById("lp-mobile-drawer");
+    const drawerClose = document.getElementById("lp-drawer-close");
+    const drawerBackdrop = document.getElementById("lp-drawer-backdrop");
+
+    if (mobileToggle && mobileDrawer) {
+        const openDrawer = () => {
+            mobileDrawer.classList.add("open");
+            mobileDrawer.setAttribute("aria-hidden", "false");
+            mobileToggle.setAttribute("aria-expanded", "true");
+            document.body.style.overflow = "hidden";
+        };
+
+        const closeDrawer = () => {
+            mobileDrawer.classList.remove("open");
+            mobileDrawer.setAttribute("aria-hidden", "true");
+            mobileToggle.setAttribute("aria-expanded", "false");
+            document.body.style.overflow = "";
+        };
+
+        mobileToggle.addEventListener("click", openDrawer);
+        if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
+        if (drawerBackdrop) drawerBackdrop.addEventListener("click", closeDrawer);
+
+        mobileDrawer.querySelectorAll(".lp-drawer-link").forEach((link) => {
+            link.addEventListener("click", closeDrawer);
+        });
+    }
+
+    // 2. Smooth Scrolling for Landing Anchor Links
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", (e) => {
+            const targetId = anchor.getAttribute("href");
+            if (!targetId || targetId === "#") return;
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) {
+                e.preventDefault();
+                targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+                if (window.history && window.history.pushState) {
+                    window.history.pushState(null, null, targetId);
+                }
+            }
+        });
+    });
+
+    // 3. Sticky Navigation Scrolled Shadow
+    const lpNav = document.getElementById("lp-nav");
+    if (lpNav) {
+        const updateNavShadow = () => {
+            if (window.scrollY > 20) {
+                lpNav.classList.add("scrolled");
+            } else {
+                lpNav.classList.remove("scrolled");
+            }
+        };
+        window.addEventListener("scroll", updateNavShadow, { passive: true });
+        updateNavShadow();
+    }
+
+    // 4. Accessible Modal Dialogs
+    document.querySelectorAll("[data-modal]").forEach((trigger) => {
+        trigger.addEventListener("click", () => {
+            const modalId = trigger.getAttribute("data-modal");
+            const modal = document.getElementById(modalId);
+            if (modal && typeof modal.showModal === "function") {
+                modal.showModal();
+            }
+        });
+    });
+
+    document.querySelectorAll(".lp-modal").forEach((modal) => {
+        modal.querySelectorAll(".lp-modal-close, .lp-modal-close-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                modal.close();
+            });
+        });
+
+        modal.addEventListener("click", (e) => {
+            const rect = modal.getBoundingClientRect();
+            const isInDialog = (
+                rect.top <= e.clientY &&
+                e.clientY <= rect.top + rect.height &&
+                rect.left <= e.clientX &&
+                e.clientX <= rect.left + rect.width
+            );
+            if (!isInDialog) {
+                modal.close();
+            }
+        });
+    });
+};
+
 window.addEventListener("DOMContentLoaded", () => {
     const sidebarToggle = document.querySelector(".sidebar-toggle");
     if (sidebarToggle) {
@@ -2542,6 +2638,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     hydrateNavUser();
+    setupLandingPage();
     setupCreateAccount();
     setupSignup();
     setupLogin();
