@@ -170,3 +170,4 @@ def test_scheduled_transfer_runner_execution(client, monkeypatch):
     st = scheduled_col.find_one({"receiver_email": "receiver@cron.com"})
     assert st["status"] == "processed"
     assert st.get("processed_at") is not None
+

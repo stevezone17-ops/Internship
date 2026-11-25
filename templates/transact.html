@@ -5,8 +5,8 @@
     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
       <div>
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-          <span class="badge" style="background: rgba(14, 165, 233, 0.1); color: var(--accent); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 9999px;">Treasury & Operations</span>
-          <span style="font-size: 0.8rem; color: var(--text-tertiary);">• Instant Settlement</span>
+          <span class="badge" style="background: var(--brand-subtle); color: var(--brand-primary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px solid rgba(23, 76, 67, 0.15);">Treasury & Operations</span>
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">• Instant Settlement</span>
         </div>
         <h2 style="font-size: 1.625rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0 0 0.35rem 0;">Deposit or Withdraw</h2>
         <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; max-width: 600px;">Move capital in and out of your high-yield banking account securely with real-time balance reconciliation.</p>
@@ -34,28 +34,28 @@
   </header>
 
   <!-- Live Balance & Limits Banner -->
-  <div class="card" style="background: linear-gradient(135deg, var(--card) 0%, rgba(14, 165, 233, 0.04) 100%); border: 1px solid var(--border); padding: 1.25rem 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+  <div class="card" style="background: var(--card); border: 1px solid var(--border); padding: 1.25rem 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-xs);">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; align-items: center;">
       <div>
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-          <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary);">Current Available Balance</span>
+          <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary);">Current Available Balance</span>
           <span class="live-pill" style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; color: var(--success); font-weight: 600;">
             <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block;"></span> Live
           </span>
         </div>
-        <div style="font-size: 1.75rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); letter-spacing: -0.02em;" id="transact-balance-display">
+        <div class="num" style="font-size: 1.75rem; font-weight: 800; font-family: var(--font-sans); color: var(--text-primary); letter-spacing: -0.02em;" id="transact-balance-display">
           ₹--
         </div>
       </div>
       <div style="border-left: 1px solid var(--border); padding-left: 1.25rem;">
-        <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); display: block; margin-bottom: 0.35rem;">Per-Transaction Limit</span>
-        <span style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">₹10,000.00</span>
-        <span style="display: block; font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.2rem;">Single transaction ceiling</span>
+        <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">Per-Transaction Limit</span>
+        <span class="num" style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-sans);">₹10,000.00</span>
+        <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Single transaction ceiling</span>
       </div>
       <div style="border-left: 1px solid var(--border); padding-left: 1.25rem;">
-        <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); display: block; margin-bottom: 0.35rem;">Savings Threshold</span>
-        <span style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">₹1,000.00</span>
-        <span style="display: block; font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.2rem;">Mandatory reserve maintenance</span>
+        <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">Savings Threshold</span>
+        <span class="num" style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-sans);">₹1,000.00</span>
+        <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Mandatory reserve maintenance</span>
       </div>
     </div>
   </div>
@@ -293,7 +293,7 @@
       <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.5rem; align-items: start;">
         <div class="card form-card" data-page="transfer" style="padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card);">
           <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
-            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(59, 130, 246, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--brand-subtle); color: var(--brand-primary); border: 1px solid rgba(23, 76, 67, 0.15); display: flex; align-items: center; justify-content: center;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>

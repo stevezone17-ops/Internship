@@ -165,3 +165,4 @@ def test_notifications_tracking_and_idor(client):
     res_all = client.post("/api/notifications/mark-all-read")
     assert res_all.status_code == 200
     assert res_all.get_json()["count"] == 1
+

@@ -515,10 +515,10 @@ const renderTransactions = (rows, transactions) => {
             } else if (tx.type === "transfer") {
                 iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3 21 7l-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/></svg>';
                 iconClass = "transfer";
-                amountClass = "amount-transfer";
                 
                 if (meta.from_account_id) {
                     amountPrefix = "+";
+                    amountClass = "amount-credit";
                     titleLabel = `Transfer Received`;
                     if (meta.sender_name) {
                         titleLabel += ` from ${meta.sender_name}`;
@@ -527,6 +527,7 @@ const renderTransactions = (rows, transactions) => {
                     }
                 } else if (meta.to_account_id) {
                     amountPrefix = "-";
+                    amountClass = "amount-debit";
                     titleLabel = `Transfer Sent`;
                     if (meta.receiver_name) {
                         titleLabel += ` to ${meta.receiver_name}`;
@@ -534,6 +535,7 @@ const renderTransactions = (rows, transactions) => {
                         titleLabel += ` to ${meta.to_email}`;
                     }
                 } else {
+                    amountClass = "amount-debit";
                     titleLabel = "Account Transfer";
                 }
             }
@@ -814,24 +816,24 @@ const renderDashboardCharts = (transactions, totalDeposits, totalWithdrawals) =>
                     {
                         label: "Deposits",
                         data: depositData,
-                        borderColor: "#2563eb",
-                        backgroundColor: "rgba(37, 99, 235, 0.12)",
-                        borderWidth: 2.5,
+                        borderColor: "#174c43",
+                        backgroundColor: "rgba(23, 76, 67, 0.08)",
+                        borderWidth: 2,
                         fill: true,
                         tension: 0.35,
                         pointRadius: 3,
-                        pointHoverRadius: 6,
+                        pointHoverRadius: 5,
                     },
                     {
                         label: "Withdrawals",
                         data: debitData,
-                        borderColor: "#ef4444",
-                        backgroundColor: "rgba(239, 68, 68, 0.08)",
-                        borderWidth: 2.5,
+                        borderColor: "#b42318",
+                        backgroundColor: "rgba(180, 35, 24, 0.06)",
+                        borderWidth: 2,
                         fill: true,
                         tension: 0.35,
                         pointRadius: 3,
-                        pointHoverRadius: 6,
+                        pointHoverRadius: 5,
                     },
                 ],
             },
@@ -877,8 +879,8 @@ const renderDashboardCharts = (transactions, totalDeposits, totalWithdrawals) =>
         const hasActivity = totalDeposits > 0 || totalWithdrawals > 0;
         const chartData = hasActivity ? [totalDeposits, totalWithdrawals] : [1];
         const bgColors = hasActivity
-            ? ["#2563eb", "#ef4444"]
-            : [isDark ? "#1e293b" : "#e2e8f0"];
+            ? ["#174c43", "#b42318"]
+            : [isDark ? "#222938" : "#e4e7ec"];
 
         dashBreakdownChartInstance = new Chart(donutCtx, {
             type: "doughnut",
@@ -952,6 +954,50 @@ const setupDashboard = () => {
     let notificationCurrentPage = 1;
     const notificationLimit = 5;
 
+    // Balance visibility toggle state
+    const balanceToggleBtn = document.getElementById("toggle-balance-visibility");
+    const accountSnippetEl = document.getElementById("dash-account-snippet");
+    if (accountSnippetEl && accountId) {
+        accountSnippetEl.textContent = accountId.slice(-4);
+    }
+
+    const applyBalanceVisibility = () => {
+        const isHidden = localStorage.getItem("balance_hidden") === "true";
+        if (balanceEl) {
+            if (isHidden) {
+                balanceEl.classList.add("balance-masked");
+                balanceEl.dataset.realValue = balanceEl.dataset.realValue || balanceEl.textContent;
+                balanceEl.textContent = "••••••••";
+            } else {
+                balanceEl.classList.remove("balance-masked");
+                if (balanceEl.dataset.realValue) {
+                    balanceEl.textContent = balanceEl.dataset.realValue;
+                }
+            }
+        }
+        if (balanceToggleBtn) {
+            const iconWrap = balanceToggleBtn.querySelector(".visibility-icon");
+            const labelWrap = balanceToggleBtn.querySelector(".visibility-label");
+            if (iconWrap) {
+                iconWrap.innerHTML = isHidden
+                    ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+                    : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+            }
+            if (labelWrap) {
+                labelWrap.textContent = isHidden ? "Show" : "Hide";
+            }
+            balanceToggleBtn.setAttribute("aria-pressed", isHidden ? "true" : "false");
+        }
+    };
+
+    if (balanceToggleBtn) {
+        balanceToggleBtn.addEventListener("click", () => {
+            const current = localStorage.getItem("balance_hidden") === "true";
+            localStorage.setItem("balance_hidden", String(!current));
+            applyBalanceVisibility();
+        });
+    }
+
     if (!accountId) {
         console.error("No account ID found. Redirecting to create account.");
         setMessage(message, "No account found. Redirecting to create account...", "error");
@@ -970,11 +1016,22 @@ const setupDashboard = () => {
             const acctTypeStr = (data.account_type || "Savings").toUpperCase();
             if (typeEl) typeEl.textContent = `${acctTypeStr} ACCOUNT`;
             if (typeBadge) typeBadge.textContent = `${acctTypeStr} ACCOUNT`;
-            if (balanceEl) balanceEl.textContent = formatCurrency(data.balance);
+            const formattedBal = formatCurrency(data.balance);
+            if (balanceEl) {
+                balanceEl.dataset.realValue = formattedBal;
+                if (localStorage.getItem("balance_hidden") === "true") {
+                    balanceEl.textContent = "••••••••";
+                    balanceEl.classList.add("balance-masked");
+                } else {
+                    balanceEl.textContent = formattedBal;
+                    balanceEl.classList.remove("balance-masked");
+                }
+            }
             if (balanceSub) {
                 balanceSub.textContent = `Updated ${formatTimestamp(new Date())}`;
             }
             setNavUserName(data.name);
+            applyBalanceVisibility();
         })
         .catch((error) => {
             console.error("Failed to load account:", error);
@@ -1239,13 +1296,13 @@ const setupTransact = () => {
                 const targetId = btn.dataset.target;
                 tabButtons.forEach((b) => {
                     b.classList.remove("active");
-                    b.style.color = "var(--text-tertiary)";
+                    b.style.color = "var(--text-secondary)";
                     b.style.borderBottom = "none";
                     b.style.background = "none";
                 });
                 btn.classList.add("active");
-                btn.style.color = "var(--accent)";
-                btn.style.background = "rgba(14, 165, 233, 0.08)";
+                btn.style.color = "var(--brand-primary)";
+                btn.style.background = "var(--brand-subtle)";
 
                 tabPanels.forEach((panel) => {
                     if (panel.id === targetId) {

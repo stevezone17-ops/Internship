@@ -200,3 +200,4 @@ def test_login_activity_audit(client):
     activities = res_act.get_json()["logins"]
     assert len(activities) >= 1
     assert activities[0]["user_agent"] == "TestBrowser/1.0"
+

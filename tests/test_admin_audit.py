@@ -136,3 +136,4 @@ def test_admin_support_reply_and_notification(client):
     notif = notifications_col.find_one({"account_id": acct_id, "metadata.type": "support"})
     assert notif is not None
     assert "Payment issue" in notif["message"]
+

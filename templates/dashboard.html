@@ -1,29 +1,41 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard — Simple Banking System{% endblock %}
+{% block title %}Overview — Simple Banking System{% endblock %}
 
 {% block content %}
 <div class="dashboard-shell" data-page="dashboard" data-account-id="{{ account_id }}">
-  <!-- Top Welcome & Quick Overview Banner -->
+  <!-- Top Overview & Header Action Bar -->
   <header class="dash-welcome-header">
     <div class="dash-welcome-text">
-      <div class="dash-pill-badge">
-        <span class="user-status-dot"></span>
-        <span id="account-type-badge">Personal Account</span>
+      <div class="dash-breadcrumb-bar">
+        <span class="dash-kicker">Accounts</span>
+        <span class="dash-kicker-sep">/</span>
+        <span class="dash-kicker-current">Overview</span>
       </div>
-      <h1 class="dash-greeting"><span id="dash-time-greeting">Welcome back</span>, <span id="account-name">Loading...</span></h1>
-      <p class="dash-sub">Here is your financial overview, cashflow metrics, and recent activity.</p>
+      <h1 class="dash-greeting">
+        <span id="dash-time-greeting">Good morning</span>, <span id="account-name">Loading...</span>
+      </h1>
+      <p class="dash-sub">Real-time ledger overview, available liquidity, and cash flow telemetry.</p>
     </div>
     <div class="dash-header-actions">
       <a class="btn primary btn-action-pill" href="/transfer">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3 21 7l-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
         <span>Send Money</span>
       </a>
-      <a class="btn deposit btn-action-pill" href="/transact">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <a class="btn secondary btn-action-pill" href="/transact">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
         <span>Deposit</span>
       </a>
-      <a class="btn withdraw btn-action-pill" href="/transact">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <a class="btn secondary btn-action-pill" href="/transact">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="19" x2="12" y2="5"></line>
+          <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
         <span>Withdraw</span>
       </a>
     </div>
@@ -31,88 +43,84 @@
 
   <div class="message" id="dashboard-message"></div>
 
-  <!-- KPI Cards Grid -->
-  <section class="dash-metrics-grid" aria-label="Account Overview">
-    <!-- Balance Card -->
-    <div class="dash-metric-card highlight-card">
-      <div class="metric-top">
-        <span class="metric-label">Current Balance</span>
-        <span class="metric-icon-badge balance">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-        </span>
+  <!-- Primary Account Hero & Cash Flow Telemetry Card -->
+  <section class="card account-hero-card" aria-label="Account Summary">
+    <div class="account-hero-top">
+      <div class="account-hero-header">
+        <div class="account-meta-pills">
+          <span class="account-type-pill" id="account-type-badge">SAVINGS ACCOUNT</span>
+          <span class="account-mask-pill">Account •••• <span id="dash-account-snippet">4829</span></span>
+          <span class="account-status-pill"><span class="user-status-dot"></span> Active</span>
+        </div>
+        <button class="balance-visibility-btn" id="toggle-balance-visibility" type="button" aria-label="Toggle balance visibility" title="Toggle balance visibility">
+          <span class="visibility-icon" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </span>
+          <span class="visibility-label">Hide</span>
+        </button>
       </div>
-      <div class="metric-value-wrap">
-        <strong class="metric-value" id="account-balance">₹0.00</strong>
-      </div>
-      <div class="metric-footer">
-        <span class="balance-sub" id="balance-sub">Updated just now</span>
-        <span class="metric-tag" id="account-type">Savings</span>
+
+      <div class="account-hero-balance-wrap">
+        <span class="balance-eyebrow">Available Liquidity</span>
+        <div class="balance-display-row">
+          <strong class="balance-amount num" id="account-balance">₹0.00</strong>
+          <span class="balance-currency-label">INR</span>
+        </div>
+        <div class="balance-timestamp-row">
+          <span class="user-status-dot"></span>
+          <span class="balance-sub" id="balance-sub">Updated just now</span>
+          <!-- Hidden fallback for JS bindings -->
+          <span id="account-type" style="display: none;">Savings</span>
+        </div>
       </div>
     </div>
 
-    <!-- Total Deposits -->
-    <div class="dash-metric-card">
-      <div class="metric-top">
-        <span class="metric-label">Total Deposits</span>
-        <span class="metric-icon-badge deposit">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        </span>
+    <!-- Integrated Telemetry Strip (Divided Rows, Minimalist) -->
+    <div class="account-hero-telemetry">
+      <div class="telemetry-col">
+        <span class="telemetry-label">Total Inflows</span>
+        <strong class="telemetry-value text-success num" id="dashboard-total-deposits">₹0.00</strong>
+        <span class="telemetry-sub">Deposits & incoming transfers</span>
       </div>
-      <div class="metric-value-wrap">
-        <strong class="metric-value text-success" id="dashboard-total-deposits">₹0.00</strong>
-      </div>
-      <div class="metric-footer">
-        <span class="metric-sub">Total incoming funds</span>
-        <span class="trend-badge positive">Inflow</span>
-      </div>
-    </div>
 
-    <!-- Total Withdrawals -->
-    <div class="dash-metric-card">
-      <div class="metric-top">
-        <span class="metric-label">Total Withdrawals</span>
-        <span class="metric-icon-badge withdrawal">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-        </span>
+      <div class="telemetry-col">
+        <span class="telemetry-label">Total Outflows</span>
+        <strong class="telemetry-value text-danger num" id="dashboard-total-withdrawals">₹0.00</strong>
+        <span class="telemetry-sub">Debits & disbursed transfers</span>
       </div>
-      <div class="metric-value-wrap">
-        <strong class="metric-value text-danger" id="dashboard-total-withdrawals">₹0.00</strong>
-      </div>
-      <div class="metric-footer">
-        <span class="metric-sub">Debits & sent transfers</span>
-        <span class="trend-badge negative">Outflow</span>
-      </div>
-    </div>
 
-    <!-- Net Cashflow & Total Activity -->
-    <div class="dash-metric-card">
-      <div class="metric-top">
-        <span class="metric-label">Net Cash Flow</span>
-        <span class="metric-icon-badge net">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg>
-        </span>
-      </div>
-      <div class="metric-value-wrap">
-        <strong class="metric-value" id="dashboard-net-flow">₹0.00</strong>
-      </div>
-      <div class="metric-footer">
-        <span class="metric-sub"><span id="dashboard-total-tx-count">0</span> transactions</span>
-        <span class="trend-badge neutral" id="dashboard-net-badge">Balanced</span>
+      <div class="telemetry-col">
+        <div class="telemetry-label-row">
+          <span class="telemetry-label">Net Liquidity</span>
+          <span class="trend-badge neutral" id="dashboard-net-badge">Balanced</span>
+        </div>
+        <strong class="telemetry-value num" id="dashboard-net-flow">₹0.00</strong>
+        <span class="telemetry-sub"><span id="dashboard-total-tx-count" class="num">0</span> recorded operations</span>
       </div>
     </div>
   </section>
 
   <!-- Interactive Financial Visualizations -->
   <section class="dash-charts-grid">
+    <!-- Trend Line Chart -->
     <div class="card dash-chart-card main-chart-card">
       <div class="card-header-clean">
         <div>
-          <h3>Monthly Financial Activity</h3>
-          <p class="muted">Inflows vs Outflows overview</p>
+          <h3>Cash Flow Activity</h3>
+          <p class="muted">Monthly comparison of inflows versus outflows</p>
         </div>
-        <div class="chart-legend-custom">
-          <span class="legend-pill"><span class="legend-dot deposit"></span>Deposits</span>
-          <span class="legend-pill"><span class="legend-dot withdrawal"></span>Withdrawals</span>
+        <div class="chart-header-controls">
+          <div class="chart-legend-custom">
+            <span class="legend-pill"><span class="legend-dot deposit"></span>Inflows</span>
+            <span class="legend-pill"><span class="legend-dot withdrawal"></span>Outflows</span>
+          </div>
+          <div class="chart-range-selector">
+            <button class="range-btn active" type="button">6M</button>
+            <button class="range-btn" type="button">1Y</button>
+          </div>
         </div>
       </div>
       <div class="chart-wrapper">
@@ -120,11 +128,12 @@
       </div>
     </div>
 
+    <!-- Cash Flow Allocation / Donut -->
     <div class="card dash-chart-card donut-chart-card">
       <div class="card-header-clean">
         <div>
-          <h3>Cash Flow Ratio</h3>
-          <p class="muted">Income vs Expenditure</p>
+          <h3>Liquidity Allocation</h3>
+          <p class="muted">Capital distribution ratio</p>
         </div>
       </div>
       <div class="donut-wrapper">
@@ -132,27 +141,27 @@
       </div>
       <div class="donut-summary-row" id="donut-summary-row">
         <div class="donut-stat">
-          <span class="donut-label"><span class="legend-dot deposit"></span>Deposits</span>
-          <strong id="donut-inflow-val">₹0.00</strong>
+          <span class="donut-label"><span class="legend-dot deposit"></span>Inflows</span>
+          <strong class="num" id="donut-inflow-val">₹0.00</strong>
         </div>
         <div class="donut-stat">
-          <span class="donut-label"><span class="legend-dot withdrawal"></span>Debits</span>
-          <strong id="donut-outflow-val">₹0.00</strong>
+          <span class="donut-label"><span class="legend-dot withdrawal"></span>Outflows</span>
+          <strong class="num" id="donut-outflow-val">₹0.00</strong>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Middle Grid: Recent Transactions & Quick Beneficiaries -->
+  <!-- Middle Grid: Recent Transactions & Beneficiaries Directory -->
   <section class="dash-content-grid">
     <!-- Recent Transactions Activity -->
     <div class="card dash-activity-card">
       <div class="card-header-clean">
         <div>
           <h3>Recent Transactions</h3>
-          <p class="muted">Latest 5 account movements</p>
+          <p class="muted">Latest account ledger events</p>
         </div>
-        <a class="view-all-link" href="/transactions">View all statements &rarr;</a>
+        <a class="view-all-link" href="/transactions">View full ledger &rarr;</a>
       </div>
       <div class="dash-transactions-list" id="recent-transactions">
         <div class="loading-state">
@@ -162,55 +171,58 @@
       </div>
     </div>
 
-    <!-- Quick Transfer / Recent Beneficiaries -->
+    <!-- Quick Beneficiaries Directory -->
     <div class="card dash-beneficiaries-card">
       <div class="card-header-clean">
         <div>
-          <h3>Saved Beneficiaries</h3>
-          <p class="muted">Quick send to saved recipients</p>
+          <h3>Saved Recipients</h3>
+          <p class="muted">Quick send to authorized payees</p>
         </div>
-        <a class="view-all-link" href="/beneficiaries">Manage &rarr;</a>
+        <a class="view-all-link" href="/beneficiaries">Manage directory &rarr;</a>
       </div>
       <div class="dash-beneficiaries-list" id="dash-beneficiaries-list">
         <div class="loading-state">
-          <span>Loading beneficiaries...</span>
+          <span>Loading recipients...</span>
         </div>
       </div>
       <div class="dash-quick-send-cta">
-        <a class="btn ghost btn-sm full-width" href="/transfer">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>Transfer to Other Recipient</span>
+        <a class="btn secondary btn-sm full-width" href="/transfer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Send to New Recipient</span>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Bottom Section: Notifications & Account Summary -->
+  <!-- Bottom Section: Notifications & Account Governance -->
   <section class="dash-bottom-grid">
     <!-- Notifications & Security Feed -->
     <div class="card dash-notifications-card">
       <div class="card-header-clean">
         <div>
-          <h3>Notifications & Activity Log</h3>
-          <p class="muted">Real-time alerts, email confirmations, and system updates</p>
+          <h3>Security & Audit Log</h3>
+          <p class="muted">Real-time alerts, verification logs, and system notices</p>
         </div>
       </div>
       <ul class="notification-feed-list list" id="notification-list">
-        <li class="loading-item">Loading notifications...</li>
+        <li class="loading-item">Loading security logs...</li>
       </ul>
       <div class="pagination" id="notifications-pagination">
-        <button class="btn ghost btn-sm" id="notifications-prev">Previous</button>
+        <button class="btn secondary btn-sm" id="notifications-prev">Previous</button>
         <span class="pagination-page-label" id="notifications-page">Page 1</span>
-        <button class="btn ghost btn-sm" id="notifications-next">Next</button>
+        <button class="btn secondary btn-sm" id="notifications-next">Next</button>
       </div>
     </div>
 
-    <!-- Account Details & Actions -->
+    <!-- Account Details & Governance -->
     <div class="card dash-account-info-card">
       <div class="card-header-clean">
         <div>
-          <h3>Account Information</h3>
-          <p class="muted">Security status and credentials</p>
+          <h3>Account Governance</h3>
+          <p class="muted">Credentials and cryptographic protection</p>
         </div>
       </div>
       <div class="dash-account-details">
@@ -223,18 +235,22 @@
           <span class="detail-value" id="account-email">-</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Account ID</span>
+          <span class="detail-label">Account Identifier</span>
           <code class="detail-code" id="dash-account-id-display">{{ account_id }}</code>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Security Shield</span>
-          <span class="badge-status-active"><span class="user-status-dot"></span> Protected (256-Bit)</span>
+          <span class="detail-label">Security Parameters</span>
+          <span class="badge-status-active"><span class="user-status-dot"></span> SHA-256 / TLS 1.3</span>
         </div>
       </div>
       <div class="dash-account-danger-zone">
-        <button class="btn ghost subtle text-danger btn-sm" id="delete-account" type="button">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-          <span>Delete Account</span>
+        <button class="btn subtle text-danger btn-sm" id="delete-account" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+          </svg>
+          <span>Close Account</span>
         </button>
       </div>
     </div>

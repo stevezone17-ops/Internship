@@ -338,3 +338,4 @@ def test_pin_update_5_and_6_digit_propagates_to_transaction_pin(client):
     ok, err, code = verify_transaction_pin(users_col, user, "654321")
     assert ok is True
     assert err is None
+

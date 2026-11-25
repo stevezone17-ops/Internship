@@ -179,3 +179,4 @@ def test_export_pdf_flow_and_idor(client):
     # User 1 attempts to export User 2's PDF
     res_idor = client.get(f"/api/transactions/{a2_id}/export/pdf")
     assert res_idor.status_code == 403
+

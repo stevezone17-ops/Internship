@@ -18,3 +18,4 @@ services:
         generateValue: true
       - key: SCHEDULED_TRANSFER_TOKEN
         generateValue: true
+

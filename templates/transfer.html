@@ -5,8 +5,8 @@
     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
       <div>
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-          <span class="badge" style="background: rgba(14, 165, 233, 0.1); color: var(--accent); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 9999px;">Money Transfer</span>
-          <span style="font-size: 0.8rem; color: var(--text-tertiary);">• Direct Bank Wire</span>
+          <span class="badge" style="background: var(--brand-subtle); color: var(--brand-primary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px solid rgba(23, 76, 67, 0.15);">Direct Wire</span>
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">• Instant Settlement</span>
         </div>
         <h2 style="font-size: 1.625rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin: 0 0 0.35rem 0;">Send Money</h2>
         <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; max-width: 600px;">Transfer capital directly to any registered account holder with real-time verification and zero platform fees.</p>
@@ -37,8 +37,8 @@
     <div class="card transfer-card" style="padding: 1.75rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-sm);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <div style="width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(59, 130, 246, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--brand-subtle); color: var(--brand-primary); border: 1px solid rgba(23, 76, 67, 0.15); display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"></line>
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
@@ -154,17 +154,17 @@
     <!-- Right Column: Balance Card & Transfer Summary -->
     <div style="display: flex; flex-direction: column; gap: 1.25rem;">
       <!-- Available Balance Card -->
-      <div class="card" id="balance-card" style="padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--card) 0%, rgba(59, 130, 246, 0.05) 100%); box-shadow: var(--shadow-sm);">
+      <div class="card" id="balance-card" style="padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-xs);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-          <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);">Available Balance</span>
+          <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">Available Balance</span>
           <span class="live-pill" style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; color: var(--success); font-weight: 600;">
             <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block;"></span> Active
           </span>
         </div>
-        <div style="font-size: 2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.4rem;">
-          <strong class="amount" id="transfer-balance">₹--</strong>
+        <div style="font-size: 2rem; font-weight: 800; font-family: var(--font-sans); color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.4rem;">
+          <strong class="amount num" id="transfer-balance">₹--</strong>
         </div>
-        <span class="updated-time" id="balance-updated-time" style="font-size: 0.75rem; color: var(--text-tertiary); display: block;">Reconciling with ledger...</span>
+        <span class="updated-time" id="balance-updated-time" style="font-size: 0.75rem; color: var(--text-secondary); display: block;">Reconciling with ledger...</span>
       </div>
 
       <!-- Transfer Security & Fee Breakdown -->
@@ -196,7 +196,7 @@
   <div id="transfer-confirm-modal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
     <div class="modal-card" style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); max-width: 460px; width: 100%; padding: 1.75rem; box-shadow: var(--shadow-xl); position: relative;">
       <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
-        <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(59, 130, 246, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+        <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--brand-subtle); color: var(--brand-primary); border: 1px solid rgba(23, 76, 67, 0.15); display: flex; align-items: center; justify-content: center;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
@@ -210,11 +210,11 @@
       <div style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem;">
           <span style="color: var(--text-secondary);">Recipient</span>
-          <strong id="modal-recipient" style="color: var(--text-primary); font-family: 'JetBrains Mono', monospace; word-break: break-all;">--</strong>
+          <strong id="modal-recipient" style="color: var(--text-primary); font-family: var(--font-mono); word-break: break-all;">--</strong>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem;">
           <span style="color: var(--text-secondary);">Transfer Amount</span>
-          <strong id="modal-amount" style="color: var(--accent); font-size: 1.1rem; font-family: 'JetBrains Mono', monospace;">₹0.00</strong>
+          <strong id="modal-amount" class="num" style="color: var(--brand-primary); font-size: 1.1rem; font-family: var(--font-sans);">₹0.00</strong>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem;">
           <span style="color: var(--text-secondary);">Processing Fee</span>

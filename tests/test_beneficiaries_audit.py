@@ -122,3 +122,4 @@ def test_list_and_delete_beneficiary_idor(client):
     del_own = client.delete(f"/api/beneficiaries/{b2_id}")
     assert del_own.status_code == 200
     assert beneficiaries_col.find_one({"_id": ObjectId(b2_id)}) is None
+
